@@ -1,0 +1,17 @@
+type tensor : [1 1 1 2]
+type tensor3 : [12 34 17]
+type tensor4 : [34 17 28 42]
+type tensor6 : [12 17 12 34 28 42]
+
+var a : tensor3
+var b : tensor3
+var c : tensor4
+var d : tensor6
+var x : tensor
+var A : tensor
+var v : tensor
+
+v = a * b * c . [[2 3] [6 8]]
+v = d * b * c . [[2 3] [6 8]]
+
+v = A * x
