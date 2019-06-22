@@ -5,31 +5,51 @@
 %defines
 
 /* %define api.value.type variant */
+/* generate a pure (i.e. re-entrant) parser: */
+%define api.pure full
+
+%param { yyscan_t yyscanner }
+%parse-param { const Program *&root }
 
 %{
 
   #include <stdio.h>
 
-  extern int yydebug;
-
-  extern FILE *yyin;
-
-  int yylex();
-  void yyerror(const char*);
-
-  void yyerror(const char *msg) {
-    fprintf(stderr, "%s\n", msg);
-  }
-
   #include "AST.h"
 
-  const NODE_PTR root;
+  typedef void* yyscan_t;
+
+  #include "lang.tab.hh"
+  #include "lex.yy.h"
+
+  //extern int yydebug;
+
+  //extern FILE *yyin;
+
+  //int yylex();
+  //void yyerror(const char*);
+
+  void yyerror(yyscan_t scanner, const Program *root, const char *msg) {
+    fprintf(stderr, "%s\n", msg);
+  }
 %}
 
 %union {
-  NODE_PTR node;
-  const char *string;
-  int integer;
+  const Program *program;
+  DeclList *decls;
+  StmtList *stmts;
+  ExprList *exprs;
+  const Decl *decl;
+  const Stmt *stmt;
+  const Expr *expr;
+  const Factor *factor;
+  const BinaryExpr *binary;
+  const Identifier *identifier;
+  const Integer *integer;
+  const BrackExpr *brack;
+  const ParenExpr *paren;
+  const char *string_literal;
+  int integer_literal;
 }
 
 %token KW_VAR
@@ -42,58 +62,66 @@
 %token STAR
 %token DOT
 %token EQUAL
-%token <integer> INT
-%token <string> ID
+%token <integer_literal> INT
+%token <string_literal> ID
 
 %start program
 
-%type <node> program
-%type <node> decl_list decl var_decl type_decl
-%type <node> stmt_list stmt
-%type <node> type_expr expr factor identifier integer brack_expr paren_expr expr_list
+%type <program> program
+%type <decls> decl_list
+%type <decl> decl var_decl type_decl
+%type <stmts> stmt_list
+%type <stmt> stmt
+%type <expr> type_expr expr
+%type <factor> factor
+%type <identifier> identifier
+%type <integer> integer
+%type <brack> brack_expr
+%type <paren> paren_expr
+%type <exprs> expr_list
 
 %%
 
 /* BNF GRAMMAR RULES */
 
-program : decl_list stmt_list { root = createProgram($1, $2); }
+program : decl_list stmt_list { root = Program::create($1, $2); }
 
-decl_list : decl_list decl { $$ = appendDeclList($1, $2); }
-          | decl  { $$ = createDeclList($1); }
+decl_list : decl_list decl { $$ = DeclList::append($1, $2); }
+          | decl  { $$ = DeclList::create($1); }
 
 decl : var_decl
      | type_decl
 
-var_decl : KW_VAR identifier COLON type_expr { $$ = createVarDecl($2, $4); }
+var_decl : KW_VAR identifier COLON type_expr { $$ = Decl::create(NT_VarDecl, $2, $4); }
 
-type_decl : KW_TYPE identifier COLON type_expr { $$ = createTypeDecl($2, $4); }
+type_decl : KW_TYPE identifier COLON type_expr { $$ = Decl::create(NT_TypeDecl, $2, $4); }
 
-stmt_list : stmt_list stmt { $$ = appendStmtList($1, $2); }
-          | stmt { $$ = createStmtList($1); }
+stmt_list : stmt_list stmt { $$ = StmtList::append($1, $2); }
+          | stmt { $$ = StmtList::create($1); }
 
-stmt : identifier EQUAL expr { $$ = createStmt($1, $3); }
+stmt : identifier EQUAL expr { $$ = Stmt::create($1, $3); }
 
 type_expr : expr
 
-expr : expr STAR factor { $$ = createTensorExpr($1, $3); }
-     | expr DOT factor { $$ = createDotExpr($1, $3); }
-     | factor
+expr : expr STAR factor { $$ = BinaryExpr::create(NT_TensorExpr, $1, $3); }
+     | expr DOT factor { $$ = BinaryExpr::create(NT_DotExpr, $1, $3); }
+     | factor { $$ = (const Expr *)$1; }
 
-factor : identifier
-       | integer
-       | brack_expr
-       | paren_expr
+factor : identifier { $$ = (const Factor *)$1; }
+       | integer { $$ = (const Factor *)$1; }
+       | brack_expr { $$ = (const Factor *)$1; }
+       | paren_expr { $$ = (const Factor *)$1; }
 
-identifier : ID { $$ = createIdentifier($1); }
+identifier : ID { $$ = Identifier::create($1); }
 
-integer : INT { $$ = createInteger($1); }
+integer : INT { $$ = Integer::create($1); }
      
-brack_expr : LBRACK expr_list RBRACK { $$ = createBrackExpr($2); }
+brack_expr : LBRACK expr_list RBRACK { $$ = BrackExpr::create($2); }
        
-paren_expr : LPAREN expr RPAREN { $$ = createParenExpr($2); }
+paren_expr : LPAREN expr RPAREN { $$ = ParenExpr::create($2); }
 
-expr_list : /* empty */ { $$ = createExprList(); }
-          | expr_list expr { $$ = appendExprList($1, $2); }
+expr_list : /* empty */ { $$ = ExprList::create(); }
+          | expr_list expr { $$ = ExprList::append($1, $2); }
 
 %%
 
@@ -102,7 +130,9 @@ expr_list : /* empty */ { $$ = createExprList(); }
 
 int main(int argc, char* argv[]) {
   FILE *in;
+  yyscan_t scanner;
   int result;
+  const Program *program;
 
   if (argc != 2) {
     return 1;
@@ -114,16 +144,21 @@ int main(int argc, char* argv[]) {
 
   yydebug = 1;
 
-  yyin = in;
-  result = yyparse();
+  if (yylex_init(&scanner)) {
+    return 3;
+  }
+
+  yyset_in(in, scanner);
+  result = yyparse(scanner, program);
 
   fclose(in);
+  yylex_destroy(scanner);
 
   if (result)
     return result;
 
-  dumpAST(root);
-  destroyAST(root);
+  program->dump();
+  Program::destroy(program);
 
   return 0;
 }
