@@ -1,20 +1,19 @@
 #include <fstream>
 #include <iostream>
 
-#include "Parser.h"
+#include "tir/Parse/Parser.h"
+#include "tir/Sema/Sema.h"
 
 int main(int argc, char *argv[]) {
 
   std::ifstream in_file;
+
   if (argc != 2) {
-    std::cout << "Usage: Parse [input file]... " << '\n';
-    return -1;
+    return 1;
   } else {
     in_file.open(argv[1]);
-    if (!in_file.is_open()) {
-      std::cout << "Error! Fail to open " << argv[1] << '\n';
-      return -1;
-    }
+    if (!in_file.is_open())
+      return 2;
   }
 
   std::filebuf *file_buf = in_file.rdbuf();
@@ -33,6 +32,9 @@ int main(int argc, char *argv[]) {
   }
 
   parser.getAST()->dump();
+
+  Sema().visitProgram(parser.getAST());
+
   Program::destroy(parser.getAST());
 
   delete[] input;

@@ -1,10 +1,10 @@
 #ifndef __AST_H__
 #define __AST_H__
 
-#include <cassert>
 #include <map>
 #include <string>
 #include <vector>
+#include <cassert>
 
 enum NodeType {
   NT_Program,

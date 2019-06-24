@@ -4,8 +4,8 @@
 #include <map>
 #include <string>
 
-#include "AST.h"
-#include "Type.h"
+#include "tir/AST/AST.h"
+#include "tir/Sema/Type.h"
 
 enum SymbolKind { SK_Variable, SK_Type, SK_SYMBOLKIND_COUNT };
 

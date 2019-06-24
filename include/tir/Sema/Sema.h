@@ -4,9 +4,9 @@
 #include <list>
 #include <map>
 
-#include "AST.h"
-#include "Symbol.h"
-#include "Type.h"
+#include "tir/AST/AST.h"
+#include "tir/Sema/Symbol.h"
+#include "tir/Sema/Type.h"
 
 class Sema : public ASTVisitor {
 private:

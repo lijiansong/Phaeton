@@ -2,22 +2,27 @@
 /* %skeleton "lalr1.cc" */
 
 /* generate header file: */
-%defines
 
 /* %define api.value.type variant */
 /* generate a pure (i.e. re-entrant) parser: */
 %define api.pure full
 
 %param { yyscan_t yyscanner }
-%parse-param { const Program *&root }
+%parse-param {Program const *&root }
+
+%code requires {
+  #include "tir/AST/AST.h"
+
+  typedef void* yyscan_t;
+}
 
 %{
 
   #include <stdio.h>
 
-  #include "AST.h"
+  //#include "tir/AST/AST.h"
 
-  typedef void* yyscan_t;
+  //typedef void* yyscan_t;
 
   #include "lang.tab.hh"
   #include "lex.yy.h"
@@ -127,7 +132,7 @@ expr_list : /* empty */ { $$ = ExprList::create(); }
 
 
 #ifdef _PARSER_DEBUG_
-
+#if 0
 int main(int argc, char* argv[]) {
   FILE *in;
   yyscan_t scanner;
@@ -162,5 +167,5 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-
+#endif
 #endif /* _PARSER_DEBUG_ */

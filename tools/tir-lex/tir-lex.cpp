@@ -1,19 +1,21 @@
 #include <fstream>
 #include <iostream>
 
-#include "Parser.h"
-#include "Sema.h"
+#include "tir/Parse/Lexer.h"
 
 int main(int argc, char *argv[]) {
 
   std::ifstream in_file;
 
   if (argc != 2) {
-    return 1;
+    std::cout << "Usage: Lex [input file]... " << '\n';
+    return -1;
   } else {
     in_file.open(argv[1]);
-    if (!in_file.is_open())
-      return 2;
+    if (!in_file.is_open()) {
+      std::cout << "Error! Fail to open " << argv[1] << '\n';
+      return -1;
+    }
   }
 
   std::filebuf *file_buf = in_file.rdbuf();
@@ -26,16 +28,15 @@ int main(int argc, char *argv[]) {
 
   in_file.close();
 
-  Parser parser(input);
-  if (parser.parse()) {
-    return 3;
+  Lexer lexer(input);
+  while (1) {
+    int token = lexer.lex();
+    if (token == EOF)
+      break;
+
+    std::cout << Lexer::getTokenString(token) << ' ';
   }
-
-  parser.getAST()->dump();
-
-  Sema().visitProgram(parser.getAST());
-
-  Program::destroy(parser.getAST());
+  std::cout << '\n';
 
   delete[] input;
 

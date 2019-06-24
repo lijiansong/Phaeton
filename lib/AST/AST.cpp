@@ -2,10 +2,10 @@
 #include <iostream>
 #include <string>
 
-#include "AST.h"
+#include "tir/AST/AST.h"
 
 #undef FORMAT_INDENT
-#define FORMAT_INDENT(indent)                                                    \
+#define FORMAT_INDENT(indent)                                                  \
   {                                                                            \
     std::cout.width((indent));                                                 \
     std::cout << std::left << "";                                              \

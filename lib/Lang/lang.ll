@@ -10,7 +10,7 @@
 %option reentrant bison-bridge
 
 /* generate a C header file: */
-%option header-file="lex.yy.h"
+/*%option header-file="lex.yy.h"*/
 
 %{
 
@@ -18,7 +18,7 @@
   #include <stdlib.h>
   #include <assert.h>
 
-  #include "AST.h"
+  #include "tir/AST/AST.h"
 
   #include "lang.tab.hh"
 
@@ -82,7 +82,7 @@ ID        [_a-zA-Z][_a-zA-Z0-9]*
 %%
 
 #ifdef _LEXER_DEBUG_
-
+#if 0
 int main(int argc, char* argv[]) {
   FILE *in;
   int tok;
@@ -117,5 +117,5 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-
+#endif
 #endif /* _LEXER_DEBUG_ */

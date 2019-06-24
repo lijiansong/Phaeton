@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "Sema.h"
-#include "Symbol.h"
-#include "Type.h"
+#include "tir/Sema/Sema.h"
+#include "tir/Sema/Symbol.h"
+#include "tir/Sema/Type.h"
 
 #define TYPE_MAP_ASSERT(expr)                                                  \
   {                                                                            \

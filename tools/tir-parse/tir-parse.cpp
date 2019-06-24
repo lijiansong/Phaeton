@@ -1,14 +1,13 @@
 #include <fstream>
 #include <iostream>
 
-#include "Lexer.h"
+#include "tir/Parse/Parser.h"
 
 int main(int argc, char *argv[]) {
 
   std::ifstream in_file;
-
   if (argc != 2) {
-    std::cout << "Usage: Lex [input file]... " << '\n';
+    std::cout << "Usage: Parse [input file]... " << '\n';
     return -1;
   } else {
     in_file.open(argv[1]);
@@ -28,15 +27,13 @@ int main(int argc, char *argv[]) {
 
   in_file.close();
 
-  Lexer lexer(input);
-  while (1) {
-    int token = lexer.lex();
-    if (token == EOF)
-      break;
-
-    std::cout << Lexer::getTokenString(token) << ' ';
+  Parser parser(input);
+  if (parser.parse()) {
+    return -1;
   }
-  std::cout << '\n';
+
+  parser.getAST()->dump();
+  Program::destroy(parser.getAST());
 
   delete[] input;
 
