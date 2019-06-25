@@ -1,18 +1,18 @@
 #ifndef __CODEGEN_H__
 #define __CODEGEN_H__
 
-#include <vector>
 #include <list>
 #include <map>
+#include <vector>
 
 #include "tir/AST/AST.h"
 #include "tir/Sema/Sema.h"
 
 class CodeGen : public ASTVisitor {
 public:
-  typedef std::vector<int> List;
-  typedef std::vector<int> Tuple;
-  typedef std::vector<Tuple> TupleList;
+  using List = std::vector<int>;
+  using Tuple = std::vector<int>;
+  using TupleList = std::vector<Tuple>;
 
   static bool isPairList(const TupleList &list);
 
