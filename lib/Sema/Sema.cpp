@@ -19,7 +19,7 @@ bool Sema::isTypeName(const Expr *e, const TensorType *&type) const {
   if (!id)
     return false;
 
-  Symbol *sym = getSymbol(id->getName());
+  const Symbol *sym = getSymbol(id->getName());
   if (!sym || (sym->getKind() != SK_Type))
     return false;
 
@@ -114,16 +114,6 @@ void Sema::visitStmt(const Stmt *s) {
   }
 }
 
-void Sema::visitExpr(const Expr *e) {
-  e->visit(this);
-  TYPE_MAP_ASSERT(e)
-}
-
-void Sema::visitFactor(const Factor *f) {
-  f->visit(this);
-  TYPE_MAP_ASSERT(f);
-}
-
 void Sema::visitBinaryExpr(const BinaryExpr *be) {
   switch (be->getNodeType()) {
   case NT_TensorExpr: {
@@ -155,6 +145,8 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
     std::vector<std::vector<int>> lists;
     if (!isListOfLists(be->getRight(), lists))
       assert(0 && "semantic error: right member of contraction not a list");
+    if (lists.empty())
+      assert(0 && "semantic error: contracting over empty index list");
 
     std::vector<int> res;
     for (int i = 0; i < type0->getRank(); i++)
@@ -212,17 +204,4 @@ void Sema::visitInteger(const Integer *i) { ExprTypes[i] = scalar; }
 
 void Sema::visitBrackExpr(const BrackExpr *be) {
   assert(0 && "semantic error: list cannot appear in typed expression");
-}
-
-void Sema::visitParenExpr(const ParenExpr *pe) { pe->getExpr()->visit(this); }
-
-template <typename T, NodeType nt, typename Derived>
-void Sema::visitNodeList(const NodeList<T, nt, Derived> *list) {
-  for (const auto &i : *list)
-    i->visit(this);
-}
-
-void Sema::visitProgram(const Program *p) {
-  p->getDecls()->visit(this);
-  p->getStmts()->visit(this);
 }

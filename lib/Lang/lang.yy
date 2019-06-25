@@ -8,7 +8,7 @@
 %define api.pure full
 
 %param { yyscan_t yyscanner }
-%parse-param {Program const *&root }
+%parse-param {const Program *root }
 
 %code requires {
   #include "tir/AST/AST.h"

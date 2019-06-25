@@ -1,10 +1,10 @@
 #ifndef __AST_H__
 #define __AST_H__
 
+#include <cassert>
 #include <map>
 #include <string>
 #include <vector>
-#include <cassert>
 
 enum NodeType {
   NT_Program,
@@ -314,19 +314,27 @@ public:
 class ASTVisitor {
 
 public:
-  virtual void visitProgram(const Program *) = 0;
-  virtual void visitDeclList(const DeclList *) = 0;
-  virtual void visitStmtList(const StmtList *) = 0;
-  virtual void visitExprList(const ExprList *) = 0;
+  virtual void visitProgram(const Program *);
+
+  template <typename T, NodeType nt, typename Derived>
+  void visitNodeList(const NodeList<T, nt, Derived> *list);
+
+#define DECL_VISIT_LIST(Derived)                                               \
+  virtual void visit##Derived(const Derived *list);
+
+  DECL_VISIT_LIST(DeclList)
+  DECL_VISIT_LIST(StmtList)
+  DECL_VISIT_LIST(ExprList)
+
   virtual void visitDecl(const Decl *) = 0;
   virtual void visitStmt(const Stmt *) = 0;
-  virtual void visitExpr(const Expr *) = 0;
-  virtual void visitFactor(const Factor *) = 0;
+  virtual void visitExpr(const Expr *);
+  virtual void visitFactor(const Factor *);
   virtual void visitBinaryExpr(const BinaryExpr *) = 0;
   virtual void visitIdentifier(const Identifier *) = 0;
   virtual void visitInteger(const Integer *) = 0;
   virtual void visitBrackExpr(const BrackExpr *) = 0;
-  virtual void visitParenExpr(const ParenExpr *) = 0;
+  virtual void visitParenExpr(const ParenExpr *);
 };
 
 #endif /* __AST_H__ */

@@ -8,8 +8,8 @@ PARSER_DEBUG=-D_PARSER_DEBUG_ -DYYDEBUG=1
 
 LEXER=lexer
 PARSER=parser
-LEX=Lex
-PARSE=Parse
+LEX=tir-lex
+PARSE=tir-parse
 COMPILE=Compile
 
 all: $(LEXER) $(PARSER) $(LEX) $(PARSE) $(COMPILE)

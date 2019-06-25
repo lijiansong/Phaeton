@@ -3,6 +3,7 @@
 
 #include "tir/Parse/Parser.h"
 #include "tir/Sema/Sema.h"
+#include "tir/CodeGen/CodeGen.h"
 
 int main(int argc, char *argv[]) {
 
@@ -31,13 +32,16 @@ int main(int argc, char *argv[]) {
     return 3;
   }
 
-  parser.getAST()->dump();
+  //parser.getAST()->dump();
+  delete [] input;
 
-  Sema().visitProgram(parser.getAST());
+  Sema sema;
+  sema.visitProgram(parser.getAST());
+  NumpyCodeGen npcg(&sema);
+  npcg.visitProgram(parser.getAST());
+  std::cout << npcg.getCode();
 
   Program::destroy(parser.getAST());
-
-  delete[] input;
 
   return 0;
 }

@@ -5,8 +5,8 @@
 #include <map>
 
 #include "tir/AST/AST.h"
-#include "tir/Sema/Symbol.h"
 #include "tir/Sema/Type.h"
+#include "tir/Sema/Symbol.h"
 
 class Sema : public ASTVisitor {
 private:
@@ -47,14 +47,17 @@ public:
     return createType(dims);
   }
 
-  Symbol *createSymbol(SymbolKind k, const std::string &name,
-                       const TensorType &type, const Decl *decl = nullptr) {
+  const TensorType *getType(const Expr *e) const { return ExprTypes.at(e); }
+
+  const Symbol *createSymbol(SymbolKind k, const std::string &name,
+                             const TensorType &type,
+                             const Decl *decl = nullptr) {
     Symbol *sym = new Symbol(k, name, type, decl);
     Symbols.addSymbol(sym);
     return sym;
   }
 
-  Symbol *getSymbol(const std::string &name) const {
+  const Symbol *getSymbol(const std::string &name) const {
     Symbol *sym;
     if (!Symbols.getSymbol(name, sym))
       return nullptr;
@@ -71,26 +74,10 @@ public:
   virtual void visitDecl(const Decl *d) override;
   virtual void visitStmt(const Stmt *s) override;
 
-  virtual void visitExpr(const Expr *e) override;
-  virtual void visitFactor(const Factor *f) override;
   virtual void visitBinaryExpr(const BinaryExpr *be) override;
   virtual void visitIdentifier(const Identifier *id) override;
   virtual void visitInteger(const Integer *i) override;
   virtual void visitBrackExpr(const BrackExpr *be) override;
-  virtual void visitParenExpr(const ParenExpr *pe) override;
-
-  template <typename T, NodeType nt, typename Derived>
-  void visitNodeList(const NodeList<T, nt, Derived> *list);
-
-#define VISIT_LIST(Derived)                                                    \
-  virtual void visit##Derived(const Derived *list) override {                  \
-    visitNodeList(list);                                                       \
-  }
-  VISIT_LIST(DeclList)
-  VISIT_LIST(StmtList)
-  VISIT_LIST(ExprList)
-
-  virtual void visitProgram(const Program *prog) override;
 };
 
 #endif /* !__SEMA_H__ */
