@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
 
-#include "tir/Parse/Lexer.h"
+#include "tir/Lex/Lexer.h"
 
 using TokenStrType = std::map<int, const std::string>;
 

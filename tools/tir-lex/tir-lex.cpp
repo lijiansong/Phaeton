@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "tir/Parse/Lexer.h"
+#include "tir/Lex/Lexer.h"
 
 int main(int argc, char *argv[]) {
 

@@ -2,9 +2,10 @@
 #define __PARSER_H__
 
 #include "tir/AST/AST.h"
-#include "tir/Parse/Lexer.h"
+#include "tir/Lex/Lexer.h"
 
 #include "lang.tab.hh"
+#include "lex.yy.h"
 
 class Parser {
 private:
