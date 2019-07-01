@@ -55,10 +55,13 @@
   const ParenExpr *paren;
   const char *string_literal;
   int integer_literal;
+  int in_out_spec;
 }
 
 %token KW_VAR
 %token KW_TYPE
+%token KW_INPUT
+%token KW_OUTPUT
 %token COLON
 %token LPAREN
 %token RPAREN
@@ -84,6 +87,7 @@
 %type <brack> brack_expr
 %type <paren> paren_expr
 %type <exprs> expr_list
+%type <in_out_spec> in_out_spec
 
 %%
 
@@ -97,7 +101,15 @@ decl_list : decl_list decl { $$ = DeclList::append($1, $2); }
 decl : var_decl
      | type_decl
 
-var_decl : KW_VAR identifier COLON type_expr { $$ = Decl::create(NT_VarDecl, $2, $4); }
+var_decl : KW_VAR in_out_spec identifier COLON type_expr {
+         $$ = Decl::create(NT_VarDecl,
+                           $3, $5,
+                           (InOutSpecifier)$2);
+         }
+
+in_out_spec : /* empty */      { $$ = IO_Empty; }
+       | KW_INPUT in_out_spec  { $$ = IO_Input | $2; }
+       | KW_OUTPUT in_out_spec { $$ = IO_Output | $2; }
 
 type_decl : KW_TYPE identifier COLON type_expr { $$ = Decl::create(NT_TypeDecl, $2, $4); }
 

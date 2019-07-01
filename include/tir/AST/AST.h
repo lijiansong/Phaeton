@@ -28,6 +28,12 @@ enum NodeType {
   NT_NODETYPE_COUNT
 };
 
+enum InOutSpecifier {
+  IO_Empty  = 0,
+  IO_Input  = 1 << 0,
+  IO_Output = 1 << 1,
+};
+
 class ASTVisitor;
 
 class Node {
@@ -250,29 +256,33 @@ public:
 };
 
 class Decl : public Node {
-private:
-  const Identifier *Id;
-  const Expr *TypeExpr;
-
 public:
-  Decl(NodeType nt, const Identifier *id, const Expr *expr)
-      : Node(nt), Id(id), TypeExpr(expr) {
+
+  Decl(NodeType nt, const Identifier *id, const Expr *expr, InOutSpecifier iospec = IO_Empty)
+      : Node(nt), Id(id), TypeExpr(expr), InOutSpec(iospec) {
     assert(nt == NT_VarDecl || nt == NT_TypeDecl);
   }
 
   const Identifier *getIdentifier() const { return Id; }
   const Expr *getTypeExpr() const { return TypeExpr; }
+  const InOutSpecifier getInOutSpecifier() const { return InOutSpec; }
 
   virtual void _delete() const final;
 
   virtual void dump(unsigned int indent = 0) const final;
 
   static const Decl *create(NodeType nt, const Identifier *id,
-                            const Expr *expr) {
-    return new Decl(nt, id, expr);
+                            const Expr *expr, InOutSpecifier iospec = IO_Empty) {
+    return new Decl(nt, id, expr, iospec);
   }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  const Identifier *Id;
+  const Expr *TypeExpr;
+  const InOutSpecifier InOutSpec;
+
 };
 
 class DeclList : public NodeList<const Decl, NT_DeclList, DeclList> {

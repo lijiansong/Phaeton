@@ -122,7 +122,14 @@ void Decl::dump(unsigned indent) const {
   std::string str = NodeLabel[getNodeType()];
 
   FORMAT_INDENT(indent)
-  std::cout << "(" << str << "\n";
+  std::cout << "(" << str;
+  if (getNodeType() == NT_VarDecl) {
+    if (getInOutSpecifier() & IO_Input)
+      std::cout << " in";
+    if (getInOutSpecifier() & IO_Output)
+      std::cout << " out";
+  }
+  std::cout << '\n';
   Id->dump(indent + str.length() + 1);
   TypeExpr->dump(indent + str.length() + 1);
   FORMAT_INDENT(indent + 1)

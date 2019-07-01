@@ -24,18 +24,20 @@
 
   const char *get_token_string(int tok) {
     switch(tok) {
-    case KW_VAR: return "KW_VAR";
-    case KW_TYPE: return "KW_TYPE";
-    case COLON: return "COLON";
-    case LPAREN: return "LPAREN";
-    case RPAREN: return "RPAREN";
-    case LBRACK: return "LBRACK";
-    case RBRACK: return "RBRACK";
-    case STAR: return "STAR";
-    case DOT: return "DOT";
-    case EQUAL: return "EQUAL";
-    case INT: return "INT";
-    case ID: return "ID";
+    case KW_VAR:    return "KW_VAR";
+    case KW_TYPE:   return "KW_TYPE";
+    case KW_INPUT:  return "KW_INPUT";
+    case KW_OUTPUT: return "KW_OUTPUT";
+    case COLON:     return "COLON";
+    case LPAREN:    return "LPAREN";
+    case RPAREN:    return "RPAREN";
+    case LBRACK:    return "LBRACK";
+    case RBRACK:    return "RBRACK";
+    case STAR:      return "STAR";
+    case DOT:       return "DOT";
+    case EQUAL:     return "EQUAL";
+    case INT:       return "INT";
+    case ID:        return "ID";
     default:
       assert(0 && "invalid token");
       return NULL;
@@ -45,6 +47,8 @@
 
 KW_VAR    "var"
 KW_TYPE   "type"
+KW_INPUT  "in"
+KW_OUTPUT "out"
 COLON     ":"
 LPAREN    "("
 RPAREN    ")"
@@ -58,26 +62,28 @@ ID        [_a-zA-Z][_a-zA-Z0-9]*
 
 %%
 
-{KW_VAR}  { return KW_VAR; }
-{KW_TYPE} { return KW_TYPE; }
-{COLON}   { return COLON; }
-{LPAREN}  { return LPAREN; }
-{RPAREN}  { return RPAREN; }
-{LBRACK}  { return LBRACK; }
-{RBRACK}  { return RBRACK; }
-{STAR}    { return STAR; }
-{DOT}     { return DOT; }
-{EQUAL}   { return EQUAL; }
-{INT}     { 
-            yylval->integer_literal = atoi(yytext);
-            return INT;
-          }
-{ID}      {
-            yylval->string_literal = yytext;
-            return ID;
-          }
-<<EOF>>   { return EOF; }
-[ \t\n]+  /* ignore whitespace */ 
+{KW_VAR}     { return KW_VAR; }
+{KW_TYPE}    { return KW_TYPE; }
+{KW_INPUT}   { return KW_INPUT; }
+{KW_OUTPUT}  { return KW_OUTPUT; }
+{COLON}      { return COLON; }
+{LPAREN}     { return LPAREN; }
+{RPAREN}     { return RPAREN; }
+{LBRACK}     { return LBRACK; }
+{RBRACK}     { return RBRACK; }
+{STAR}       { return STAR; }
+{DOT}        { return DOT; }
+{EQUAL}      { return EQUAL; }
+{INT}        {
+               yylval->integer_literal = atoi(yytext);
+               return INT;
+             }
+{ID}         {
+               yylval->string_literal = yytext;
+               return ID;
+             }
+<<EOF>>      { return EOF; }
+[ \t\n]+     /* ignore whitespace */
 
 %%
 
