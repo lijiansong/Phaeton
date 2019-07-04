@@ -35,6 +35,11 @@
     case RBRACK:    return "RBRACK";
     case STAR:      return "STAR";
     case DOT:       return "DOT";
+    case ADD:       return "ADD";
+    case SUB:       return "SUB";
+    case MUL:       return "MUL";
+    case DIV:       return "DIV";
+    case PRODUCT:   return "PRODUCT";
     case EQUAL:     return "EQUAL";
     case INT:       return "INT";
     case ID:        return "ID";
@@ -57,6 +62,11 @@ RBRACK    "]"
 STAR      "*"
 EQUAL     "="
 DOT       "."
+ADD       "+"
+SUB       "-"
+MUL       "*"
+DIV       "/"
+PRODUCT   "#"
 INT       [0-9]+
 ID        [_a-zA-Z][_a-zA-Z0-9]*
 
@@ -73,6 +83,11 @@ ID        [_a-zA-Z][_a-zA-Z0-9]*
 {RBRACK}     { return RBRACK; }
 {STAR}       { return STAR; }
 {DOT}        { return DOT; }
+{ADD}        { return ADD; }
+{SUB}        { return SUB; }
+{MUL}        { return MUL; }
+{DIV}        { return DIV; }
+{PRODUCT}    { return PRODUCT; }
 {EQUAL}      { return EQUAL; }
 {INT}        {
                yylval->integer_literal = atoi(yytext);

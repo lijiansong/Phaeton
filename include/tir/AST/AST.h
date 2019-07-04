@@ -20,6 +20,12 @@ enum NodeType {
 
   NT_TensorExpr,
   NT_DotExpr,
+  NT_AddExpr,
+  NT_SubExpr,
+  NT_MulExpr,
+  NT_DivExpr,
+  NT_ProductExpr,
+  NT_ContractionExpr,
   NT_Identifier,
   NT_Integer,
   NT_BrackExpr,
@@ -115,23 +121,24 @@ public:
 class BinaryExpr : public Expr {
 private:
   const Expr *LeftExpr;
-  const Factor *RightFactor;
+  const Expr *RightExpr;
 
 public:
-  BinaryExpr(NodeType nt, const Expr *left, const Factor *right)
-      : Expr(nt), LeftExpr(left), RightFactor(right) {
-    assert(nt == NT_TensorExpr || nt == NT_DotExpr);
+  BinaryExpr(NodeType nt, const Expr *left, const Expr *right)
+      : Expr(nt), LeftExpr(left), RightExpr(right) {
+    assert(nt == NT_ContractionExpr || nt == NT_AddExpr || nt == NT_SubExpr ||
+           nt == NT_MulExpr || nt == NT_DivExpr || nt == NT_ProductExpr);
   }
 
   const Expr *getLeft() const { return LeftExpr; }
-  const Factor *getRight() const { return RightFactor; }
+  const Expr *getRight() const { return RightExpr; }
 
   virtual void _delete() const final;
 
   virtual void dump(unsigned indent = 0) const final;
 
   static BinaryExpr *create(NodeType nt, const Expr *left,
-                            const Factor *right) {
+                            const Expr *right) {
     return new BinaryExpr(nt, left, right);
   }
 

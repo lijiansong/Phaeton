@@ -64,7 +64,7 @@ void BinaryExpr::dump(unsigned indent) const {
   FORMAT_INDENT(indent)
   std::cout << "(" << str << "\n";
   LeftExpr->dump(indent + str.length() + 1);
-  RightFactor->dump(indent + str.length() + 1);
+  RightExpr->dump(indent + str.length() + 1);
   FORMAT_INDENT(indent + 1)
   std::cout << ")\n";
 }
@@ -73,8 +73,8 @@ void BinaryExpr::_delete() const {
   LeftExpr->_delete();
   delete LeftExpr;
 
-  RightFactor->_delete();
-  delete RightFactor;
+  RightExpr->_delete();
+  delete RightExpr;
 }
 
 void BinaryExpr::visit(ASTVisitor *v) const { v->visitBinaryExpr(this); }

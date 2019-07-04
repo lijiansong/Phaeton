@@ -69,6 +69,11 @@
 %token RBRACK
 %token STAR
 %token DOT
+%token ADD
+%token SUB
+%token MUL
+%token DIV
+%token PRODUCT
 %token EQUAL
 %token <integer_literal> INT
 %token <string_literal> ID
@@ -80,13 +85,12 @@
 %type <decl> decl var_decl type_decl
 %type <stmts> stmt_list
 %type <stmt> stmt
-%type <expr> type_expr expr
-%type <factor> factor
+%type <expr> type_expr contract_expr expr term factor atom
 %type <identifier> identifier
 %type <integer> integer
 %type <brack> brack_expr
 %type <paren> paren_expr
-%type <exprs> expr_list
+%type <exprs> contract_expr_list
 %type <in_out_spec> in_out_spec
 
 %%
@@ -120,26 +124,45 @@ stmt : identifier EQUAL expr { $$ = Stmt::create($1, $3); }
 
 type_expr : expr
 
-expr : expr STAR factor { $$ = BinaryExpr::create(NT_TensorExpr, $1, $3); }
-     | expr DOT factor { $$ = BinaryExpr::create(NT_DotExpr, $1, $3); }
-     | factor { $$ = (const Expr *)$1; }
+expr : term
+     | term ADD expr { $$ = BinaryExpr::create(NT_AddExpr, $1, $3); }
+     | term SUB expr { $$ = BinaryExpr::create(NT_SubExpr, $1, $3); }
 
-factor : identifier { $$ = (const Factor *)$1; }
-       | integer { $$ = (const Factor *)$1; }
-       | brack_expr { $$ = (const Factor *)$1; }
-       | paren_expr { $$ = (const Factor *)$1; }
+term : factor
+     | factor MUL term {
+         $$ = BinaryExpr::create(NT_MulExpr, $1, $3);
+       }
+     | factor DIV term {
+         $$ = BinaryExpr::create(NT_DivExpr, $1, $3);
+       }
+
+factor : atom
+       | atom PRODUCT factor {
+           $$ = BinaryExpr::create(NT_ProductExpr, $1, $3);
+         }
+
+atom : identifier { $$ = (const Expr *)$1; }
+     | integer { $$ = (const Expr *)$1; }
+     | brack_expr { $$ = (const Expr *)$1; }
+     | paren_expr { $$ = (const Expr *)$1; }
 
 identifier : ID { $$ = Identifier::create($1); }
 
 integer : INT { $$ = Integer::create($1); }
      
-brack_expr : LBRACK expr_list RBRACK { $$ = BrackExpr::create($2); }
+brack_expr : LBRACK contract_expr_list RBRACK { $$ = BrackExpr::create($2); }
        
-paren_expr : LPAREN expr RPAREN { $$ = ParenExpr::create($2); }
+paren_expr : LPAREN contract_expr RPAREN { $$ = ParenExpr::create($2); }
 
-expr_list : /* empty */ { $$ = ExprList::create(); }
-          | expr_list expr { $$ = ExprList::append($1, $2); }
+contract_expr_list : /* empty */ { $$ = ExprList::create(); }
+                   | contract_expr_list contract_expr {
+                       $$ = ExprList::append($1, $2);
+                     }
 
+contract_expr : expr
+              | expr DOT contract_expr {
+                  $$ = BinaryExpr::create(NT_ContractionExpr, $1, $3);
+                }
 %%
 
 
