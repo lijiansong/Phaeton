@@ -1,11 +1,14 @@
+//===--- Parser.h - Parser for DSL TensorIR ---------------------*- C++ -*-===//
+//
+//  This file defines the Parser interface.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef __PARSER_H__
 #define __PARSER_H__
 
 #include "tir/AST/AST.h"
 #include "tir/Lex/Lexer.h"
-
-#include "lang.tab.hh"
-#include "lex.yy.h"
 
 class Parser {
 private:
@@ -23,4 +26,4 @@ public:
   const Program *getAST() const { return ast; }
 };
 
-#endif /* !__PARSER_H__ */
+#endif // __PARSER_H__

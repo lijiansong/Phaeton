@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
 
   std::ifstream in_file;
   if (argc != 2) {
-    std::cout << "Usage: Parse [input file]... " << '\n';
+    std::cout << "Usage: AST-Dump [input file]... " << '\n';
     return -1;
   } else {
     in_file.open(argv[1]);

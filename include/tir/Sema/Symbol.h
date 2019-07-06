@@ -1,3 +1,9 @@
+//===--- Symbol.h - Classes for representing symbol table -------*- C++ -*-===//
+//
+//  This file defines symbol table to track variable information.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef __SYMBOL_H__
 #define __SYMBOL_H__
 
@@ -7,9 +13,15 @@
 #include "tir/AST/AST.h"
 #include "tir/Sema/Type.h"
 
-enum SymbolKind { SK_Variable, SK_Type, SK_SYMBOLKIND_COUNT };
-
 class Symbol {
+public:
+  enum SymbolKind {
+    SK_Variable,
+    SK_Type,
+
+    SK_SYMBOLKIND_COUNT
+  };
+
 private:
   const SymbolKind K;
 
@@ -41,22 +53,9 @@ private:
 public:
   SymbolTable() {}
 
-  bool addSymbol(Symbol *sym) {
-    if (Symbols.count(sym->getName()))
-      return false;
+  bool addSymbol(Symbol *sym);
 
-    Symbols[sym->getName()] = sym;
-    return true;
-  }
-
-  bool getSymbol(const std::string &name, Symbol *&sym) const {
-    auto it = Symbols.find(name);
-    if (it == Symbols.end())
-      return false;
-
-    sym = it->second;
-    return true;
-  }
+  bool getSymbol(const std::string &name, Symbol *&sym) const;
 
   SymbolMap::iterator begin() { return Symbols.begin(); }
   SymbolMap::iterator end() { return Symbols.end(); }
@@ -65,4 +64,4 @@ public:
   SymbolMap::const_iterator end() const { return Symbols.end(); }
 };
 
-#endif /* !__SYMBOL_H__ */
+#endif // __SYMBOL_H__

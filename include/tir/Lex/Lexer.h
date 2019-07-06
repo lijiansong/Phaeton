@@ -1,3 +1,9 @@
+//===--- Lexer.h - Lexer for DSL TensorIR -----------------------*- C++ -*-===//
+//
+//  This file defines the Lexer interface.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef __LEXER_H__
 #define __LEXER_H__
 
@@ -5,15 +11,9 @@
 #include <map>
 #include <string>
 
-#include "tir/AST/AST.h"
-
-using yyscan_t =  void*;
-
-#include "lang.tab.hh"
-#include "lex.yy.h"
+#include "tir.tab.hh"
 
 class Lexer {
-
 private:
   const char *Input;
 
@@ -21,14 +21,10 @@ private:
   YYSTYPE Val;
 
 public:
-  Lexer(const char *input) : Input(input) {
-    yylex_init(&Scanner);
-    yy_scan_string(Input, Scanner);
-  }
+  Lexer(const char *input);
+  ~Lexer();
 
-  ~Lexer() { yylex_destroy(Scanner); }
-
-  int lex() { return yylex(&Val, Scanner); }
+  int lex();
 
   yyscan_t getScanner() const { return Scanner; }
   YYSTYPE getVal() const { return Val; }
@@ -40,4 +36,4 @@ public:
   }
 };
 
-#endif /* !__LEXER_H__ */
+#endif // __LEXER_H__

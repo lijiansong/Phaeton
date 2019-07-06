@@ -1,20 +1,23 @@
 #include <fstream>
 #include <iostream>
 
+#include "tir/CodeGen/PyCG.h"
 #include "tir/Parse/Parser.h"
 #include "tir/Sema/Sema.h"
-#include "tir/CodeGen/CodeGen.h"
 
 int main(int argc, char *argv[]) {
 
   std::ifstream in_file;
 
   if (argc != 2) {
+    std::cout << "Usage: Translate [input file]... " << '\n';
     return 1;
   } else {
     in_file.open(argv[1]);
-    if (!in_file.is_open())
+    if (!in_file.is_open()) {
+      std::cout << "Error! Fail to open " << argv[1] << '\n';
       return 2;
+    }
   }
 
   std::filebuf *file_buf = in_file.rdbuf();
@@ -32,12 +35,12 @@ int main(int argc, char *argv[]) {
     return 3;
   }
 
-  //parser.getAST()->dump();
-  delete [] input;
+  // parser.getAST()->dump();
+  delete[] input;
 
   Sema sema;
   sema.visitProgram(parser.getAST());
-  NumpyCodeGen npcg(&sema);
+  NumpyDirectCG npcg(&sema);
   npcg.visitProgram(parser.getAST());
   std::cout << npcg.getCode();
 

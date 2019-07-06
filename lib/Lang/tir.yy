@@ -1,14 +1,7 @@
-/* generate C++ output: */ 
-/* %skeleton "lalr1.cc" */
-
-/* generate header file: */
-
-/* %define api.value.type variant */
-/* generate a pure (i.e. re-entrant) parser: */
 %define api.pure full
 
 %param { yyscan_t yyscanner }
-%parse-param {const Program *root }
+%parse-param { const Program *&root }
 
 %code requires {
   #include "tir/AST/AST.h"
@@ -17,22 +10,11 @@
 }
 
 %{
-
   #include <stdio.h>
 
-  //#include "tir/AST/AST.h"
 
-  //typedef void* yyscan_t;
-
-  #include "lang.tab.hh"
+  #include "tir.tab.hh"
   #include "lex.yy.h"
-
-  //extern int yydebug;
-
-  //extern FILE *yyin;
-
-  //int yylex();
-  //void yyerror(const char*);
 
   void yyerror(yyscan_t scanner, const Program *root, const char *msg) {
     fprintf(stderr, "%s\n", msg);
@@ -41,33 +23,37 @@
 
 %union {
   const Program *program;
+  
   DeclList *decls;
   StmtList *stmts;
   ExprList *exprs;
+ 
   const Decl *decl;
+
   const Stmt *stmt;
+
   const Expr *expr;
-  const Factor *factor;
-  const BinaryExpr *binary;
+
   const Identifier *identifier;
   const Integer *integer;
   const BrackExpr *brack;
   const ParenExpr *paren;
+
   const char *string_literal;
   int integer_literal;
+
   int in_out_spec;
 }
 
 %token KW_VAR
-%token KW_TYPE
 %token KW_INPUT
 %token KW_OUTPUT
+%token KW_TYPE
 %token COLON
 %token LPAREN
 %token RPAREN
 %token LBRACK
 %token RBRACK
-%token STAR
 %token DOT
 %token ADD
 %token SUB
@@ -106,39 +92,47 @@ decl : var_decl
      | type_decl
 
 var_decl : KW_VAR in_out_spec identifier COLON type_expr {
-         $$ = Decl::create(NT_VarDecl,
-                           $3, $5,
-                           (InOutSpecifier)$2);
-         }
+             $$ = Decl::create(ASTNode::NT_VarDecl,
+                               $3, $5,
+                               (Decl::InOutSpecifier)$2);
+           }
 
-in_out_spec : /* empty */      { $$ = IO_Empty; }
-       | KW_INPUT in_out_spec  { $$ = IO_Input | $2; }
-       | KW_OUTPUT in_out_spec { $$ = IO_Output | $2; }
+in_out_spec : /* empty */ { $$ = Decl::IO_Empty; }
+       | KW_INPUT in_out_spec { $$ = Decl::IO_Input | $2; }
+       | KW_OUTPUT in_out_spec { $$ = Decl::IO_Output | $2; }
 
-type_decl : KW_TYPE identifier COLON type_expr { $$ = Decl::create(NT_TypeDecl, $2, $4); }
+type_decl : KW_TYPE identifier COLON type_expr {
+              $$ = Decl::create(ASTNode::NT_TypeDecl, $2, $4);
+            }
 
 stmt_list : stmt_list stmt { $$ = StmtList::append($1, $2); }
           | stmt { $$ = StmtList::create($1); }
 
-stmt : identifier EQUAL expr { $$ = Stmt::create($1, $3); }
+stmt : identifier EQUAL contract_expr { $$ = Stmt::create($1, $3); }
 
-type_expr : expr
+type_expr : identifier { $$ = (const Expr *)$1; }
+          | brack_expr { $$ = (const Expr *)$1; }
+
+contract_expr : expr
+              | expr DOT contract_expr {
+                  $$ = BinaryExpr::create(ASTNode::NT_ContractionExpr, $1, $3);
+                }
 
 expr : term
-     | term ADD expr { $$ = BinaryExpr::create(NT_AddExpr, $1, $3); }
-     | term SUB expr { $$ = BinaryExpr::create(NT_SubExpr, $1, $3); }
+     | term ADD expr { $$ = BinaryExpr::create(ASTNode::NT_AddExpr, $1, $3); }
+     | term SUB expr { $$ = BinaryExpr::create(ASTNode::NT_SubExpr, $1, $3); }
 
 term : factor
      | factor MUL term {
-         $$ = BinaryExpr::create(NT_MulExpr, $1, $3);
+         $$ = BinaryExpr::create(ASTNode::NT_MulExpr, $1, $3);
        }
      | factor DIV term {
-         $$ = BinaryExpr::create(NT_DivExpr, $1, $3);
+         $$ = BinaryExpr::create(ASTNode::NT_DivExpr, $1, $3);
        }
 
 factor : atom
        | atom PRODUCT factor {
-           $$ = BinaryExpr::create(NT_ProductExpr, $1, $3);
+           $$ = BinaryExpr::create(ASTNode::NT_ProductExpr, $1, $3);
          }
 
 atom : identifier { $$ = (const Expr *)$1; }
@@ -159,48 +153,4 @@ contract_expr_list : /* empty */ { $$ = ExprList::create(); }
                        $$ = ExprList::append($1, $2);
                      }
 
-contract_expr : expr
-              | expr DOT contract_expr {
-                  $$ = BinaryExpr::create(NT_ContractionExpr, $1, $3);
-                }
 %%
-
-
-#ifdef _PARSER_DEBUG_
-#if 0
-int main(int argc, char* argv[]) {
-  FILE *in;
-  yyscan_t scanner;
-  int result;
-  const Program *program;
-
-  if (argc != 2) {
-    return 1;
-  } else {
-    in = fopen(argv[1], "r");
-    if (!in)
-      return 2;
-  }
-
-  yydebug = 1;
-
-  if (yylex_init(&scanner)) {
-    return 3;
-  }
-
-  yyset_in(in, scanner);
-  result = yyparse(scanner, program);
-
-  fclose(in);
-  yylex_destroy(scanner);
-
-  if (result)
-    return result;
-
-  program->dump();
-  Program::destroy(program);
-
-  return 0;
-}
-#endif
-#endif /* _PARSER_DEBUG_ */

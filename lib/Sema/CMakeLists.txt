@@ -1,1 +1,4 @@
-add_library(Sema STATIC Sema.cpp)
+add_library(Sema STATIC
+            Sema.cpp
+            Symbol.cpp
+            Type.cpp)

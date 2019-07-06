@@ -1,14 +1,19 @@
+//===--- Type.h - Classes for representing base tensor type -----*- C++ -*-===//
+//
+//  This file defines the compile base data type Tensor.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef __TYPE_H__
 #define __TYPE_H__
 
 #include <string>
 #include <vector>
 
-enum AddressSpace { AS_Default };
-
 class TensorType {
 private:
   std::vector<int> Dims;
+  // TODO: add data type
 
 public:
   TensorType() {}
@@ -20,33 +25,14 @@ public:
 
   int getDim(unsigned i) const { return Dims.at(i); }
 
-  bool operator==(const TensorType &rhs) const {
-    if (getRank() != rhs.getRank())
-      return false;
-
-    for (unsigned i = 0; i < getRank(); i++) {
-      if (getDim(i) != rhs.getDim(i))
-        return false;
-    }
-
-    return true;
-  }
-
+  bool operator==(const TensorType &rhs) const;
   bool operator!=(const TensorType &rhs) const { return !(*this == rhs); }
 
   bool equals(const std::vector<int> &dims) const {
     return (*this == TensorType(dims));
   }
 
-  const std::string getDimString() const {
-    std::string result = "";
-    for (unsigned i = 0; i < getRank(); i++) {
-      result += std::to_string(getDim(i));
-      if (i != (getRank() - 1))
-        result += ", ";
-    }
-    return result;
-  }
+  const std::string getDimString() const;
 };
 
-#endif /* !__TYPE_H__ */
+#endif // __TYPE_H__

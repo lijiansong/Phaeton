@@ -1,20 +1,48 @@
+//==------ CodeGen.h - Representation of code generation -------------------==//
+//
+// This file defines the base class CodeGen.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef __CODEGEN_H__
 #define __CODEGEN_H__
 
 #include <list>
 #include <map>
+#include <string>
 #include <vector>
 
-#include "tir/AST/AST.h"
 #include "tir/Sema/Sema.h"
+#include "tir/Sema/Type.h"
 
+// TODO: add wrappers for Codegen module
 class CodeGen : public ASTVisitor {
+private:
+  const Sema *TheSema;
+
+  int TempCounter;
+
+  std::string Code;
+
+  std::map<const TensorType *, std::string> EmittedTypes;
+
+public:
+  CodeGen(const Sema *sema);
+
+  const Sema *getSema() const { return TheSema; }
+  std::string getTemp();
+  const std::string &getCode() const { return Code; }
+
+  void append(const std::string &code) { Code += code; }
+
+  bool typeEmitted(const TensorType *type) const;
+  const std::string &getEmittedTypeName(const TensorType *type) const;
+  void addEmittedType(const TensorType *type, const std::string &name);
+
 public:
   using List = std::vector<int>;
   using Tuple = std::vector<int>;
   using TupleList = std::vector<Tuple>;
-
-  static bool isPairList(const TupleList &list);
 
   enum Comparison {
     CMP_Less,
@@ -27,62 +55,21 @@ public:
   };
 
   static bool allCompare(const List &list, Comparison cmp, int pivot);
+
+  static bool isPairList(const TupleList &list);
   static bool partitionPairList(int pivot, const TupleList &list,
                                 TupleList &left, TupleList &right,
                                 TupleList &mixed);
-
   static void shiftList(int shiftAmount, List &list);
   static void shiftTupleList(int shiftAmount, TupleList &tuple);
   static void flattenTupleList(const TupleList &list, std::list<int> &result);
+  static void unpackPairList(const TupleList &list, List &left, List &right);
+  static void adjustForContractions(List &indices,
+                                    const TupleList &contractions);
+
+  static const std::string getTupleListString(const TupleList &list);
+
+  static const BinaryExpr *extractTensorExprOrNull(const Expr *e);
 };
 
-class NumpyCodeGen : public CodeGen {
-  const Sema *TheSema;
-
-  std::string Code;
-
-  int TempCounter;
-
-  // 'Expr' nodes in the AST ===> temp variables:
-  std::map<const Expr *, std::string> ExprTemps;
-
-  const std::string getTemp() { return "t" + std::to_string(TempCounter++); }
-
-  const std::string addTempForExpr(const Expr *e) {
-    const std::string t = getTemp();
-    ExprTemps[e] = t;
-    return t;
-  }
-
-  const std::string addNameForExpr(const Expr *e, const std::string &name) {
-    const std::string t = getTemp();
-    ExprTemps[e] = name;
-    return name;
-  }
-
-  const std::string getTempForExpr(const Expr *e) const {
-    return ExprTemps.at(e);
-  }
-
-public:
-  NumpyCodeGen(const Sema *sema) : TheSema(sema), Code(""), TempCounter(0) {}
-
-  const Sema *getSema() const { return TheSema; }
-  const std::string &getCode() const { return Code; }
-
-  void append(const std::string &code) { Code += code; }
-
-  virtual void visitProgram(const Program *p) override;
-
-  virtual void visitDecl(const Decl *d) override;
-  virtual void visitStmt(const Stmt *s) override;
-
-  virtual void visitBinaryExpr(const BinaryExpr *be) override;
-  virtual void visitIdentifier(const Identifier *id) override;
-  virtual void visitInteger(const Integer *i) override;
-  virtual void visitBrackExpr(const BrackExpr *be) override;
-
-  const std::string visitContraction(const Expr *e, const TupleList &indices);
-};
-
-#endif /* !__CODEGEN_H__ */
+#endif // __CODEGEN_H__
