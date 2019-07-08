@@ -55,7 +55,9 @@ public:
   virtual const std::string
   visitContractionEpilogue(const Expr *e, const std::string &lhs,
                            const std::string &rhs,
-                           const TupleList &LeftAndRightInds) {}
+                           const TupleList &LeftAndRightInds) {
+    return std::string();
+  }
 
   virtual void visitBinaryExprPrologue(const BinaryExpr *be) {}
   virtual void visitBinaryExprEpilogue(const BinaryExpr *be) {}

@@ -9,11 +9,12 @@ var c : tensor4
 var d : tensor6
 var x : tensor
 var A : tensor
-var v : tensor
+var out v : tensor
 var W : [32 3 96 48]
 
 v = a * b * c . [[2 3] [6 8]]
 v = d * b * c . [[2 3] [6 8]]
 
+// v is marked with 'out'
 v = W * x
 v = W * x + b

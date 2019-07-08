@@ -15,5 +15,12 @@ var W : [32 3 96 48]
 v = a * b * c . [[2 3] [6 8]]
 v = d * b * c . [[2 3] [6 8]]
 
+// comments one line
+// comments one line
+// comments one line
+// comments one line
+// comments one line
+// comments one line
+// comments one line
 v = W * x
 v = W * x + b

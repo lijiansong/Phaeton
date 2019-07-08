@@ -28,7 +28,7 @@ public:
   virtual const std::string
   visitContractionEpilogue(const Expr *e, const std::string &lhs,
                            const std::string &rhs,
-                           const TupleList &LeftAndRightIndices);
+                           const TupleList &LeftAndRightIndices) override;
 
   virtual void visitAddExprEpilogue(const BinaryExpr *be) override;
   virtual void visitSubExprEpilogue(const BinaryExpr *be) override;

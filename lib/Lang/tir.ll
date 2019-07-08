@@ -3,7 +3,13 @@
 %option reentrant bison-bridge
 
 %{
+  #include <cstdlib>
   #include "tir.tab.hh"
+
+#if __cplusplus > 199711L
+#define register      // Deprecated in C++11.
+#endif  // #if __cplusplus > 199711L
+
 %}
 
 KW_VAR    "var"
@@ -54,5 +60,7 @@ ID        [_a-zA-Z][_a-zA-Z0-9]*
             }
 <<EOF>>     { return EOF; }
 [ \t\n]+    /* ignore whitespace */
+
+"//".*             ;
 
 %%
