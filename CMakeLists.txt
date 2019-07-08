@@ -9,7 +9,7 @@ add_custom_command(TARGET LangOutputDirectory
                    COMMAND mkdir
                    ARGS -p ${TENSORIR_LANG_OUTPUT_DIR})
 
-               set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wno-deprecated-register -Wno-deprecated-declarations")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wno-deprecated-register -Wno-deprecated-declarations")
 
 include_directories(include)
 
