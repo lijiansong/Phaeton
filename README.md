@@ -1,3 +1,3 @@
 # TensorIR
 
-A toy domain specific language for tensor expressions.
+A tiny domain specific language for deep learning tensor expressions.
