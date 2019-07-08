@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   std::ifstream in_file;
 
   if (argc != 2) {
-    std::cout << "Usage: Translate [input file]... " << '\n';
+    std::cout << "Usage: Opt [input file]... " << '\n';
     return -1;
   } else {
     in_file.open(argv[1]);
