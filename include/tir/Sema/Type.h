@@ -14,8 +14,19 @@ class TensorType {
 private:
   std::vector<int> Dims;
   // TODO: add data type
+  // TODO: add memory hierarchy
 
 public:
+  enum AddrSpaceType {
+    AS_Global,
+    AS_Shared,
+    AS_Neural,
+    AS_Synapse,
+    AS_Constant,
+
+    AS_Default
+  };
+
   TensorType() {}
   TensorType(const std::vector<int> &dims) : Dims(dims) {}
 
