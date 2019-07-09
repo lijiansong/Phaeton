@@ -7,7 +7,7 @@
   #include "tir.tab.hh"
 
   #if __cplusplus > 199711L
-  #define register      // Deprecated in C++11.
+  #define register // 'register' keyword is deprecated in C++11.
   #endif  // #if __cplusplus > 199711L
 
 %}
@@ -61,6 +61,6 @@ ID        [_a-zA-Z][_a-zA-Z0-9]*
 <<EOF>>     { return EOF; }
 [ \t\n]+    /* ignore whitespace */
 
-"//".*             ;
+"//".*             ; /* for double slash comments*/
 
 %%
