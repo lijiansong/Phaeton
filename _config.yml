@@ -1,0 +1,29 @@
+# Dependencies
+markdown: kramdown
+pygments: true
+#timezone: Asia/Shanghai
+
+permalink: pretty
+
+# Site Info
+title: "TensorIR:  "
+tagline: 'A tiny DSL for DNN accelerator tensor expressions'
+
+url: https://lijiansong.github.io/TensorIR
+baseurl: /TensorIR
+
+github:
+  repo: https://github.com/lijiansong/TensorIR
+
+encoding: utf-8
+
+author:
+  name: 'Json Lee'
+  description: 'TensorIR is a domain specific language for machine learning tensor expressions with performance portability at different hardware platforms.'
+  url:             https://lijiansong.github.io/TensorIR
+
+# Site configurations
+paginate: 5
+#gems:
+#  - jekyll-paginate
+version: 1.0.0

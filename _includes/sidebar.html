@@ -1,0 +1,68 @@
+<!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox" checked>
+     <!--<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox" {% if page.title =="Home" %}checked{% endif %}>-->
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <div class="sidebar-personal-info">
+      <div class="sidebar-personal-info-section">
+        <a href="https://en.gravatar.com/userimage/108884328/315e3734b7a935efe81b8e5f892506dc.png?size=200">
+          <img src="https://en.gravatar.com/userimage/108884328/315e3734b7a935efe81b8e5f892506dc.png?size=200" title="View on Gravatar" alt="View on Gravatar" />
+        </a>
+      </div>
+      <div class="sidebar-personal-info-section">
+        <p>{{ site.author.description }}</p>
+      </div>
+      {% if site.author.contact %}
+      {% assign len = site.author.contact | size %}
+      {% assign current_index = 0 %}
+      <div class="sidebar-personal-info-section">
+        <p> Follow me: 
+        {% for contact in site.author.contact %}
+        {% assign iconname = contact[0] %}
+        {% if contact[0] == 'email' %}
+        {% assign iconname = 'envelope' %}
+        {% endif %}
+        <a href="{{ contact[1] }}">
+          <i class="fa fa-{{ iconname }}" aria-hidden="true"></i>
+        </a>
+        {% assign current_index = current_index | plus: 1 %}
+        {% if current_index != len %}|{% endif %}
+        {% endfor %}
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item{% if page.title == "Home" %} active{% endif %}" href="/TensorIR">Home</a>
+
+    {% comment %}
+      The code below dynamically generates a sidebar nav of pages with
+      `layout: page` in the front-matter. See readme for usage.
+    {% endcomment %}
+
+
+    {% assign pages_list = site.pages %}
+    {% for node in pages_list %}
+      {% if node.title != null %}
+        {% if node.layout == "page" %}
+          <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="/TensorIR{{ node.url }}">{{ node.title }}</a>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    <a class="sidebar-nav-item" href="{{ site.github.repo }}">GitHub Project</a>
+    <a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/master.zip">Download</a>
+    <span class="sidebar-nav-item">Currently v{{ site.version }}</span>
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+    Theme powered by <a href="http://jekyllrb.com">jekyll</a> and <a href="http://github.com/poole">Poole</a>
+    </p>
+  </div>
+</div>
