@@ -1,3 +1,0 @@
-# TensorIR Specification
-
-TBD.
