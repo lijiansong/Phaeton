@@ -20,3 +20,9 @@ $ cmake .. && make -j
 - tc: <https://github.com/facebookresearch/TensorComprehensions>
 - glow: <https://github.com/pytorch/glow>
 - tvm: <https://github.com/dmlc/tvm>
+
+# Postscript
+
+I only contribute to this project in my part-time, so this repo will be updated irregularly.
+
+If you are interested in becoming a contributor, or you have any questions or suggestions, feel free to open an [issue](https://github.com/lijiansong/TensorIR/issues) or drop me a message.
