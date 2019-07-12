@@ -2,6 +2,7 @@
 markdown: kramdown
 pygments: true
 #timezone: Asia/Shanghai
+highlighter: rouge
 
 permalink: pretty
 
@@ -20,7 +21,7 @@ encoding: utf-8
 author:
   name: 'Json Lee'
   description: 'TensorIR is a domain specific language for machine learning tensor expressions with performance portability at different hardware platforms.'
-  url:             https://lijiansong.github.io/TensorIR
+  url: https://lijiansong.github.io/TensorIR
 
 # Site configurations
 paginate: 5
