@@ -17,6 +17,7 @@ $ cmake .. && make -j
 - lift: <https://github.com/lift-project/lift>
 - mlir: <https://github.com/tensorflow/mlir>
 - halide: <https://github.com/halide/Halide>
+- futhark: <https://github.com/diku-dk/futhark>
 - tc: <https://github.com/facebookresearch/TensorComprehensions>
 - glow: <https://github.com/pytorch/glow>
 - tvm: <https://github.com/dmlc/tvm>
