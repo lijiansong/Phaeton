@@ -7,21 +7,21 @@ highlighter: rouge
 permalink: pretty
 
 # Site Info
-title: "TensorIR:  "
+title: "Phaeton:  "
 tagline: 'A tiny DSL for DNN accelerator tensor expressions'
 
-url: https://lijiansong.github.io/TensorIR
-baseurl: /TensorIR
+url: https://lijiansong.github.io/Phaeton
+baseurl: /Phaeton
 
 github:
-  repo: https://github.com/lijiansong/TensorIR
+  repo: https://github.com/lijiansong/Phaeton
 
 encoding: utf-8
 
 author:
   name: 'Json Lee'
-  description: 'TensorIR is a domain specific language for machine learning tensor expressions with performance portability at different hardware platforms.'
-  url: https://lijiansong.github.io/TensorIR
+  description: 'Phaeton is a domain specific language for machine learning tensor expressions with performance portability at different hardware platforms.'
+  url: https://lijiansong.github.io/Phaeton
 
 # Site configurations
 paginate: 5

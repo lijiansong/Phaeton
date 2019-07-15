@@ -3,7 +3,7 @@ layout: page
 title: Syntax
 ---
 
-## 1. TensorIR Specification
+## 1. Phaeton Specification
 
 TBD.
 
