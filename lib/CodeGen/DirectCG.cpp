@@ -2,10 +2,10 @@
 #include <string>
 #include <vector>
 
-#include "tir/AST/AST.h"
-#include "tir/CodeGen/DirectCG.h"
-#include "tir/Sema/Sema.h"
-#include "tir/Sema/Type.h"
+#include "ph/AST/AST.h"
+#include "ph/CodeGen/DirectCG.h"
+#include "ph/Sema/Sema.h"
+#include "ph/Sema/Type.h"
 
 #define TEMP_MAP_ASSERT(expr)                                                  \
   {                                                                            \

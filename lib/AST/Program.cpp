@@ -1,6 +1,6 @@
-#include "tir/AST/Program.h"
-#include "tir/AST/ASTUtils.h"
-#include "tir/AST/ASTVisitor.h"
+#include "ph/AST/Program.h"
+#include "ph/AST/ASTUtils.h"
+#include "ph/AST/ASTVisitor.h"
 
 void Program::dump(unsigned indent) const {
   std::string str = NodeLabel[getNodeType()];

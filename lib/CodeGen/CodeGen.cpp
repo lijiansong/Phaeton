@@ -3,8 +3,8 @@
 #include <list>
 #include <vector>
 
-#include "tir/CodeGen/CodeGen.h"
-#include "tir/Sema/Type.h"
+#include "ph/CodeGen/CodeGen.h"
+#include "ph/Sema/Type.h"
 
 CodeGen::CodeGen(const Sema *sema) : TheSema(sema), TempCounter(0), Code("") {}
 

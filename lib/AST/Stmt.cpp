@@ -1,6 +1,6 @@
-#include "tir/AST/Stmt.h"
-#include "tir/AST/ASTUtils.h"
-#include "tir/AST/ASTVisitor.h"
+#include "ph/AST/Stmt.h"
+#include "ph/AST/ASTUtils.h"
+#include "ph/AST/ASTVisitor.h"
 
 void Stmt::dump(unsigned indent) const {
   std::string str = NodeLabel[getNodeType()];

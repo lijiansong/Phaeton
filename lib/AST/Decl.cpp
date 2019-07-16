@@ -1,6 +1,6 @@
-#include "tir/AST/Decl.h"
-#include "tir/AST/ASTVisitor.h"
-#include "tir/AST/ASTUtils.h"
+#include "ph/AST/Decl.h"
+#include "ph/AST/ASTVisitor.h"
+#include "ph/AST/ASTUtils.h"
 
 void Decl::dump(unsigned indent) const {
   std::string str = NodeLabel[getNodeType()];

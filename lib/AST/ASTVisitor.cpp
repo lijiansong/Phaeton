@@ -1,5 +1,5 @@
-#include "tir/AST/ASTVisitor.h"
-#include "tir/AST/ASTUtils.h"
+#include "ph/AST/ASTVisitor.h"
+#include "ph/AST/ASTUtils.h"
 
 
 template <typename T, ASTNode::NodeType nt, typename Derived>

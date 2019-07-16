@@ -1,15 +1,15 @@
 #include <string>
 
-#include "tir/AST/AST.h"
-#include "tir/CodeGen/PyCG.h"
-#include "tir/Sema/Sema.h"
-#include "tir/Sema/Type.h"
+#include "ph/AST/AST.h"
+#include "ph/CodeGen/PyCG.h"
+#include "ph/Sema/Sema.h"
+#include "ph/Sema/Type.h"
 
 PythonFragBuilder::PythonFragBuilder(const std::string &prefix)
     : ModulePrefix(prefix) {}
 
 void PythonFragBuilder::buildNumpyProgramPrologue(const CodeGen *cg) {
-  Fragment = "# ----- Autogen kernel by TensorIR -----\n";
+  Fragment = "# ----- Autogen kernel by Phaeton -----\n";
   Fragment += "import numpy as " + getModulePrefix() + "\n\n";
 }
 

@@ -1,4 +1,4 @@
-#include "tir/Sema/Type.h"
+#include "ph/Sema/Type.h"
 
 bool TensorType::operator==(const TensorType &rhs) const {
   if (getRank() != rhs.getRank())

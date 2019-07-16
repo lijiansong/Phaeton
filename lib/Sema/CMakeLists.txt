@@ -1,4 +1,4 @@
 add_library(Sema STATIC
             Sema.cpp
-            Symbol.cpp
+            SymbolTable.cpp
             Type.cpp)

@@ -8,17 +8,17 @@ add_custom_target(FlexLexerSources echo "Generating lex.yy.c lex.yy.h"
 
 add_custom_command(TARGET FlexLexerSources
                    COMMAND flex
-                   ARGS --outfile=${TENSORIR_LANG_OUTPUT_DIR}/lex.yy.c
-                   --header-file=${TENSORIR_LANG_OUTPUT_DIR}/lex.yy.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/tir.ll
-                   DEPENDS tir.ll)
+                   ARGS --outfile=${PHAETON_LANG_OUTPUT_DIR}/lex.yy.c
+                   --header-file=${PHAETON_LANG_OUTPUT_DIR}/lex.yy.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/phaeton.ll
+                   DEPENDS phaeton.ll)
 
-add_custom_target(BisonParserSources echo "Generating tir.tab.cc tir.tab.hh"
+add_custom_target(BisonParserSources echo "Generating phaeton.tab.cc phaeton.tab.hh"
                   DEPENDS LangOutputDirectory)
 
 add_custom_command(TARGET BisonParserSources
                    COMMAND bison
-                   ARGS --output=${TENSORIR_LANG_OUTPUT_DIR}/tir.tab.cc
-                   --defines=${TENSORIR_LANG_OUTPUT_DIR}/tir.tab.hh
-                        ${CMAKE_CURRENT_SOURCE_DIR}/tir.yy
-                   DEPENDS tir.yy)
+                   ARGS --output=${PHAETON_LANG_OUTPUT_DIR}/phaeton.tab.cc
+                   --defines=${PHAETON_LANG_OUTPUT_DIR}/phaeton.tab.hh
+                        ${CMAKE_CURRENT_SOURCE_DIR}/phaeton.yy
+                   DEPENDS phaeton.yy)

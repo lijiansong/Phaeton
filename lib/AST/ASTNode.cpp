@@ -1,9 +1,9 @@
-#include "tir/AST/ASTNode.h"
-#include "tir/AST/Decl.h"
-#include "tir/AST/Expr.h"
-#include "tir/AST/Stmt.h"
-#include "tir/AST/ASTVisitor.h"
-#include "tir/AST/ASTUtils.h"
+#include "ph/AST/ASTNode.h"
+#include "ph/AST/Decl.h"
+#include "ph/AST/Expr.h"
+#include "ph/AST/Stmt.h"
+#include "ph/AST/ASTVisitor.h"
+#include "ph/AST/ASTUtils.h"
 
 std::map<ASTNode::NodeType, std::string> ASTNode::NodeLabel = {
     {ASTNode::NT_Program, "Program"},

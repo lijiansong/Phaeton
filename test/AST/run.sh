@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-EXE=../../build/bin/tir-astdump
-for tc in `ls *.tir`
+EXE=../../build/bin/ph-astdump
+for tc in `ls *.ph`
 do
     echo "===----- Begin test ${tc} -----==="
     ${EXE} ${tc}

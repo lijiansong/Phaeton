@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "tir/Sema/Sema.h"
+#include "ph/Sema/Sema.h"
 
 #define TYPE_MAP_ASSERT(expr)                                                  \
   {                                                                            \

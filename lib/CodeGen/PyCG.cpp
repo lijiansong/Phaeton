@@ -1,9 +1,9 @@
 #include <vector>
 
-#include "tir/AST/AST.h"
-#include "tir/CodeGen/PyCG.h"
-#include "tir/Sema/Sema.h"
-#include "tir/Sema/Type.h"
+#include "ph/AST/AST.h"
+#include "ph/CodeGen/PyCG.h"
+#include "ph/Sema/Sema.h"
+#include "ph/Sema/Type.h"
 
 NumpyDirectCG::NumpyDirectCG(const Sema *sema, const std::string &prefix)
     : DirectCodeGen(sema), Builder(prefix) {}

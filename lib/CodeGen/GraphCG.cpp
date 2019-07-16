@@ -5,10 +5,10 @@
 #include <iostream>
 #include <sstream>
 
-#include "tir/AST/AST.h"
-#include "tir/CodeGen/GraphCG.h"
-#include "tir/Sema/Sema.h"
-#include "tir/Sema/Type.h"
+#include "ph/AST/AST.h"
+#include "ph/CodeGen/GraphCG.h"
+#include "ph/Sema/Sema.h"
+#include "ph/Sema/Type.h"
 
 void GraphCodeGen::updateCurEnd(GCG_Node *n) {
   if (curEnd != nullptr) {

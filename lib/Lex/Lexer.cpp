@@ -1,7 +1,7 @@
 #include <map>
 #include <string>
 
-#include "tir/Lex/Lexer.h"
+#include "ph/Lex/Lexer.h"
 #include "lex.yy.h"
 
 Lexer::Lexer(const char *input) : Input(input) {

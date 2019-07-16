@@ -1,6 +1,6 @@
-#include "tir/AST/Expr.h"
-#include "tir/AST/ASTVisitor.h"
-#include "tir/AST/ASTUtils.h"
+#include "ph/AST/Expr.h"
+#include "ph/AST/ASTVisitor.h"
+#include "ph/AST/ASTUtils.h"
 
 void Expr::visit(ASTVisitor *v) const {
   assert(0 && "internal error: base class 'Expr' should not be visited");

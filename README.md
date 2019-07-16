@@ -1,12 +1,12 @@
-# TensorIR
+# Phaeton
 
 A toy domain specific language for deep learning tensor expressions.
 
 # Building
 
 ```
-$ git clone git@github.com:lijiansong/TensorIR.git
-$ cd TensorIR
+$ git clone git@github.com:lijiansong/Phaeton.git
+$ cd Phaeton
 $ mkdir build && cd build
 $ cmake .. && make -j
 ```
@@ -26,4 +26,4 @@ $ cmake .. && make -j
 
 I only contribute to this project in my part-time, so this repo will be updated irregularly.
 
-If you are interested in becoming a contributor, or you have any questions or suggestions, feel free to open an [issue](https://github.com/lijiansong/TensorIR/issues) or drop me a message.
+If you are interested in becoming a contributor, or you have any questions or suggestions, feel free to open an [issue](https://github.com/lijiansong/Phaeton/issues) or drop me a message.

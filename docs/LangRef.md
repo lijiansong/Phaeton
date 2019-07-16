@@ -1,2 +1,2 @@
-# TensorIR Specification
+# Phaeton Specification
 TBD
