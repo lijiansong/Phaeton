@@ -4,9 +4,14 @@
 #include <vector>
 
 #include "ph/CodeGen/CodeGen.h"
+#include "ph/CodeGen/ExprTree.h"
 #include "ph/Sema/Type.h"
 
-CodeGen::CodeGen(const Sema *sema) : TheSema(sema), TempCounter(0), Code("") {}
+CodeGen::CodeGen(const Sema *sema) : TheSema(sema), TempCounter(0), Code("") {
+  ENBuilder = new ExprNodeBuilder;
+}
+
+CodeGen::~CodeGen() { delete ENBuilder; }
 
 std::string CodeGen::getTemp() { return "t" + std::to_string(TempCounter++); }
 
@@ -23,6 +28,15 @@ void CodeGen::addEmittedType(const TensorType *type, const std::string &name) {
   assert(!typeEmitted(type));
   EmittedTypes[type] = name;
 }
+
+void CodeGen::EXPR_TREE_MAP_ASSERT(const Expr *expr) const {
+  if (ExprTrees.find((expr)) == ExprTrees.end())
+    assert(0 && "internal error: no expression tree for 'Expr' node");
+}
+
+void CodeGen::visitDecl(const Decl *d) { Declarations.push_back(d); }
+
+void CodeGen::visitStmt(const Stmt *s) { Statements.push_back(s); }
 
 bool CodeGen::allCompare(const List &list, Comparison cmp, int pivot) {
   std::function<bool(int)> compare = [cmp, pivot](int i) {
@@ -41,7 +55,6 @@ bool CodeGen::allCompare(const List &list, Comparison cmp, int pivot) {
       assert(0 && "internal error: invalid comparison");
     }
   };
-
   for (const auto &i : list) {
     if (!compare(i))
       return false;
@@ -127,17 +140,21 @@ void CodeGen::adjustForContractions(List &indices,
   }
 }
 
+const std::string CodeGen::getListString(const List &list) {
+  std::string result = "[";
+  for (int l = 0; l < list.size(); l++) {
+    result += std::to_string(list[l]);
+    if (l != (list.size() - 1))
+      result += ", ";
+  }
+  result += "]";
+  return result;
+}
+
 const std::string CodeGen::getTupleListString(const TupleList &list) {
   std::string result = "[";
   for (int l = 0; l < list.size(); l++) {
-    result += "[";
-    auto &tuple = list[l];
-    for (int i = 0; i < tuple.size(); i++) {
-      result += std::to_string(tuple[i]);
-      if (i != (tuple.size() - 1))
-        result += ", ";
-    }
-    result += "]";
+    result += getListString(list[l]);
     if (l != (list.size() - 1))
       result += ", ";
   }

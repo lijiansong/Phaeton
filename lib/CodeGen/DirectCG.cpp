@@ -13,53 +13,21 @@
       assert(0 && "internal error: no temporary for 'Expr' node");             \
   }
 
-const std::string DirectCodeGen::addTempForExpr(const Expr *e) {
-  const std::string t = getTemp();
-  ExprTemps[e] = t;
-  return t;
-}
-
-const std::string DirectCodeGen::addNameForExpr(const Expr *e,
-                                                const std::string &name) {
-  ExprTemps[e] = name;
-  return name;
-}
-
-const std::string DirectCodeGen::getTempForExpr(const Expr *e) const {
-  return ExprTemps.at(e);
-}
-
 DirectCodeGen::DirectCodeGen(const Sema *sema) : CodeGen(sema) {}
 
-void DirectCodeGen::visitProgram(const Program *p) {
-  visitProgramPrologue(p);
-  ASTVisitor::visitProgram(p);
-  visitProgramEpilogue(p);
-}
-
-void DirectCodeGen::visitDecl(const Decl *d) {
-  visitDeclPrologue(d);
-  visitDeclEpilogue(d);
-}
-
 void DirectCodeGen::visitStmt(const Stmt *s) {
-  visitStmtPrologue(s);
+  CodeGen::visitStmt(s);
 
   const Expr *expr = s->getExpr();
   expr->visit(this);
-  TEMP_MAP_ASSERT(expr)
-
-  visitStmtEpilogue(s);
+  EXPR_TREE_MAP_ASSERT(expr);
 }
 
-const std::string DirectCodeGen::visitContraction(const Expr *e,
-                                                  const TupleList &indices) {
-  visitContractionPrologue(e, indices);
-
+void DirectCodeGen::visitContraction(const Expr *e, const TupleList &indices) {
   if (indices.empty()) {
     e->visit(this);
-    TEMP_MAP_ASSERT(e);
-    return getTempForExpr(e);
+    EXPR_TREE_MAP_ASSERT(e);
+    return;
   }
 
   const BinaryExpr *tensor = extractTensorExprOrNull(e);
@@ -75,18 +43,27 @@ const std::string DirectCodeGen::visitContraction(const Expr *e,
   int rankL = typeL->getRank();
 
   TupleList contrL, contrR, contrMixed;
+  // Classify these index pairs into three categories:
+  // - contractions of the left sub-expression, i.e. 'contrL'
+  // - contractions of the right sub-expression, i.e. 'contrR'
+  // - having one index from each sub-expression, i.e. 'contrMixed'
   partitionPairList(rankL, indices, contrL, contrR, contrMixed);
 
-  const std::string tempL = visitContraction(tensorL, contrL);
+  visitContraction(tensorL, contrL);
+  EXPR_TREE_MAP_ASSERT(tensorL);
 
   int rankContractedL = rankL - 2 * contrL.size();
 
   TupleList shiftedR = contrR;
   shiftTupleList(-rankL, shiftedR);
-  const std::string tempR = visitContraction(tensorR, shiftedR);
+  visitContraction(tensorR, shiftedR);
+  EXPR_TREE_MAP_ASSERT(tensorR);
 
-  if (contrMixed.empty())
-    return visitContractionEpilogue(e, tempL, tempR, TupleList());
+  if (contrMixed.empty()) {
+    addExprNode(e, ENBuilder->createProductExpr(getExprNode(tensorL),
+                                                getExprNode(tensorR)));
+    return;
+  }
 
   List indL, indR;
   unpackPairList(contrMixed, indL, indR);
@@ -95,21 +72,14 @@ const std::string DirectCodeGen::visitContraction(const Expr *e,
   adjustForContractions(indR, contrR);
   shiftList(-rankContractedL, indR);
 
-  TupleList indicesLR;
-  indicesLR.push_back(indL);
-  indicesLR.push_back(indR);
-  return visitContractionEpilogue(e, tempL, tempR, indicesLR);
+  addExprNode(e, ENBuilder->createContractionExpr(getExprNode(tensorL), indL,
+                                                  getExprNode(tensorR), indR));
 }
 
 void DirectCodeGen::visitBinaryExpr(const BinaryExpr *be) {
   const ASTNode::NodeType nt = be->getNodeType();
 
-  visitBinaryExprPrologue(be);
-
   if (nt == ASTNode::NT_ContractionExpr) {
-    visitContractionExprPrologue(be);
-
-    std::string result;
     TupleList contractionsList;
     if (Sema::isListOfLists(be->getRight(), contractionsList)) {
       const BinaryExpr *tensor = extractTensorExprOrNull(be->getLeft());
@@ -119,121 +89,90 @@ void DirectCodeGen::visitBinaryExpr(const BinaryExpr *be) {
       if (contractionsList.empty())
         assert(0 && "internal error: cannot have an empty list here");
 
-      result = visitContraction(tensor, contractionsList);
+      visitContraction(tensor, contractionsList);
+      EXPR_TREE_MAP_ASSERT(tensor);
+      addExprNode(be, getExprNode(tensor));
     } else {
       const Expr *left = be->getLeft();
       left->visit(this);
-      TEMP_MAP_ASSERT(left);
+      EXPR_TREE_MAP_ASSERT(left);
 
       const Expr *right = be->getRight();
       right->visit(this);
-      TEMP_MAP_ASSERT(right);
+      EXPR_TREE_MAP_ASSERT(right);
 
       const int leftRank = getSema()->getType(left)->getRank();
-      TupleList indicesLR;
-      indicesLR.push_back({leftRank - 1});
-      indicesLR.push_back({0});
-      result = visitContractionEpilogue(be, getTempForExpr(left),
-                                        getTempForExpr(right), indicesLR);
+      addExprNode(
+          be, ENBuilder->createContractionExpr(
+                  getExprNode(left), {leftRank - 1}, getExprNode(right), {0}));
     }
-    addNameForExpr(be, result);
-    visitContractionExprEpilogue(be);
-
-    visitBinaryExprEpilogue(be);
     return;
   }
 
   assert(nt != ASTNode::NT_ContractionExpr &&
          "internal error: should not be here");
 
-  switch (nt) {
-  case ASTNode::NT_AddExpr:
-    visitAddExprPrologue(be);
-    break;
-  case ASTNode::NT_SubExpr:
-    visitSubExprPrologue(be);
-    break;
-  case ASTNode::NT_MulExpr:
-    visitMulExprPrologue(be);
-    break;
-  case ASTNode::NT_DivExpr:
-    visitDivExprPrologue(be);
-    break;
-  case ASTNode::NT_ProductExpr:
-    visitProductExprPrologue(be);
-    break;
-  default:
-    assert(0 && "internal error: invalid binary expression");
-  }
-
   const Expr *left = be->getLeft();
   left->visit(this);
-  TEMP_MAP_ASSERT(left);
+  EXPR_TREE_MAP_ASSERT(left);
 
   const Expr *right = be->getRight();
   right->visit(this);
-  TEMP_MAP_ASSERT(right);
+  EXPR_TREE_MAP_ASSERT(right);
 
-  addTempForExpr(be);
-
+  ExprNode *result, *lhs = getExprNode(left), *rhs = getExprNode(right);
   switch (nt) {
   case ASTNode::NT_AddExpr:
-    visitAddExprEpilogue(be);
+    result = ENBuilder->createAddExpr(lhs, rhs);
     break;
   case ASTNode::NT_SubExpr:
-    visitSubExprEpilogue(be);
+    result = ENBuilder->createSubExpr(lhs, rhs);
     break;
   case ASTNode::NT_MulExpr:
-    visitMulExprEpilogue(be);
+    result = ENBuilder->createMulExpr(lhs, rhs);
     break;
   case ASTNode::NT_DivExpr:
-    visitDivExprEpilogue(be);
+    result = ENBuilder->createDivExpr(lhs, rhs);
     break;
   case ASTNode::NT_ProductExpr:
-    visitProductExprEpilogue(be);
+    result = ENBuilder->createProductExpr(lhs, rhs);
     break;
   default:
     assert(0 && "internal error: invalid binary expression");
   }
 
-  visitBinaryExprEpilogue(be);
-  return;
+  addExprNode(be, result);
 }
 
 void DirectCodeGen::visitIdentifier(const Identifier *id) {
-  visitIdentifierPrologue(id);
-  addNameForExpr(id, id->getName());
-  visitIdentifierEpilogue(id);
-}
+  const Sema &sema = *getSema();
+  const std::string &name = id->getName();
+  const TensorType &type = sema.getSymbol(name)->getType();
 
-void DirectCodeGen::visitInteger(const Integer *i) {
-  visitIntegerPrologue(i);
-  addTempForExpr(i);
-  visitIntegerEpilogue(i);
+  addExprNode(id, ENBuilder->createIdentifierExpr(name, type.getDims()));
 }
 
 void DirectCodeGen::visitBrackExpr(const BrackExpr *be) {
-  visitBrackExprPrologue(be);
-
   const ExprList &exprs = *be->getExprs();
   assert(exprs.size() &&
          "internal error: tensor stack should not be empty here");
 
+  std::vector<ExprNode *> members;
   for (unsigned i = 0; i < exprs.size(); i++) {
     const Expr *e = exprs[i];
     e->visit(this);
-    TEMP_MAP_ASSERT(e);
+    EXPR_TREE_MAP_ASSERT(e);
+
+    members.push_back(getExprNode(e));
   }
 
-  addTempForExpr(be);
-  visitBrackExprEpilogue(be);
+  addExprNode(be, ENBuilder->createStackExpr(members));
 }
 
 void DirectCodeGen::visitParenExpr(const ParenExpr *pe) {
-  visitParenExprPrologue(pe);
   const Expr *e = pe->getExpr();
   e->visit(this);
-  TEMP_MAP_ASSERT(e);
-  addNameForExpr(pe, getTempForExpr(e));
-  visitParenExprEpilogue(pe);
+  EXPR_TREE_MAP_ASSERT(e);
+
+  addExprNode(pe, getExprNode(e));
 }

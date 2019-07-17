@@ -15,6 +15,9 @@
 #include "ph/Sema/Sema.h"
 #include "ph/Sema/Type.h"
 
+class ExprNode;
+class ExprNodeBuilder;
+
 // TODO: add wrappers for Codegen module
 class CodeGen : public ASTVisitor {
 private:
@@ -26,8 +29,24 @@ private:
 
   std::map<const TensorType *, std::string> EmittedTypes;
 
+  // map for each 'Expr' in the AST to an expression tree,
+  // which rooted at an 'ExprNode'
+  std::map<const Expr *, ExprNode *> ExprTrees;
+
+protected:
+  ExprNodeBuilder *ENBuilder;
+
+  void EXPR_TREE_MAP_ASSERT(const Expr *expr) const;
+
+public:
+  ExprNodeBuilder *getENBuilder() { return ENBuilder; }
+
+  void addExprNode(const Expr *expr, ExprNode *en) { ExprTrees[expr] = en; }
+  ExprNode *getExprNode(const Expr *expr) const { return ExprTrees.at(expr); }
+
 public:
   CodeGen(const Sema *sema);
+  virtual ~CodeGen();
 
   const Sema *getSema() const { return TheSema; }
   std::string getTemp();
@@ -39,10 +58,23 @@ public:
   const std::string &getEmittedTypeName(const TensorType *type) const;
   void addEmittedType(const TensorType *type, const std::string &name);
 
+private:
+  std::list<const Decl *> Declarations;
+  std::list<const Stmt *> Statements;
+
 public:
-  using List = std::vector<int>;
-  using Tuple = std::vector<int>;
-  using TupleList = std::vector<Tuple>;
+  virtual void visitDecl(const Decl *d) override;
+  virtual void visitStmt(const Stmt *s) override;
+
+  const std::list<const Decl *> &getDeclarations() const {
+    return Declarations;
+  }
+  const std::list<const Stmt *> &getStatements() const { return Statements; }
+
+public:
+  typedef std::vector<int> List;
+  typedef std::vector<int> Tuple;
+  typedef std::vector<Tuple> TupleList;
 
   enum Comparison {
     CMP_Less,
@@ -67,6 +99,7 @@ public:
   static void adjustForContractions(List &indices,
                                     const TupleList &contractions);
 
+  static const std::string getListString(const List &list);
   static const std::string getTupleListString(const TupleList &list);
 
   static const BinaryExpr *extractTensorExprOrNull(const Expr *e);

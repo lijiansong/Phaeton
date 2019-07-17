@@ -6,12 +6,14 @@
 #ifndef __PYCG_H__
 #define __PYCG_H__
 
+#include <list>
 #include <string>
 
 #include "ph/CodeGen/DirectCG.h"
+#include "ph/CodeGen/ExprTree.h"
 #include "ph/CodeGen/GraphCG.h"
-#include "ph/CodeGen/PyFragBuilder.h"
 
+#if 0
 // for python Numpy, TODO: CG for SIMD intrinsics.
 class NumpyDirectCG : public DirectCodeGen {
 protected:
@@ -70,6 +72,59 @@ public:
                            const std::string &rhs) override;
   virtual void emitDivExpr(const std::string &result, const std::string &lhs,
                            const std::string &rhs) override;
+};
+#endif // if 0
+
+class NumpyEmitter : public ExprTreeVisitor {
+private:
+  CodeGen *CG;
+
+  const std::string ModulePrefix;
+
+  std::string resultTemp;
+
+public:
+  NumpyEmitter(CodeGen *cg, const std::string &prefix = "np")
+      : CG(cg), ModulePrefix(prefix) {}
+
+  void genCode(const Program *p);
+  const std::string &getCode() const { return CG->getCode(); }
+
+protected:
+  const std::string &getModulePrefix() const { return ModulePrefix; }
+
+  std::string getResultTemp() const { return resultTemp; }
+  void setResultTemp(const std::string &temp) { resultTemp = temp; }
+
+#define DECL_VISIT_EXPR_NODE(Kind)                                             \
+  virtual void visit##Kind##Expr(const Kind##Expr *e) override;
+
+  DECL_VISIT_EXPR_NODE(Add)
+  DECL_VISIT_EXPR_NODE(Sub)
+  DECL_VISIT_EXPR_NODE(Mul)
+  DECL_VISIT_EXPR_NODE(Div)
+  DECL_VISIT_EXPR_NODE(Contraction)
+  DECL_VISIT_EXPR_NODE(Product)
+  DECL_VISIT_EXPR_NODE(Stack)
+  DECL_VISIT_EXPR_NODE(Identifier)
+#undef DECL_VISIT_EXPR_NODE
+
+  void visitBinOpExpr(const ExprNode *en, const std::string &op);
+  void visitTensordotExpr(const ExprNode *en, const std::string &axes);
+
+private:
+  std::string getTemp() { return CG->getTemp(); }
+  void append(const std::string &code) { CG->append(code); }
+
+  const Sema *getSema() const { return CG->getSema(); }
+
+  void addExprNode(const Expr *expr, ExprNode *en) {
+    CG->addExprNode(expr, en);
+  }
+
+  const ExprNode *getExprNode(const Expr *expr) const {
+    return CG->getExprNode(expr);
+  }
 };
 
 #endif // __PYCG_H__

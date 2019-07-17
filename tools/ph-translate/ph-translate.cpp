@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "ph/CodeGen/PyCG.h"
+#include "ph/CodeGen/GraphCG.h"
 #include "ph/Parse/Parser.h"
 #include "ph/Sema/Sema.h"
 
@@ -40,9 +41,10 @@ int main(int argc, char *argv[]) {
 
   Sema sema;
   sema.visitProgram(parser.getAST());
-  NumpyDirectCG npcg(&sema);
-  npcg.visitProgram(parser.getAST());
-  std::cout << npcg.getCode();
+  GraphCodeGen gcg(&sema);
+  NumpyEmitter ne(&gcg);
+  ne.genCode(parser.getAST());
+  std::cout << ne.getCode();
 
   Program::destroy(parser.getAST());
 

@@ -1,3 +1,5 @@
+// test case 4
+
 type scalar : []
 type vector : [11]
 type matrix : [12 34]

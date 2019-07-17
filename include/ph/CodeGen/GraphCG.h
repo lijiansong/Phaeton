@@ -13,26 +13,24 @@
 #include <vector>
 
 #include "ph/AST/AST.h"
-#include "ph/CodeGen/CodeGen.h"
 #include "ph/CodeGen/CGUtils.h"
+#include "ph/CodeGen/CodeGen.h"
+#include "ph/CodeGen/ExprTree.h"
 #include "ph/CodeGen/TensorGraph.h"
 
 class GraphCodeGen : public CodeGen {
 public:
-  using GCG_Graph = TensorGraph<StringID, StringID>;
-  using GCG_Node = GraphNode<StringID, StringID>;
-  using GCG_Edge = GraphEdge<StringID, StringID>;
+  using NodeID = AddressID<ExprNode>;
+  using EdgeID = StringID;
 
-  using GCG_LabeledGraph = std::pair<const std::string, GCG_Graph *>;
+  using GCG_Node = GraphNode<NodeID, EdgeID>;
+  using GCG_Edge = GraphEdge<NodeID, EdgeID>;
+  using GCG_Graph = TensorGraph<NodeID, EdgeID>;
+
   using GCG_Legs = std::vector<GCG_Edge::NodeIndexPair>;
-
   using EdgeSet = std::set<const GCG_Edge *>;
 
 private:
-  // map for names of temporary variable to expressions represented by graphs
-  // FIXME: we need to record the order
-  std::list<GCG_LabeledGraph> Graphs;
-
   // helpers for graph constuction
   GCG_Graph *curGraph;
   GCG_Legs curLegs;
@@ -40,63 +38,39 @@ private:
 
   void updateCurEnd(GCG_Node *n);
 
+  // map for 'Exprs' in the AST to graphs representing the 'Expr'
+  std::map<const Expr *, const GCG_Graph *> ExprGraphs;
+
+  // keep track of allocated graphs
+  std::set<const GCG_Graph *> Graphs;
+
 public:
   GraphCodeGen(const Sema *sema);
-  ~GraphCodeGen();
 
-  virtual void visitProgram(const Program *p) override;
+public:
+  virtual void visitStmt(const Stmt *) override;
 
-  virtual void visitDecl(const Decl *d) override;
-  virtual void visitStmt(const Stmt *s) override;
-
-  virtual void visitBinaryExpr(const BinaryExpr *be) override;
-  virtual void visitIdentifier(const Identifier *id) override;
-  virtual void visitInteger(const Integer *i) override;
-  virtual void visitBrackExpr(const BrackExpr *be) override;
-  virtual void visitParenExpr(const ParenExpr *pe) override;
-
-  void visitContraction(const Expr *e, const TupleList &indices);
-
-  virtual void visitProgramPrologue(const Program *p) {}
-  virtual void visitProgramEpilogue(const Program *p) {}
-
-  virtual void visitDeclPrologue(const Decl *d) {}
-  virtual void visitDeclEpilogue(const Decl *d) {}
+  virtual void visitBinaryExpr(const BinaryExpr *) override;
+  virtual void visitIdentifier(const Identifier *) override;
+  virtual void visitInteger(const Integer *) override;
+  virtual void visitBrackExpr(const BrackExpr *) override;
+  virtual void visitParenExpr(const ParenExpr *) override;
 
   static void dump(const GCG_Graph &g);
-  void dump() const;
 
-  virtual void emitGraph(const std::string &name, GCG_Graph *graph);
-  virtual void selectEdgesToContract(EdgeSet &result, const GCG_Graph &g) const;
+private:
+  void visitContraction(const Expr *e, const TupleList &indices);
+
+  void buildExprTreeForExpr(const Expr *);
+  ExprNode *buildExprTreeForGraph(GCG_Graph *);
+
+  void selectEdgesToContract(EdgeSet &result, const GCG_Graph &g) const;
   void getRemainingEdgesAtNode(EdgeSet &result, const GCG_Node &n,
                                const EdgeSet &toContract) const;
   void replaceEdgesAtNode(GCG_Graph &graph, const GCG_Node &oldNode,
                           const EdgeSet &edgesAtOldNode,
                           const GCG_Node &newNode, int shift,
                           const EdgeSet &toContract);
-
-  std::string emitGraphForExpr(const Expr *expr);
-
-  virtual void emitContraction(const std::string &result,
-                               const std::string &lhs, const List &srcIndices,
-                               const std::string &rhs,
-                               const List &tgtIndices) = 0;
-  virtual void emitTensorProduct(const std::string &result,
-                                 const std::string &lhs,
-                                 const std::string &rhs) = 0;
-  virtual void emitTensorStack(const std::string &result,
-                               const std::list<std::string> &temps) = 0;
-  virtual void emitAssignment(const std::string &result,
-                              const std::string &expr) = 0;
-
-  virtual void emitAddExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) = 0;
-  virtual void emitSubExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) = 0;
-  virtual void emitMulExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) = 0;
-  virtual void emitDivExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) = 0;
 };
 
 #endif // __GRAPH_CG_H__

@@ -1,3 +1,4 @@
+// test case 1
 type tensor : [1 1 1 2]
 type tensor3 : [12 34 56]
 type tensor4 : [34 12 27 43]

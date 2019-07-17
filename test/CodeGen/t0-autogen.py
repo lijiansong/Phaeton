@@ -1,21 +1,19 @@
 # ----- Autogen kernel by Phaeton -----
 import numpy as np
 
-a = np.random.rand(3, 3)
-b = np.random.rand(3, 3)
-t0 = a + b
-b = t0
-t1 = a - b
-b = t1
-t2 = a * b
-b = t2
-t3 = a / b
-b = t3
+
+t0 = np.TensorType('float64', (False,)*2)
+a = np.TensorVariable(t0)
+b = np.TensorVariable(t0)
+b = a + b
+b = a - b
+b = a * b
+b = a / b
 t4 = b + a
-t5 = t4 + a
-t6 = a + t5
-t7 = a * b
-t8 = a - t7
-t9 = t6 * t8
-t10 = t9 * b
-b = t10
+t3 = t4 + a
+t2 = a + t3
+t6 = a * b
+t5 = a - t6
+t1 = t2 * t5
+b = t1 * b
+t7 = theano_function([a, b], b)
