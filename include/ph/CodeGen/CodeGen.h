@@ -33,6 +33,12 @@ private:
   // which rooted at an 'ExprNode'
   std::map<const Expr *, ExprNode *> ExprTrees;
 
+public:
+  struct Assignment {
+    std::string variable;
+    const ExprNode *en;
+  };
+
 protected:
   ExprNodeBuilder *ENBuilder;
 

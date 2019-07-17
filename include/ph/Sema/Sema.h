@@ -74,17 +74,29 @@ public:
   std::set<const Symbol *>::const_iterator inputs_begin() const {
     return Inputs.begin();
   }
+
   std::set<const Symbol *>::const_iterator inputs_end() const {
     return Inputs.end();
   }
+
   int inputs_size() const { return Inputs.size(); }
 
   std::set<const Symbol *>::const_iterator outputs_begin() const {
     return Outputs.begin();
   }
+
   std::set<const Symbol *>::const_iterator outputs_end() const {
     return Outputs.end();
   }
+
+  bool is_in_inputs(const std::string &name) const {
+    return (Inputs.find(getSymbol(name)) != Inputs.end());
+  }
+
+  bool is_in_outputs(const std::string &name) const {
+    return (Outputs.find(getSymbol(name)) != Outputs.end());
+  }
+
   int outputs_size() const { return Outputs.size(); }
 
   bool isNamedType(const TensorType *type) const;
