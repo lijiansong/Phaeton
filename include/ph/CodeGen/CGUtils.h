@@ -13,6 +13,14 @@
 
 #include "ph/AST/AST.h"
 
+// TODO: add wrappers for CodeGen indent formater
+#define FORMAT_CG_INDENT(indent)                                               \
+  {                                                                            \
+    std::cout.width((indent));                                                 \
+    std::cout << std::left << "";                                              \
+    std::cout.unsetf(std::ios::adjustfield);                                   \
+  }
+
 template <typename Derived> class Comparable {
 public:
   virtual bool operator==(const Derived &rhs) const = 0;
@@ -57,27 +65,26 @@ public:
       : GraphComponentID<StringID>(rhs.getLabel(), rhs.getAST()),
         ID(rhs.str()) {}
 
-  const std::string str() const final { return ID; }
+  virtual const std::string str() const final { return ID; }
   bool operator==(const StringID &id) const final { return ID == id.str(); }
   bool operator<(const StringID &id) const final { return ID < id.str(); }
 };
 
-class AddressID : public GraphComponentID<AddressID> {
+template <typename T> class AddressID : public GraphComponentID<AddressID<T>> {
 private:
-  const void *const ID;
+  T *ID;
 
 public:
-  AddressID(const void *const id, const std::string label = "",
-            const ASTNode *ast = nullptr)
+  AddressID(T *id, const std::string label = "", const ASTNode *ast = nullptr)
       : GraphComponentID<AddressID>(label, ast), ID(id) {}
 
-  const void *const get() const { return ID; }
+  T *get() const { return ID; }
 
   AddressID(const AddressID &rhs, const std::string label = "")
       : GraphComponentID<AddressID>(rhs.getLabel(), rhs.getAST()),
         ID(rhs.get()) {}
 
-  const std::string str() const {
+  virtual const std::string str() const final {
     std::stringstream ss;
     ss << std::hex << ID;
     return ss.str();
