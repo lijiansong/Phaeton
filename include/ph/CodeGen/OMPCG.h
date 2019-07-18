@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "ph/CodeGen/CodeGen.h"
-#include "ph/CodeGen/ExprTree.h"
+#include "ph/Opt/ExprTreeVisitor.h"
 #include "ph/Sema/Type.h"
 
 class OpenMPEmitter : public ExprTreeVisitor {

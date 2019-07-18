@@ -13,13 +13,6 @@
 
 #include "ph/AST/AST.h"
 
-// TODO: add wrappers for CodeGen indent formater
-#define FORMAT_CG_INDENT(indent)                                               \
-  {                                                                            \
-    std::cout.width((indent));                                                 \
-    std::cout << std::left << "";                                              \
-    std::cout.unsetf(std::ios::adjustfield);                                   \
-  }
 
 template <typename Derived> class Comparable {
 public:

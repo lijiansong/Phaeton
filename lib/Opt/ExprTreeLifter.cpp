@@ -1,4 +1,4 @@
-#include "ph/CodeGen/ExprTreeLifter.h"
+#include "ph/Opt/ExprTreeLifter.h"
 
 void ExprTreeLifter::transformNode(ExprNode *en) {
   if (isNodeToBeLifted(en))
@@ -12,7 +12,7 @@ void ExprTreeLifter::liftNode(ExprNode *en) {
   unsigned childIndex = getChildIndex();
 
   if (parent == nullptr) {
-    // node 'en' is at the top of the tree, nothing to do here but visit
+    // ExprNode 'en' is at the top of the tree, nothing to do here but visit
     // children
     setParent(en);
     transformChildren(en);
@@ -20,7 +20,7 @@ void ExprTreeLifter::liftNode(ExprNode *en) {
   } else {
     const std::string temp = getTemp();
     ExprNode *newNode =
-        getENBuilder()->createIdentifierExpr(temp, en->getDims());
+        getExprNodeBuilder()->createIdentifierExpr(temp, en->getDims());
 
     parent->setChild(childIndex, newNode);
 

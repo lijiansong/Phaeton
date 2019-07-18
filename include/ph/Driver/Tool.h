@@ -7,5 +7,6 @@
 #ifndef __TOOL_H__
 #define __TOOL_H__
 
+class Tools {};
 
 #endif // __TOOL_H__

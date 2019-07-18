@@ -4,7 +4,8 @@ include_directories(${PHAETON_LANG_OUTPUT_DIR})
 
 add_executable(${PH_TRANSLATE_EXE} ph-translate.cpp)
 target_link_libraries(${PH_TRANSLATE_EXE} AST
-                                           CodeGen
-                                           Lexer
-                                           Parser
-                                           Sema)
+                                          Opt
+                                          CodeGen
+                                          Lexer
+                                          Parser
+                                          Sema)

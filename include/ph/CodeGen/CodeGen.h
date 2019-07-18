@@ -45,7 +45,7 @@ protected:
   void EXPR_TREE_MAP_ASSERT(const Expr *expr) const;
 
 public:
-  ExprNodeBuilder *getENBuilder() { return ENBuilder; }
+  ExprNodeBuilder *getExprNodeBuilder() { return ENBuilder; }
 
   void addExprNode(const Expr *expr, ExprNode *en) { ExprTrees[expr] = en; }
   ExprNode *getExprNode(const Expr *expr) const { return ExprTrees.at(expr); }

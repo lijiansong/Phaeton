@@ -4,8 +4,11 @@
 #include <sstream>
 #include <string>
 
-#include "ph/CodeGen/CGUtils.h"
-#include "ph/CodeGen/ExprTree.h"
+#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/ExprTreeTransformer.h"
+#include "ph/Opt/ExprTreeVisitor.h"
+#include "ph/Opt/ENBuilder.h"
+#include "ph/Opt/OptUtils.h"
 
 std::map<ExprNode::ExprKind, std::string> ExprNode::ExprLabel = {
     {EK_Add, "Add"},
@@ -29,13 +32,13 @@ void ExprNode::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_CG_INDENT(indent)
+  FORMAT_OPT_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
 
   for (int i = 0; i < getNumChildren(); i++)
     getChild(i)->dump(indent + str.length() + 1);
 
-  FORMAT_CG_INDENT(indent + 1)
+  FORMAT_OPT_INDENT(indent + 1)
   std::cout << ")\n";
 }
 
@@ -107,7 +110,7 @@ ContractionExpr::ContractionExpr(ExprNode *lhs,
   leftIndicesList.sort();
   std::list<int> rightIndicesList(rightIndices.begin(), rightIndices.end());
   rightIndicesList.sort();
-  // the following works at the precondition that 'leftIndicesList'
+  // The following works at the precondition that 'leftIndicesList'
   // and 'rightIndicesList' is sorted.
   int erased = 0;
   for (const int index : leftIndicesList) {
@@ -130,18 +133,18 @@ void ContractionExpr::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_CG_INDENT(indent)
+  FORMAT_OPT_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
 
   getChild(1)->dump(indent + str.length() + 1);
-  FORMAT_CG_INDENT(indent + str.length() + 1)
+  FORMAT_OPT_INDENT(indent + str.length() + 1)
   std::cout << CodeGen::getListString(getLeftIndices()) << "\n";
 
   getChild(0)->dump(indent + str.length() + 1);
-  FORMAT_CG_INDENT(indent + str.length() + 1)
+  FORMAT_OPT_INDENT(indent + str.length() + 1)
   std::cout << CodeGen::getListString(getRightIndices()) << "\n";
 
-  FORMAT_CG_INDENT(indent + 1)
+  FORMAT_OPT_INDENT(indent + 1)
   std::cout << ")\n";
 }
 
@@ -153,7 +156,7 @@ StackExpr::StackExpr(const std::vector<ExprNode *> &members)
   ExprDimensions dims;
   dims.push_back(members.size());
   if (members.size()) {
-    // for type checking, all members must have the same dimensions;
+    // For type checking, all members must have the same dimensions;
     const ExprDimensions &memberDims = members[0]->getDims();
     for (int i = 0; i < memberDims.size(); i++)
       dims.push_back(memberDims[i]);
@@ -168,7 +171,7 @@ void IdentifierExpr::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_CG_INDENT(indent)
+  FORMAT_OPT_INDENT(indent)
   std::cout << "(" << str << ss.str() << " \"" << getName() << "\")\n";
 }
 

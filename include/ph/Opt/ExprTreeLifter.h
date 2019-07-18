@@ -3,7 +3,7 @@
 // This file defines interfaces of expression tree lifter. Expression tree
 // lifter lifts tensor 'Contraction' and 'Stack' nodes out of expression
 // trees and replaces them with temporary variables, which can help
-// generate better C code.
+// generate better code.
 //
 //===----------------------------------------------------------------------===//
 
@@ -15,7 +15,9 @@
 #include <string>
 
 #include "ph/CodeGen/CodeGen.h"
-#include "ph/CodeGen/ExprTree.h"
+#include "ph/Opt/ENBuilder.h"
+#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/ExprTreeTransformer.h"
 
 class ExprTreeLifter : public ExprTreeTransformer {
 public:
@@ -74,7 +76,7 @@ public:
 
 private:
   std::string getTemp() { return CG->getTemp(); }
-  ExprNodeBuilder *getENBuilder() { return CG->getENBuilder(); }
+  ExprNodeBuilder *getExprNodeBuilder() { return CG->getExprNodeBuilder(); }
 };
 
 #endif // __EXPR_TREE_LIFTER_H__

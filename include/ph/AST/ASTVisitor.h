@@ -20,6 +20,7 @@ public:
   DECL_VISIT_LIST(DeclList)
   DECL_VISIT_LIST(StmtList)
   DECL_VISIT_LIST(ExprList)
+#undef DECL_VISIT_LIST
 
 #define DECL_PURE_VISIT_ASTNode(NodeName)                                               \
   virtual void visit##NodeName(const NodeName *) = 0;
@@ -31,6 +32,7 @@ public:
   DECL_PURE_VISIT_ASTNode(Identifier)
   DECL_PURE_VISIT_ASTNode(Integer)
   DECL_PURE_VISIT_ASTNode(BrackExpr)
+#undef DECL_PURE_VISIT_ASTNode
 
 #define DECL_VISIT_ASTNode(NodeName)                                               \
   virtual void visit##NodeName(const NodeName *);
@@ -38,6 +40,7 @@ public:
   DECL_VISIT_ASTNode(Expr)
   DECL_VISIT_ASTNode(Factor)
   DECL_VISIT_ASTNode(ParenExpr)
+#undef DECL_VISIT_ASTNode
 };
 
 #endif // __ASTVISITOR_H__
