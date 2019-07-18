@@ -39,7 +39,7 @@ protected:
   int getChildIndex() const { return ChildIndex; }
 
 public:
-  typedef std::list<CodeGen::Assignment> AssignmentsListTy;
+  using AssignmentsListTy = std::list<CodeGen::Assignment>;
 
 private:
   AssignmentsListTy Assignments;

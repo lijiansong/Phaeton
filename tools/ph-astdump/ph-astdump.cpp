@@ -1,3 +1,18 @@
+//===- ph-astdump.cpp - Phaeton AST Dumper -------------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This utility provides a simple wrapper around the Flex & Bison yyparser,
+// which allow the dump of Phaeton programs abstract syntax tree.
+//
+//===----------------------------------------------------------------------===//
+//
+// TODO: Refering clang-2.6 ast-print to dump the AST more elegantly.
+//
+//===----------------------------------------------------------------------===//
+
 #include <fstream>
 #include <iostream>
 

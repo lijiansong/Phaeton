@@ -1,3 +1,19 @@
+//===- ph-lex.cpp - Phaeton Token Lexer -----------------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This utility provides a simple wrapper around the Flex & Bison yylexer,
+// which allow the dump of Phaeton programs tokens. This tool is for debug
+// use.
+//
+//===----------------------------------------------------------------------===//
+//
+// TODO: Refering clang-2.6 to dump the tokens more elegantly.
+//
+//===----------------------------------------------------------------------===//
+
 #include <fstream>
 #include <iostream>
 

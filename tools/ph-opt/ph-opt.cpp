@@ -1,3 +1,18 @@
+//===- opt.cpp - The Phaeton Modular Optimizer ----------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// Optimizations may be specified an arbitrary number of times on the command
+// line, They are run in the order specified.
+//
+//===----------------------------------------------------------------------===//
+//
+// TODO: Refering llvm-2.6/tools/opt to add the compiler optimizer module.
+//
+//===----------------------------------------------------------------------===//
+
 #include <fstream>
 #include <iostream>
 

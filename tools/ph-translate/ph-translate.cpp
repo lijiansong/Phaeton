@@ -1,3 +1,21 @@
+//===--- ph-translate.cpp - Phaeton-Language Front-end --------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This utility may be invoked in the following manner:
+//   ph-translate --help                - Output help info.
+//   ph-translate [options]             - Read from stdin.
+//   ph-translate [options] file        - Read from "file".
+//   ph-translate [options] file1 file2 - Read these files.
+//
+//===----------------------------------------------------------------------===//
+//
+// TODO: Refering clang-2.6/tools/clang-cc to add the compiler driver module.
+//
+//===----------------------------------------------------------------------===//
+
 #include <fstream>
 #include <iostream>
 
