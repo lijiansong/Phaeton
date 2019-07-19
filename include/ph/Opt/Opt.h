@@ -1,5 +1,9 @@
 //===--- Opt.h - "Umbrella" header for Opt library --------------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 //  This file defines the interface to the Opt classes.
 //
 //===----------------------------------------------------------------------===//

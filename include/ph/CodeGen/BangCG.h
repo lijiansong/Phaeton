@@ -1,5 +1,9 @@
 //==------ BangCG.h ------ Representation of code generation for Bang ------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines the base class CodeGen for target language Cambricon Bang.
 //
 //===----------------------------------------------------------------------===//
@@ -8,11 +12,11 @@
 #define __BANG_CG_H__
 
 #if 0
-#include <string>
-
 #include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
 #include "ph/CodeGen/PyFragBuilder.h"
+
+#include <string>
 
 // TODO: CG for Cambricon Bang with SIMD intrinsics.
 class BangCG : public DirectCodeGen {

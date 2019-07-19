@@ -1,5 +1,9 @@
 //==------ DirectCG.h ----- Representation of CodeGen ----------------------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines intefaces of direct code generation.
 //
 //===----------------------------------------------------------------------===//
@@ -7,11 +11,11 @@
 #ifndef __DIRECT_CG_H__
 #define __DIRECT_CG_H__
 
-#include <map>
-#include <string>
-
 #include "ph/AST/AST.h"
 #include "ph/CodeGen/CodeGen.h"
+
+#include <map>
+#include <string>
 
 class DirectCodeGen : public CodeGen {
   // map for 'Expr' nodes in the AST to temporary variables:

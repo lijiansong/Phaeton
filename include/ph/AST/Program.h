@@ -1,5 +1,9 @@
 //===--- Program.h - Classes for representing programs ----------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 //  This file defines the subclass Program inherited from ASTNode.
 //
 //===----------------------------------------------------------------------===//

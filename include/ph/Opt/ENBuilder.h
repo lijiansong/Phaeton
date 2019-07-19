@@ -1,5 +1,9 @@
 //==------ ENBuilder.h - Representation of expression node builder ---------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines interfaces of expression node builder. Expression node
 // builder is a factory class for memory management and memory scheduling.
 // For DNN accelerator, we will hide the memory hierarchy, only expose the
@@ -10,8 +14,9 @@
 #ifndef __EXPR_NODE_BUILDER_H__
 #define __EXPR_NODE_BUILDER_H__
 
-#include <set>
 #include "ph/Opt/ExprTree.h"
+
+#include <set>
 
 class ExprNodeBuilder {
 private:

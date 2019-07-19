@@ -1,4 +1,4 @@
-//===- ph-astdump.cpp - Phaeton AST Dumper -------------------------------===//
+//===- ph-astdump.cpp - Phaeton AST Dumper --------------------------------===//
 //
 //                     The Phaeton Compiler Infrastructure
 //

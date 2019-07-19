@@ -1,5 +1,9 @@
 //===--- Decl.h - Classes for representing declarations ---------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 //  This file defines the Decl subclasses inherited from base class ASTNode.
 //
 //===----------------------------------------------------------------------===//

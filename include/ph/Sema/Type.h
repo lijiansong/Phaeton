@@ -1,6 +1,10 @@
 //===--- Type.h - Classes for representing base tensor type -----*- C++ -*-===//
 //
-//  This file defines the compile base data type Tensor.
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file defines the compiler base data type Tensor.
 //
 //===----------------------------------------------------------------------===//
 

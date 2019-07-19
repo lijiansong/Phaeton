@@ -1,9 +1,19 @@
+//===--- ASTNode.cpp - Union class for AST nodes --------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file implements the ASTNode class.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/AST/ASTNode.h"
+#include "ph/AST/ASTUtils.h"
+#include "ph/AST/ASTVisitor.h"
 #include "ph/AST/Decl.h"
 #include "ph/AST/Expr.h"
 #include "ph/AST/Stmt.h"
-#include "ph/AST/ASTVisitor.h"
-#include "ph/AST/ASTUtils.h"
 
 std::map<ASTNode::NodeType, std::string> ASTNode::NodeLabel = {
     {ASTNode::NT_Program, "Program"},

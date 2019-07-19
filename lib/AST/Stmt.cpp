@@ -1,3 +1,13 @@
+//===--- Stmt.cpp - Interface for statements AST node --------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file implements interfaces of the Stmt class.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/AST/Stmt.h"
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"

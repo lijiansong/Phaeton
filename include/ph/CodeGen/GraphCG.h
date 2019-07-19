@@ -1,5 +1,9 @@
 //==------ GraphCG.h ------ Representation of CodeGen ----------------------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines intefaces of code generation via graph.
 //
 //===----------------------------------------------------------------------===//
@@ -7,15 +11,15 @@
 #ifndef __GRAPH_CG_H__
 #define __GRAPH_CG_H__
 
+#include "ph/AST/AST.h"
+#include "ph/CodeGen/CGUtils.h"
+#include "ph/CodeGen/CodeGen.h"
+#include "ph/CodeGen/TensorGraph.h"
+
 #include <list>
 #include <set>
 #include <utility>
 #include <vector>
-
-#include "ph/AST/AST.h"
-#include "ph/CodeGen/CodeGen.h"
-#include "ph/CodeGen/CGUtils.h"
-#include "ph/CodeGen/TensorGraph.h"
 
 class GraphCodeGen : public CodeGen {
 public:

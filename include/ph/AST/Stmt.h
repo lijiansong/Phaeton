@@ -1,5 +1,9 @@
 //===--- Stmt.h - Classes for representing statements -----------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 //  This file defines the Stmt interface.
 //
 //===----------------------------------------------------------------------===//

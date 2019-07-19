@@ -1,3 +1,13 @@
+//==------ ExprTreeLifter.cpp - Interfaces to expression tree lifter -------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements interfaces of ExprTreeLifter.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/Opt/ExprTreeLifter.h"
 
 void ExprTreeLifter::transformNode(ExprNode *en) {

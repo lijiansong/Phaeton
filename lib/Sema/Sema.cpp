@@ -1,10 +1,21 @@
+//===--- Sema.cpp - AST Builder and Semantic Analysis Implementation ------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements the actions class which performs semantic analysis and
+// builds an AST out of a parse stream.
+//
+//===----------------------------------------------------------------------===//
+
+#include "ph/Sema/Sema.h"
+
 #include <cassert>
 #include <list>
 #include <set>
 #include <string>
 #include <vector>
-
-#include "ph/Sema/Sema.h"
 
 #define TYPE_MAP_ASSERT(expr)                                                  \
   {                                                                            \

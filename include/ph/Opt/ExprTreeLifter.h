@@ -1,5 +1,9 @@
 //==------ ExprTreeLifter.h - Representation of expr tree lifer ------------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines interfaces of expression tree lifter. Expression tree
 // lifter lifts tensor 'Contraction' and 'Stack' nodes out of expression
 // trees and replaces them with temporary variables, which can help
@@ -10,14 +14,14 @@
 #ifndef __EXPR_TREE_LIFTER_H__
 #define __EXPR_TREE_LIFTER_H__
 
-#include <functional>
-#include <list>
-#include <string>
-
 #include "ph/CodeGen/CodeGen.h"
 #include "ph/Opt/ENBuilder.h"
 #include "ph/Opt/ExprTree.h"
 #include "ph/Opt/ExprTreeTransformer.h"
+
+#include <functional>
+#include <list>
+#include <string>
 
 class ExprTreeLifter : public ExprTreeTransformer {
 public:

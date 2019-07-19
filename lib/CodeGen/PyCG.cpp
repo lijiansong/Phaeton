@@ -1,3 +1,13 @@
+//==--- PyCG.cpp ----- Interface to code generation for Python Numpy -------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This provides a class for Python Numpy code generation.
+//
+//===----------------------------------------------------------------------===//
+
 #include <vector>
 
 #include "ph/AST/AST.h"

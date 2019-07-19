@@ -1,5 +1,9 @@
 //==------ CudaCG.h ------ Representation of code generation for Cuda ------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines the base class CodeGen for target language NVIDIA CUDA.
 //
 //===----------------------------------------------------------------------===//
@@ -8,11 +12,11 @@
 #define __CUDA_CG_H__
 
 #if 0
-#include <string>
-
 #include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
 #include "ph/CodeGen/PyFragBuilder.h"
+
+#include <string>
 
 class CudaCG : public DirectCodeGen {
 protected:

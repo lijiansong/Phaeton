@@ -1,5 +1,9 @@
 //==------ TensorGraph.h - Representation of tensor graph ------------------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines tensor graph which is used for high order tensor contract
 // calculation, this idea is inspired by:
 // https://liwt31.github.io/2018/01/22/graphical_matrix
@@ -9,12 +13,12 @@
 #ifndef __TENSOR_GRAPH_H__
 #define __TENSOR_GRAPH_H__
 
+#include "ph/CodeGen/CGUtils.h"
+
 #include <fstream>
 #include <map>
 #include <utility>
 #include <vector>
-
-#include "ph/CodeGen/CGUtils.h"
 
 template <typename NodeID, typename EdgeID> class GraphEdge;
 template <typename NodeID, typename EdgeID> class TensorGraph;
@@ -171,9 +175,9 @@ public:
   const GraphNode<NodeID, EdgeID> *getStartNode() const;
 };
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 GraphNode<NodeID, EdgeID>::GraphNode(NodeID &&id, int rank)
-  : ID(id), Rank(rank) {
+    : ID(id), Rank(rank) {
   for (int i = 0; i < this->getRank(); i++)
     Legs.push_back(nullptr);
 
@@ -181,37 +185,33 @@ GraphNode<NodeID, EdgeID>::GraphNode(NodeID &&id, int rank)
   setSucc(nullptr);
 }
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 const GraphEdge<NodeID, EdgeID> *const &
 GraphNode<NodeID, EdgeID>::at(int i) const {
   assert(i < this->getRank());
   return Legs.at(i);
 }
 
-template<typename NodeID, typename EdgeID>
-const GraphEdge<NodeID, EdgeID> *&
-GraphNode<NodeID, EdgeID>::operator[](int i) {
+template <typename NodeID, typename EdgeID>
+const GraphEdge<NodeID, EdgeID> *&GraphNode<NodeID, EdgeID>::operator[](int i) {
   assert(i < this->getRank());
   return Legs[i];
 }
 
-template<typename NodeID, typename EdgeID>
-void
-GraphNode<NodeID, EdgeID>::unset(int i) {
+template <typename NodeID, typename EdgeID>
+void GraphNode<NodeID, EdgeID>::unset(int i) {
   assert(i < this->getRank());
   Legs[i] = nullptr;
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-GraphNode<NodeID, EdgeID>::isSet(int i) const {
+template <typename NodeID, typename EdgeID>
+bool GraphNode<NodeID, EdgeID>::isSet(int i) const {
   assert(i < this->getRank());
   return Legs[i] != nullptr;
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-GraphNode<NodeID, EdgeID>::anySet() const {
+template <typename NodeID, typename EdgeID>
+bool GraphNode<NodeID, EdgeID>::anySet() const {
   for (int i = 0; i < this->getRank(); i++)
     if (isSet(i))
       return true;
@@ -219,9 +219,8 @@ GraphNode<NodeID, EdgeID>::anySet() const {
   return false;
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-GraphNode<NodeID, EdgeID>::anyUnset() const {
+template <typename NodeID, typename EdgeID>
+bool GraphNode<NodeID, EdgeID>::anyUnset() const {
   for (int i = 0; i < this->getRank(); i++)
     if (isUnset(i))
       return true;
@@ -229,9 +228,8 @@ GraphNode<NodeID, EdgeID>::anyUnset() const {
   return false;
 }
 
-template<typename NodeID, typename EdgeID>
-int
-GraphNode<NodeID, EdgeID>::countSet() const {
+template <typename NodeID, typename EdgeID>
+int GraphNode<NodeID, EdgeID>::countSet() const {
   int result = 0;
   for (int i = 0; i < this->getRank(); i++)
     result += isSet(i);
@@ -239,10 +237,9 @@ GraphNode<NodeID, EdgeID>::countSet() const {
   return result;
 }
 
-template<typename NodeID, typename EdgeID>
-void
-GraphNode<NodeID, EdgeID>::updateSequence(GraphNode<NodeID, EdgeID> *pred,
-                                          GraphNode<NodeID, EdgeID> *succ) {
+template <typename NodeID, typename EdgeID>
+void GraphNode<NodeID, EdgeID>::updateSequence(
+    GraphNode<NodeID, EdgeID> *pred, GraphNode<NodeID, EdgeID> *succ) {
   setPred(pred);
   if (pred != nullptr)
     pred->setSucc(this);
@@ -252,27 +249,24 @@ GraphNode<NodeID, EdgeID>::updateSequence(GraphNode<NodeID, EdgeID> *pred,
     succ->setPred(this);
 }
 
-template<typename NodeID, typename EdgeID>
-GraphEdge<NodeID, EdgeID>::GraphEdge(EdgeID &&id,
-                                     const NodeIndexPair &src,
+template <typename NodeID, typename EdgeID>
+GraphEdge<NodeID, EdgeID>::GraphEdge(EdgeID &&id, const NodeIndexPair &src,
                                      const NodeIndexPair &tgt)
-  : ID(id), Edge(src, tgt) {}
+    : ID(id), Edge(src, tgt) {}
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 GraphEdge<NodeID, EdgeID>::GraphEdge(EdgeID &&id,
                                      const GraphNode<NodeID, EdgeID> *srcNode,
                                      int srcIndex,
                                      const GraphNode<NodeID, EdgeID> *tgtNode,
                                      int tgtIndex)
-  : GraphEdge(EdgeID(id),
-              NodeIndexPair(srcNode, srcIndex),
-              NodeIndexPair(tgtNode, tgtIndex)) {}
+    : GraphEdge(EdgeID(id), NodeIndexPair(srcNode, srcIndex),
+                NodeIndexPair(tgtNode, tgtIndex)) {}
 
-
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 TensorGraph<NodeID, EdgeID>::~TensorGraph() {
   bool success = true;
-  
+
   while (!Edges.empty())
     success &= eraseEdge(Edges.begin()->first);
 
@@ -280,12 +274,11 @@ TensorGraph<NodeID, EdgeID>::~TensorGraph() {
     success &= eraseNode(Nodes.begin()->first);
 
   assert(success &&
-         "internal error: erasing of graph components should not fail"); 
+         "internal error: erasing of graph components should not fail");
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::empty() const {
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::empty() const {
   if (!Nodes.empty())
     return false;
 
@@ -293,27 +286,22 @@ TensorGraph<NodeID, EdgeID>::empty() const {
   return true;
 }
 
-template<typename NodeID, typename EdgeID>
-int
-TensorGraph<NodeID, EdgeID>::getNumEdges() const {
+template <typename NodeID, typename EdgeID>
+int TensorGraph<NodeID, EdgeID>::getNumEdges() const {
   return Edges.size();
 }
 
-template<typename NodeID, typename EdgeID>
-int
-TensorGraph<NodeID, EdgeID>::getNumEdges(const NodeID &id) const {
+template <typename NodeID, typename EdgeID>
+int TensorGraph<NodeID, EdgeID>::getNumEdges(const NodeID &id) const {
   if (!isNode(id))
     return 0;
 
   return Nodes.at(id).countSet();
 }
 
-template<typename NodeID, typename EdgeID>
-void
-TensorGraph<NodeID, EdgeID>::getEdgesAtNode(
-  EdgeMap &result,
-  const GraphNode<NodeID, EdgeID> *n) const
-{
+template <typename NodeID, typename EdgeID>
+void TensorGraph<NodeID, EdgeID>::getEdgesAtNode(
+    EdgeMap &result, const GraphNode<NodeID, EdgeID> *n) const {
   for (const auto &e : Edges) {
     const GraphNode<NodeID, EdgeID> &src = *e.second->getSrcNode();
     const GraphNode<NodeID, EdgeID> &tgt = *e.second->getTgtNode();
@@ -323,13 +311,10 @@ TensorGraph<NodeID, EdgeID>::getEdgesAtNode(
   }
 }
 
-template<typename NodeID, typename EdgeID>
-void
-TensorGraph<NodeID, EdgeID>::getEdgesBetweenNodes(
-  EdgeMap &result,
-  const GraphNode<NodeID, EdgeID> *src,
-  const GraphNode<NodeID, EdgeID> *tgt) const
-{
+template <typename NodeID, typename EdgeID>
+void TensorGraph<NodeID, EdgeID>::getEdgesBetweenNodes(
+    EdgeMap &result, const GraphNode<NodeID, EdgeID> *src,
+    const GraphNode<NodeID, EdgeID> *tgt) const {
   EdgeMap tmp;
   getEdgesAtNode(tmp, src);
 
@@ -343,21 +328,18 @@ TensorGraph<NodeID, EdgeID>::getEdgesBetweenNodes(
   }
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::isNode(const NodeID &id) const {
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::isNode(const NodeID &id) const {
   return Nodes.count(id);
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::isEdge(const EdgeID &id) const {
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::isEdge(const EdgeID &id) const {
   return Edges.count(id);
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::addNode(const NodeID &id, int rank) {
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::addNode(const NodeID &id, int rank) {
   if (isNode(id))
     return false;
 
@@ -366,21 +348,21 @@ TensorGraph<NodeID, EdgeID>::addNode(const NodeID &id, int rank) {
   return true;
 }
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 const GraphNode<NodeID, EdgeID> *
 TensorGraph<NodeID, EdgeID>::getNode(const NodeID &id) const {
   assert(isNode(id));
   return Nodes.at(id);
 }
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 GraphNode<NodeID, EdgeID> *
 TensorGraph<NodeID, EdgeID>::getNode(const NodeID &id) {
   assert(isNode(id));
   return Nodes[id];
 }
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 GraphNode<NodeID, EdgeID> *
 TensorGraph<NodeID, EdgeID>::getNode(const NodeID &id, int rank) {
   if (!isNode(id)) {
@@ -393,16 +375,15 @@ TensorGraph<NodeID, EdgeID>::getNode(const NodeID &id, int rank) {
   return n;
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::eraseNode(const NodeID &id) {
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::eraseNode(const NodeID &id) {
   if (!isNode(id))
     return false;
 
   GraphNode<NodeID, EdgeID> *n = Nodes[id];
   if (n->anySet())
-      // Cannot erase this node if it has outgoing edges:
-      return false;
+    // Cannot erase this node if it has outgoing edges:
+    return false;
 
   if (n->hasPred()) {
     GraphNode<NodeID, EdgeID> *pred = n->getPred();
@@ -418,20 +399,16 @@ TensorGraph<NodeID, EdgeID>::eraseNode(const NodeID &id) {
   return true;
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::addEdge(const EdgeID &id,
-                                     const GraphNode<NodeID, EdgeID> *srcNode,
-                                     int srcIndex,
-                                     const GraphNode<NodeID, EdgeID> *tgtNode,
-                                     int tgtIndex) {
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::addEdge(
+    const EdgeID &id, const GraphNode<NodeID, EdgeID> *srcNode, int srcIndex,
+    const GraphNode<NodeID, EdgeID> *tgtNode, int tgtIndex) {
   if (!isNode(srcNode->getID()) || !isNode(tgtNode->getID()))
     return false;
   if (srcNode->isSet(srcIndex) || tgtNode->isSet(tgtIndex))
     return false;
 
-  auto *e = new GraphEdge<NodeID, EdgeID>(EdgeID(id),
-                                          srcNode, srcIndex,
+  auto *e = new GraphEdge<NodeID, EdgeID>(EdgeID(id), srcNode, srcIndex,
                                           tgtNode, tgtIndex);
   Edges[id] = e;
   auto *writableSrcNode = getNode(srcNode->getID());
@@ -441,35 +418,30 @@ TensorGraph<NodeID, EdgeID>::addEdge(const EdgeID &id,
   return true;
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::addEdge(const GraphEdge<NodeID, EdgeID> &e) {
-  return addEdge(e.getID(),
-                 e.getSrcNode(), e.getSrcIndex(),
-                 e.getTgtNode(), e.getTgtIndex());
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::addEdge(const GraphEdge<NodeID, EdgeID> &e) {
+  return addEdge(e.getID(), e.getSrcNode(), e.getSrcIndex(), e.getTgtNode(),
+                 e.getTgtIndex());
 }
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 const GraphEdge<NodeID, EdgeID> *
 TensorGraph<NodeID, EdgeID>::getEdge(const EdgeID &id) const {
   assert(isEdge(id));
   return Edges.at(id);
 }
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 GraphEdge<NodeID, EdgeID> *
 TensorGraph<NodeID, EdgeID>::getEdge(const EdgeID &id) {
   assert(isEdge(id));
   return Edges[id];
 }
 
-template<typename NodeID, typename EdgeID>
-GraphEdge<NodeID, EdgeID> *
-TensorGraph<NodeID, EdgeID>::getEdge(const EdgeID &id,
-                                     const GraphNode<NodeID, EdgeID> *srcNode,
-                                     int srcIndex,
-                                     const GraphNode<NodeID, EdgeID> *tgtNode,
-                                     int tgtIndex) {
+template <typename NodeID, typename EdgeID>
+GraphEdge<NodeID, EdgeID> *TensorGraph<NodeID, EdgeID>::getEdge(
+    const EdgeID &id, const GraphNode<NodeID, EdgeID> *srcNode, int srcIndex,
+    const GraphNode<NodeID, EdgeID> *tgtNode, int tgtIndex) {
   if (!isEdge(id))
     return addEdge(id, srcNode, srcIndex, tgtNode, tgtIndex);
 
@@ -479,9 +451,8 @@ TensorGraph<NodeID, EdgeID>::getEdge(const EdgeID &id,
   return e;
 }
 
-template<typename NodeID, typename EdgeID>
-bool
-TensorGraph<NodeID, EdgeID>::eraseEdge(const EdgeID &id) {
+template <typename NodeID, typename EdgeID>
+bool TensorGraph<NodeID, EdgeID>::eraseEdge(const EdgeID &id) {
   if (!isEdge(id))
     return false;
 
@@ -495,14 +466,13 @@ TensorGraph<NodeID, EdgeID>::eraseEdge(const EdgeID &id) {
   return true;
 }
 
-template<typename NodeID, typename EdgeID>
-void
-TensorGraph<NodeID, EdgeID>::plot(std::ofstream &of) const {
+template <typename NodeID, typename EdgeID>
+void TensorGraph<NodeID, EdgeID>::plot(std::ofstream &of) const {
   of << "digraph <" << this << "> {\n";
-    
+
   for (const auto &n : Nodes) {
     const NodeID &id = n.first;
-    of << "\"" << id.str()  << "\""
+    of << "\"" << id.str() << "\""
        << " [label=\"" << id.getLabel() << "\"];\n";
   }
 
@@ -530,7 +500,7 @@ TensorGraph<NodeID, EdgeID>::plot(std::ofstream &of) const {
   of << "}\n";
 }
 
-template<typename NodeID, typename EdgeID>
+template <typename NodeID, typename EdgeID>
 const GraphNode<NodeID, EdgeID> *
 TensorGraph<NodeID, EdgeID>::getStartNode() const {
   const GraphNode<NodeID, EdgeID> *n = nodes_begin()->second;

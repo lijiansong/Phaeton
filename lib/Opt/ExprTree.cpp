@@ -1,14 +1,24 @@
+//==------ ExprTree.cpp - Union class for expression tree ------------------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements interfaces of ExprNode.
+//
+//===----------------------------------------------------------------------===//
+
+#include "ph/Opt/ENBuilder.h"
+#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/ExprTreeTransformer.h"
+#include "ph/Opt/ExprTreeVisitor.h"
+#include "ph/Opt/OptUtils.h"
+
 #include <cassert>
 #include <iostream>
 #include <list>
 #include <sstream>
 #include <string>
-
-#include "ph/Opt/ExprTree.h"
-#include "ph/Opt/ExprTreeTransformer.h"
-#include "ph/Opt/ExprTreeVisitor.h"
-#include "ph/Opt/ENBuilder.h"
-#include "ph/Opt/OptUtils.h"
 
 std::map<ExprNode::ExprKind, std::string> ExprNode::ExprLabel = {
     {EK_Add, "Add"},

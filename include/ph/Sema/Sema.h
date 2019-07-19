@@ -1,5 +1,9 @@
 //===--- Sema.h - Semantic Analysis & AST Building --------------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines the Sema class, which performs semantic analysis and
 // builds ASTs.
 //
@@ -8,13 +12,13 @@
 #ifndef __SEMA_H__
 #define __SEMA_H__
 
-#include <list>
-#include <map>
-#include <set>
-
 #include "ph/AST/AST.h"
 #include "ph/Sema/SymbolTable.h"
 #include "ph/Sema/Type.h"
+
+#include <list>
+#include <map>
+#include <set>
 
 class Sema : public ASTVisitor {
 private:

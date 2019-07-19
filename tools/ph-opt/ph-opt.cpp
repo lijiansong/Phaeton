@@ -1,4 +1,4 @@
-//===- opt.cpp - The Phaeton Modular Optimizer ----------------------------===//
+//===- ph-opt.cpp - The Phaeton Modular Optimizer -------------------------===//
 //
 //                     The Phaeton Compiler Infrastructure
 //

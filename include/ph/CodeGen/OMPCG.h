@@ -1,5 +1,9 @@
 //==------ OMPCG.h ------- Representation of code generation for OpenMP ----==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines the base class CodeGen for CPU C with OpenMP pragmas.
 //
 //===----------------------------------------------------------------------===//
@@ -7,13 +11,13 @@
 #ifndef __OMP_CG_H__
 #define __OMP_CG_H__
 
-#include <list>
-#include <string>
-#include <vector>
-
 #include "ph/CodeGen/CodeGen.h"
 #include "ph/Opt/ExprTreeVisitor.h"
 #include "ph/Sema/Type.h"
+
+#include <list>
+#include <string>
+#include <vector>
 
 class OpenMPEmitter : public ExprTreeVisitor {
 private:

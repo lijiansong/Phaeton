@@ -1,4 +1,8 @@
-//==------ PyFragBuilder.h - Representation of CodeGen ---------------------==//
+//==------ PyFragBuilder.h - Representation of CodeGen for numpy -----------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
 //
 // This file defines intefaces of direct code generation python fragments.
 //
@@ -7,10 +11,10 @@
 #ifndef __PY_FRAG_BUILDER_H__
 #define __PY_FRAG_BUILDER_H__
 
-#include <string>
-
 #include "ph/AST/AST.h"
 #include "ph/CodeGen/CodeGen.h"
+
+#include <string>
 
 class PythonFragBuilder {
 private:

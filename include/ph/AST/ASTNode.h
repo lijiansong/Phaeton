@@ -1,5 +1,9 @@
 //===--- ASTNode.h - Classes for representing AST nodes ---------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 //  This file defines the ASTNode base class.
 //
 //===----------------------------------------------------------------------===//

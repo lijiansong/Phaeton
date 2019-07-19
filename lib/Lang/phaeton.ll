@@ -1,3 +1,13 @@
+/*===--- pheaton.ll - Recognize tokens for Phaeton ------------------------===*\
+|*                                                                            *|
+|*                     The Phaeton Compiler Infrastructure                    *|
+|*                                                                            *|
+|*===----------------------------------------------------------------------===*|
+|*                                                                            *|
+|*  This file defines the tokens for DSL Phaeton.                             *|
+|*                                                                            *|
+\*===----------------------------------------------------------------------===*/
+
 %option noyywrap
 %option pointer
 %option reentrant bison-bridge

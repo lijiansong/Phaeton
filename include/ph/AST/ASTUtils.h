@@ -1,5 +1,9 @@
 //===--- ASTUtils.h --------- AST Helper Functions --------------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 /// \file
 /// \brief This file provides some common utility functions for processing
 /// AST operations.

@@ -1,3 +1,13 @@
+/*===--- pheaton.yy ----- Syntax rules for Phaeton ------------------------===*\
+|*                                                                            *|
+|*                     The Phaeton Compiler Infrastructure                    *|
+|*                                                                            *|
+|*===----------------------------------------------------------------------===*|
+|*                                                                            *|
+|*  This file defines and implements the syntax rules for DSL Phaeton.        *|
+|*                                                                            *|
+\*===----------------------------------------------------------------------===*/
+
 %define api.pure full
 
 %param { yyscan_t yyscanner }

@@ -1,16 +1,20 @@
 //==------ PyCG.h ------ Representation of code generation for python ------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines the base class CodeGen for target language python.
 //
 //===----------------------------------------------------------------------===//
 #ifndef __PYCG_H__
 #define __PYCG_H__
 
-#include <string>
-
 #include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
 #include "ph/CodeGen/PyFragBuilder.h"
+
+#include <string>
 
 // for python Numpy, TODO: CG for SIMD intrinsics.
 class NumpyDirectCG : public DirectCodeGen {

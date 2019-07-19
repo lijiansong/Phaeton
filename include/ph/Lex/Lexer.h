@@ -1,5 +1,9 @@
 //===---- Lexer.h - Lexer for DSL Phaeton -----------------------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 //  This file defines the Lexer interface.
 //
 //===----------------------------------------------------------------------===//
@@ -7,11 +11,11 @@
 #ifndef __LEXER_H__
 #define __LEXER_H__
 
+#include "phaeton.tab.hh"
+
 #include <fstream>
 #include <map>
 #include <string>
-
-#include "phaeton.tab.hh"
 
 class Lexer {
 private:

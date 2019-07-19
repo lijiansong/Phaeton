@@ -1,5 +1,9 @@
 //===--- CGUtils.h ------ CodeGen Helper Functions --------------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 /// \file
 /// \brief This file provides some common utility functions for code generation.
 ///
@@ -8,11 +12,10 @@
 #ifndef __CG_UTILS_H__
 #define __CG_UTILS_H__
 
-#include <sstream>
-#include <string>
-
 #include "ph/AST/AST.h"
 
+#include <sstream>
+#include <string>
 
 template <typename Derived> class Comparable {
 public:

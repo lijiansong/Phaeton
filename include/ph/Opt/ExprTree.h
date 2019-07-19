@@ -1,5 +1,9 @@
 //==------ ExprTree.h - Representation of expression tree ------------------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines interfaces of expression tree. Expression tree records
 // the states of each tensor expression. We can do some transformation over
 // it to get high performace code.
@@ -9,14 +13,14 @@
 #ifndef __EXPR_TREE_H__
 #define __EXPR_TREE_H__
 
+#include "ph/CodeGen/CodeGen.h"
+#include "ph/Sema/SymbolTable.h"
+
 #include <cassert>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
-
-#include "ph/CodeGen/CodeGen.h"
-#include "ph/Sema/SymbolTable.h"
 
 class ExprTreeVisitor;
 class ExprTreeTransformer;

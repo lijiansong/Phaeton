@@ -1,11 +1,21 @@
+//===--- ASTVisitor.h - Visitor for AST nodes -------------------*- C++ -*-===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file defines the ASTVisitor interface.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef __ASTVISITOR_H__
 #define __ASTVISITOR_H__
 
 #include "ph/AST/ASTNode.h"
 #include "ph/AST/Decl.h"
 #include "ph/AST/Expr.h"
-#include "ph/AST/Stmt.h"
 #include "ph/AST/Program.h"
+#include "ph/AST/Stmt.h"
 
 class ASTVisitor {
 public:
@@ -20,9 +30,10 @@ public:
   DECL_VISIT_LIST(DeclList)
   DECL_VISIT_LIST(StmtList)
   DECL_VISIT_LIST(ExprList)
+
 #undef DECL_VISIT_LIST
 
-#define DECL_PURE_VISIT_ASTNode(NodeName)                                               \
+#define DECL_PURE_VISIT_ASTNode(NodeName)                                      \
   virtual void visit##NodeName(const NodeName *) = 0;
 
   DECL_PURE_VISIT_ASTNode(Decl)
@@ -32,14 +43,16 @@ public:
   DECL_PURE_VISIT_ASTNode(Identifier)
   DECL_PURE_VISIT_ASTNode(Integer)
   DECL_PURE_VISIT_ASTNode(BrackExpr)
+
 #undef DECL_PURE_VISIT_ASTNode
 
-#define DECL_VISIT_ASTNode(NodeName)                                               \
+#define DECL_VISIT_ASTNode(NodeName)                                           \
   virtual void visit##NodeName(const NodeName *);
 
   DECL_VISIT_ASTNode(Expr)
   DECL_VISIT_ASTNode(Factor)
   DECL_VISIT_ASTNode(ParenExpr)
+
 #undef DECL_VISIT_ASTNode
 };
 

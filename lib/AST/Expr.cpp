@@ -1,6 +1,16 @@
+//===--- Expr.cpp - Union class for expressions ---------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file implements interface of expressions.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/AST/Expr.h"
-#include "ph/AST/ASTVisitor.h"
 #include "ph/AST/ASTUtils.h"
+#include "ph/AST/ASTVisitor.h"
 
 void Expr::visit(ASTVisitor *v) const {
   assert(0 && "internal error: base class 'Expr' should not be visited");
@@ -97,4 +107,3 @@ void ParenExpr::_delete() const {
 }
 
 void ParenExpr::visit(ASTVisitor *v) const { v->visitParenExpr(this); }
-

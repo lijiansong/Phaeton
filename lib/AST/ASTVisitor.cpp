@@ -1,6 +1,15 @@
+//===--- ASTVisitor.cpp - Visitors for AST nodes --------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file implements visitor of the ASTVisitor class.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/AST/ASTVisitor.h"
 #include "ph/AST/ASTUtils.h"
-
 
 template <typename T, ASTNode::NodeType nt, typename Derived>
 void ASTVisitor::visitASTNodeList(const ASTNodeList<T, nt, Derived> *list) {

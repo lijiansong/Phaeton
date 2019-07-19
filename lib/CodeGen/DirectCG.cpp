@@ -1,11 +1,21 @@
-#include <cassert>
-#include <string>
-#include <vector>
+//==--- DirectCG.cpp ----- Interface to naive code generation --------------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements the DirectCodeGen class.
+//
+//===----------------------------------------------------------------------===//
 
 #include "ph/AST/AST.h"
 #include "ph/CodeGen/DirectCG.h"
 #include "ph/Sema/Sema.h"
 #include "ph/Sema/Type.h"
+
+#include <cassert>
+#include <string>
+#include <vector>
 
 #define TEMP_MAP_ASSERT(expr)                                                  \
   {                                                                            \

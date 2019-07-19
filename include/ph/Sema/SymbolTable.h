@@ -1,5 +1,9 @@
 //===--- SymbolTable.h - Classes for representing symbol table --*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 //  This file defines symbol table to track variable information.
 //
 //===----------------------------------------------------------------------===//
@@ -7,11 +11,11 @@
 #ifndef __SYMBOL_TABLE_H__
 #define __SYMBOL_TABLE_H__
 
-#include <map>
-#include <string>
-
 #include "ph/AST/AST.h"
 #include "ph/Sema/Type.h"
+
+#include <map>
+#include <string>
 
 class Symbol {
 public:

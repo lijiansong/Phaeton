@@ -1,3 +1,13 @@
+//===--- Type.cpp - Interfaces to base tensor type ------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file implements the interfaces of compiler base data type Tensor.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/Sema/Type.h"
 
 bool TensorType::operator==(const TensorType &rhs) const {

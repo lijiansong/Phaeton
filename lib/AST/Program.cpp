@@ -1,3 +1,13 @@
+//===--- Program.cpp - Interface for Program AST node --------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file implements interfaces of the Program class.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/AST/Program.h"
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"

@@ -1,8 +1,19 @@
-#include <map>
-#include <string>
+//===--- Lexer.cpp - Phaeton Language Lexer -------------------------------===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file implements the Lexer and Token interfaces.
+//
+//===----------------------------------------------------------------------===//
 
 #include "ph/Lex/Lexer.h"
+
 #include "lex.yy.h"
+
+#include <map>
+#include <string>
 
 Lexer::Lexer(const char *input) : Input(input) {
   yylex_init(&Scanner);

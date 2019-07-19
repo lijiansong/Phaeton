@@ -1,5 +1,16 @@
+//===--- Expr.h - Classes for representing expressions ----------*- C++ -*-===//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file defines the Expr interface and subclasses.
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef __EXPR_H__
 #define __EXPR_H__
+
 #pragma once
 
 #include "ph/AST/ASTNode.h"
@@ -133,4 +144,5 @@ public:
 
   virtual void visit(ASTVisitor *v) const override;
 };
+
 #endif // __EXPR_H__

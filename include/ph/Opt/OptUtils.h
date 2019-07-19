@@ -1,5 +1,9 @@
 //===--- OptUtils.h ------ Optimizer Helper Functions -----------*- C++ -*-===//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 /// \file
 /// \brief This file provides some common utility functions for optimizers.
 ///

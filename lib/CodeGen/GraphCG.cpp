@@ -1,14 +1,23 @@
+//==--- GraphCG.cpp ----- Interface to code generation via graph -----------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements the GraphCodeGen class.
+//
+//===----------------------------------------------------------------------===//
+
+#include "ph/AST/AST.h"
+#include "ph/CodeGen/GraphCG.h"
+#include "ph/Sema/Sema.h"
+#include "ph/Sema/Type.h"
 
 #include <cassert>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <sstream>
-
-#include "ph/AST/AST.h"
-#include "ph/CodeGen/GraphCG.h"
-#include "ph/Sema/Sema.h"
-#include "ph/Sema/Type.h"
 
 void GraphCodeGen::updateCurEnd(GCG_Node *n) {
   if (curEnd != nullptr) {

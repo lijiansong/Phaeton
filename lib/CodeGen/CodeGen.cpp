@@ -1,12 +1,22 @@
+//==--- CodeGen.cpp ----- Interface to code generation ---------------------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements the CodeGen class.
+//
+//===----------------------------------------------------------------------===//
+
+#include "ph/CodeGen/CodeGen.h"
+#include "ph/Opt/ENBuilder.h"
+#include "ph/Opt/ExprTree.h"
+#include "ph/Sema/Type.h"
+
 #include <cassert>
 #include <functional>
 #include <list>
 #include <vector>
-
-#include "ph/CodeGen/CodeGen.h"
-#include "ph/Opt/ExprTree.h"
-#include "ph/Opt/ENBuilder.h"
-#include "ph/Sema/Type.h"
 
 CodeGen::CodeGen(const Sema *sema) : TheSema(sema), TempCounter(0), Code("") {
   ENBuilder = new ExprNodeBuilder;

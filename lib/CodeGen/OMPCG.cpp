@@ -1,3 +1,13 @@
+//==--- OMPCG.cpp ----- Interface to code generation for CPU OpenMP --------==//
+//
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
+// This provides a class for OpenMP code generation targeting the CPUs.
+//
+//===----------------------------------------------------------------------===//
+
 #include "ph/CodeGen/OMPCG.h"
 #include "ph/AST/AST.h"
 #include "ph/Opt/ExprTreeLifter.h"
@@ -14,6 +24,7 @@
 // TODO: Add pragma for parallel
 void OpenMPEmitter::genCode(const Program *p) {
   nestingLevel = initialNestingLevel = 0;
+  // Emit kernel description
   append("// ----- Autogen kernel by Phaeton -----\n");
   // Emit C function name signature
   emitSignature();

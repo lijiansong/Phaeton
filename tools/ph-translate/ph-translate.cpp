@@ -23,6 +23,20 @@
 #include "ph/Parse/Parser.h"
 #include "ph/Sema/Sema.h"
 
+enum ProgActions {
+  EmitAssembly, // Emit a .s file.
+  EmitLLVM,     // Emit a LLVM IR .ll file.
+  EmitOpenMP,   // Translate input source into CPU OpenMP code.
+  EmitOpenCL,   // Translate input source into GPU OpenCL code.
+  EmitCuda,     // Translate input source into NVIDIA GPU CUDA code.
+  EmitBang,     // Translate input source into Cambricon MLU BANG code.
+  EmitCCE,      // Translate input source into Huawei Ascend CCE code.
+  EmitTPU,      // Translate input source into Google TPU code.
+  EmitNumpy,    // Translate input source into python numpy code.
+  ASTDump,      // Parse Phaeton ASTs and dump them.
+  DumpTokens,   // Dump out preprocessed tokens.
+};
+
 int main(int argc, char *argv[]) {
 
   std::ifstream in_file;

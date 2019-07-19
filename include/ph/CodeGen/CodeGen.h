@@ -1,5 +1,9 @@
 //==------ CodeGen.h - Representation of code generation -------------------==//
 //
+//                     The Phaeton Compiler Infrastructure
+//
+//===----------------------------------------------------------------------===//
+//
 // This file defines the base class CodeGen.
 //
 //===----------------------------------------------------------------------===//
@@ -7,13 +11,13 @@
 #ifndef __CODEGEN_H__
 #define __CODEGEN_H__
 
+#include "ph/Sema/Sema.h"
+#include "ph/Sema/Type.h"
+
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
-
-#include "ph/Sema/Sema.h"
-#include "ph/Sema/Type.h"
 
 class ExprNode;
 class ExprNodeBuilder;
