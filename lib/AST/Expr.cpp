@@ -26,7 +26,7 @@ void Identifier::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << " \"" << getName() << "\")\n";
 }
 
@@ -38,7 +38,7 @@ void Integer::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << " \"" << getValue() << "\")\n";
 }
 
@@ -50,11 +50,11 @@ void BinaryExpr::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
   LeftExpr->dump(indent + str.length() + 1);
   RightExpr->dump(indent + str.length() + 1);
-  FORMAT_INDENT(indent + 1)
+  FORMAT_AST_INDENT(indent + 1)
   std::cout << ")\n";
 }
 
@@ -74,10 +74,10 @@ void BrackExpr::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
   Exprs->dump(indent + str.length() + 1);
-  FORMAT_INDENT(indent + 1)
+  FORMAT_AST_INDENT(indent + 1)
   std::cout << ")\n";
 }
 
@@ -94,10 +94,10 @@ void ParenExpr::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
   NestedExpr->dump(indent + str.length() + 1);
-  FORMAT_INDENT(indent + 1)
+  FORMAT_AST_INDENT(indent + 1)
   std::cout << ")\n";
 }
 

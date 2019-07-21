@@ -18,11 +18,11 @@ void Stmt::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
   Id->dump(indent + str.length() + 1);
   RightExpr->dump(indent + str.length() + 1);
-  FORMAT_INDENT(indent + 1)
+  FORMAT_AST_INDENT(indent + 1)
   std::cout << ")\n";
 }
 

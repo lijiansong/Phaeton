@@ -9,7 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// TODO: Refering clang-2.6 ast-print to dump the AST more elegantly.
+// TODO: Refering clang-2.6 ast-print or Swift to dump the AST more elegantly.
 //
 //===----------------------------------------------------------------------===//
 

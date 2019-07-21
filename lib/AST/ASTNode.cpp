@@ -51,13 +51,13 @@ void ASTNodeList<T, nt, Derived>::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
 
   for (int i = 0; i < size(); i++)
     elements[i]->dump(indent + str.length() + 1);
 
-  FORMAT_INDENT(indent + 1)
+  FORMAT_AST_INDENT(indent + 1)
   std::cout << ")\n";
 }
 

@@ -18,7 +18,7 @@ void Decl::dump(unsigned indent) const {
   std::stringstream ss;
   ss << " <" << std::hex << this << ">";
 
-  FORMAT_INDENT(indent)
+  FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str();
 
   if (getNodeType() == NT_VarDecl) {
@@ -31,7 +31,7 @@ void Decl::dump(unsigned indent) const {
 
   Id->dump(indent + str.length() + 1);
   TypeExpr->dump(indent + str.length() + 1);
-  FORMAT_INDENT(indent + 1)
+  FORMAT_AST_INDENT(indent + 1)
   std::cout << ")\n";
 }
 

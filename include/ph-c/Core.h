@@ -1,8 +1,13 @@
-//===--- Core.h - Core library C interface ----------------------*- C++ -*-===//
-//
-//  This header declares the C interface for Phaeton.
-//
-//===----------------------------------------------------------------------===//
+/*===--- Core.h - Core library C interface ----------------------*- C++ -*-===*\
+|*                                                                            *|
+|*                     The Phaeton Compiler Infrastructure                    *|
+|*                                                                            *|
+|*===----------------------------------------------------------------------===*|
+|*                                                                            *|
+|*  This header declares the C interface for Phaeton.                         *|
+|*                                                                            *|
+\*===----------------------------------------------------------------------===*/
+
 #ifndef __CORE_H__
 #define __CORE_H__
 

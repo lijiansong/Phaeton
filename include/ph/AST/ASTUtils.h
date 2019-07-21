@@ -18,8 +18,9 @@
 #include <sstream>
 #include <string>
 
-// TODO: add log wrapper
-#define FORMAT_INDENT(indent)                                                  \
+// TODO: add log wrapper.
+// Current AST style refer to Swift AST, using a list pattern.
+#define FORMAT_AST_INDENT(indent)                                                  \
   {                                                                            \
     std::cout.width((indent));                                                 \
     std::cout << std::left << "";                                              \
