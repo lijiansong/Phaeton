@@ -43,37 +43,5 @@ public:
   virtual void visitBrackExprEpilogue(const BrackExpr *be) override;
 };
 
-class NumpyGraphCG : public GraphCodeGen {
-protected:
-  PythonFragBuilder Builder;
-
-public:
-  NumpyGraphCG(const Sema *sema, const std::string &prefix = "np");
-
-  virtual void visitProgramPrologue(const Program *p) override;
-
-  virtual void visitDeclEpilogue(const Decl *d) override;
-
-  virtual void emitContraction(const std::string &result,
-                               const std::string &lhs, const List &lhsIndices,
-                               const std::string &rhs,
-                               const List &rhsIndices) override;
-  virtual void emitTensorProduct(const std::string &result,
-                                 const std::string &lhs,
-                                 const std::string &rhs) override;
-  virtual void emitTensorStack(const std::string &result,
-                               const std::list<std::string> &temps) override;
-  virtual void emitAssignment(const std::string &result,
-                              const std::string &expr) override;
-
-  virtual void emitAddExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) override;
-  virtual void emitSubExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) override;
-  virtual void emitMulExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) override;
-  virtual void emitDivExpr(const std::string &result, const std::string &lhs,
-                           const std::string &rhs) override;
-};
-
+// FIXME: Refactoring graph codegen for numpy.
 #endif // __PYCG_H__

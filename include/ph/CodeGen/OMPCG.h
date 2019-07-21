@@ -12,6 +12,7 @@
 #define __OMP_CG_H__
 
 #include "ph/CodeGen/CodeGen.h"
+#include "ph/CodeGen/GraphCG.h"
 #include "ph/Opt/ExprTreeVisitor.h"
 #include "ph/Sema/Type.h"
 
@@ -19,7 +20,7 @@
 #include <string>
 #include <vector>
 
-class OpenMPEmitter : public ExprTreeVisitor {
+class OMPCG : public ExprTreeVisitor {
 private:
   CodeGen *CG;
 
@@ -39,8 +40,8 @@ private:
   std::vector<std::string> exprIndices;
 
 public:
-  OpenMPEmitter(CodeGen *cg, bool rowMajor = true,
-                const std::string fpTypeName = "float")
+  OMPCG(CodeGen *cg, bool rowMajor = true,
+        const std::string fpTypeName = "float")
       : CG(cg), FPTypeName(fpTypeName), IndexCounter(0), RowMajor(rowMajor) {}
 
   void genCode(const Program *p);

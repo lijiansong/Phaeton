@@ -22,10 +22,10 @@
 #define OMP_INDENT_PER_LEVEL (2)
 
 // TODO: Add pragma for parallel
-void OpenMPEmitter::genCode(const Program *p) {
+void OMPCG::genCode(const Program *p) {
   nestingLevel = initialNestingLevel = 0;
   // Emit kernel description
-  append("// ----- Autogen kernel by Phaeton -----\n");
+  append("// ----- Autogen kernel by Phaeton -----\n\n");
   // Emit C function name signature
   emitSignature();
 
@@ -112,16 +112,14 @@ void OpenMPEmitter::genCode(const Program *p) {
   append("}\n");
 }
 
-std::string OpenMPEmitter::getIndex() {
-  return "i" + std::to_string(IndexCounter++);
-}
+std::string OMPCG::getIndex() { return "i" + std::to_string(IndexCounter++); }
 
 // TODO: Emit function signature with name mangling
-void OpenMPEmitter::emitSignature() {
+void OMPCG::emitSignature() {
   const Sema &sema = *getSema();
 
   bool isFirstArgument = true;
-  append("void C_func(\n");
+  append("void omp_func(\n");
 
   // FIXME: Emit inputs as function arguments
   for (auto in = sema.inputs_begin(); in != sema.inputs_end(); in++) {
@@ -159,27 +157,25 @@ void OpenMPEmitter::emitSignature() {
   append(")\n");
 }
 
-void OpenMPEmitter::emitForLoopHeader(unsigned indent,
-                                      const std::string &indexVar,
-                                      const std::string &bound) {
+void OMPCG::emitForLoopHeader(unsigned indent, const std::string &indexVar,
+                              const std::string &bound) {
   OMP_CG_INDENT(indent)
   append("for (unsigned " + indexVar + " = 0; " + indexVar + " < " + bound +
          "; " + "++" + indexVar + ") {\n");
 }
 
-void OpenMPEmitter::emitForLoopHeader(unsigned indent,
-                                      const std::string &indexVar,
-                                      int intBound) {
+void OMPCG::emitForLoopHeader(unsigned indent, const std::string &indexVar,
+                              int intBound) {
   emitForLoopHeader(indent, indexVar, std::to_string(intBound));
 }
 
-void OpenMPEmitter::emitForLoopFooter(unsigned indent) {
+void OMPCG::emitForLoopFooter(unsigned indent) {
   OMP_CG_INDENT(indent)
   append("}\n");
 }
 
-void OpenMPEmitter::emitTempDefinition(unsigned indent, const std::string &temp,
-                                       const std::string &init) {
+void OMPCG::emitTempDefinition(unsigned indent, const std::string &temp,
+                               const std::string &init) {
   OMP_CG_INDENT(indent)
   append(getFPTypeName() + " " + temp);
   if (init.length())
@@ -187,9 +183,8 @@ void OpenMPEmitter::emitTempDefinition(unsigned indent, const std::string &temp,
   append(";\n");
 }
 
-std::string
-OpenMPEmitter::subscriptString(const std::vector<std::string> &indices,
-                               const std::vector<int> &dims) const {
+std::string OMPCG::subscriptString(const std::vector<std::string> &indices,
+                                   const std::vector<int> &dims) const {
   assert(indices.size() == dims.size());
 
   const int rank = dims.size();
@@ -216,7 +211,7 @@ OpenMPEmitter::subscriptString(const std::vector<std::string> &indices,
   return "[" + result + "]";
 }
 
-void OpenMPEmitter::emitLoopHeaderNest(const std::vector<int> &exprDims) {
+void OMPCG::emitLoopHeaderNest(const std::vector<int> &exprDims) {
   const int rank = exprIndices.size();
 
   if (RowMajor) {
@@ -246,14 +241,14 @@ void OpenMPEmitter::emitLoopHeaderNest(const std::vector<int> &exprDims) {
   }
 }
 
-void OpenMPEmitter::emitLoopFooterNest() {
+void OMPCG::emitLoopFooterNest() {
   while (nestingLevel > initialNestingLevel) {
     --nestingLevel;
     emitForLoopFooter(nestingLevel * OMP_INDENT_PER_LEVEL);
   }
 }
 
-void OpenMPEmitter::visitBinOpExpr(const ExprNode *en, const std::string &op) {
+void OMPCG::visitBinOpExpr(const ExprNode *en, const std::string &op) {
   // FIXME: Here 'BinOp' is elementwise operation, the two
   // operands have the same ranks and dimensions
   assert(en->getNumChildren() == 2);
@@ -289,15 +284,15 @@ void OpenMPEmitter::visitBinOpExpr(const ExprNode *en, const std::string &op) {
   exprIndices = savedExprIndices;
 }
 
-void OpenMPEmitter::visitAddExpr(const AddExpr *en) { visitBinOpExpr(en, "+"); }
+void OMPCG::visitAddExpr(const AddExpr *en) { visitBinOpExpr(en, "+"); }
 
-void OpenMPEmitter::visitSubExpr(const SubExpr *en) { visitBinOpExpr(en, "-"); }
+void OMPCG::visitSubExpr(const SubExpr *en) { visitBinOpExpr(en, "-"); }
 
-void OpenMPEmitter::visitMulExpr(const MulExpr *en) { visitBinOpExpr(en, "*"); }
+void OMPCG::visitMulExpr(const MulExpr *en) { visitBinOpExpr(en, "*"); }
 
-void OpenMPEmitter::visitDivExpr(const DivExpr *en) { visitBinOpExpr(en, "/"); }
+void OMPCG::visitDivExpr(const DivExpr *en) { visitBinOpExpr(en, "/"); }
 
-void OpenMPEmitter::visitProductExpr(const ProductExpr *en) {
+void OMPCG::visitProductExpr(const ProductExpr *en) {
   assert(en->getNumChildren() == 2);
 
   const std::string result = getResultTemp();
@@ -363,7 +358,7 @@ void OpenMPEmitter::visitProductExpr(const ProductExpr *en) {
   exprIndices = savedExprIndices;
 }
 
-void OpenMPEmitter::visitContractionExpr(const ContractionExpr *en) {
+void OMPCG::visitContractionExpr(const ContractionExpr *en) {
   assert(en->getNumChildren() == 2);
 
   const std::string result = getResultTemp();
@@ -471,7 +466,7 @@ void OpenMPEmitter::visitContractionExpr(const ContractionExpr *en) {
   exprIndices = savedExprIndices;
 }
 
-void OpenMPEmitter::visitStackExpr(const StackExpr *en) {
+void OMPCG::visitStackExpr(const StackExpr *en) {
   // Current implementation of this function yields correct results
   // ONLY if it emits code at the top level (i.e. no nest in any for loops)
   assert(nestingLevel == initialNestingLevel);
@@ -530,7 +525,7 @@ void OpenMPEmitter::visitStackExpr(const StackExpr *en) {
   exprIndices = savedExprIndices;
 }
 
-void OpenMPEmitter::visitIdentifierExpr(const IdentifierExpr *en) {
+void OMPCG::visitIdentifierExpr(const IdentifierExpr *en) {
   assert(
       0 &&
       "internal error: code generation for identifier has been optimized out");

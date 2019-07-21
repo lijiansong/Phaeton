@@ -1,4 +1,4 @@
-//===------ ph-cc.cpp --- Phaeton-Language Front-end ----------------------===//
+//===------ ph-translate.cpp --- Phaeton-Language Front-end ---------------===//
 //
 //                     The Phaeton Compiler Infrastructure
 //
@@ -7,8 +7,8 @@
 //  This utility may be invoked in the following manner:
 //   ph-translate --help                - Output help info.
 //   ph-translate [options]             - Read from stdin.
-//   ph-translate [options] file        - Read from "file".
-//   ph-translate [options] file1 file2 - Read these files.
+//   ph-translate [options] file        - Read from "file" and output default.
+//   ph-translate [options] f1 -o f2    - Read from "f1" and output "f2".
 //
 //===----------------------------------------------------------------------===//
 //
@@ -19,9 +19,9 @@
 #include <fstream>
 #include <iostream>
 
-#include "ph/CodeGen/PyCG.h"
-#include "ph/CodeGen/OMPCG.h"
 #include "ph/CodeGen/GraphCG.h"
+#include "ph/CodeGen/OMPCG.h"
+#include "ph/CodeGen/PyCG.h"
 #include "ph/Parse/Parser.h"
 #include "ph/Sema/Sema.h"
 #include "ph/Tooling/CommonOptionsParser.h"
@@ -55,7 +55,8 @@ enum FinalPhase {
 };
 } // end anonymous namespace
 
-const std::set<std::string> VALID_TARGET_LANG = {"OpenMP", "OpenCL", "Cuda", "Bang", "CCE", "TPU", "Numpy"};
+const std::set<std::string> VALID_TARGET_LANG = {
+    "OPENMP", "OPENCL", "CUDA", "BANG", "CCE", "TPU", "NUMPY"};
 
 // TODO: refer to ClangCheck to add a factory wrapper.
 void createOptions(Options &options) {
@@ -63,8 +64,8 @@ void createOptions(Options &options) {
   options.allow_unrecognised_options().add_options()("h, help", "Print help")(
       "i, input", "Input phaeton source file", cxxopts::value<std::string>())(
       "l, lang",
-      "Emit target language, currently supports: Numpy, OpenMP, OpenCL, CUDA, "
-      "BANG, CCE, TPU",
+      "Emit target language, currently supports: Numpy, OpenMP, OpenCL, Cuda, "
+      "Bang, CCE, TPU",
       cxxopts::value<std::string>()->default_value("OpenMP"))(
       "o, output", "Output file",
       cxxopts::value<std::string>()->default_value("a.cpp"))(
@@ -91,15 +92,15 @@ ParseResult parseArgs(Options &options, int &argc, char **argv) {
 }
 
 std::string getDefaultOutputFileName(std::string &tgt_lang) {
-  if(!std::strcmp(tgt_lang.c_str(), "OpenMP")) {
+  if (!std::strcmp(tgt_lang.c_str(), "OPENMP")) {
     return "a.cpp";
-  } else if (!std::strcmp(tgt_lang.c_str(), "Numpy")) {
+  } else if (!std::strcmp(tgt_lang.c_str(), "NUMPY")) {
     return "a.py";
-  } else if (!std::strcmp(tgt_lang.c_str(), "OpenCL")) {
+  } else if (!std::strcmp(tgt_lang.c_str(), "OPENCL")) {
     return "a.cl";
-  } else if (!std::strcmp(tgt_lang.c_str(), "Cuda")) {
+  } else if (!std::strcmp(tgt_lang.c_str(), "CUDA")) {
     return "a.cu";
-  } else if (!std::strcmp(tgt_lang.c_str(), "Bang")) {
+  } else if (!std::strcmp(tgt_lang.c_str(), "BANG")) {
     return "a.mlu";
   } else if (!std::strcmp(tgt_lang.c_str(), "CCE")) {
     return "a.cce";
@@ -109,34 +110,40 @@ std::string getDefaultOutputFileName(std::string &tgt_lang) {
   return "a.cpp";
 }
 
-std::string getTargetLanguageCode(const Parser &parser, const std::string &tgt_lang) {
+std::string getTargetLanguageCode(const Parser &parser,
+                                  const std::string &tgt_lang) {
   Sema sema;
   sema.visitProgram(parser.getAST());
   std::string tgt_code = "";
-  if (!std::strcmp(tgt_lang.c_str(), "OpenMP")) {
-    //GraphCodeGen gcg(&sema);
-    //OpenMPEmitter omp(&gcg, true);
-    //omp.genCode(parser.getAST());
-    //tgt_code = omp.getCode();
-  } else if (!std::strcmp(tgt_lang.c_str(), "Numpy")) {
+  if (!std::strcmp(tgt_lang.c_str(), "OPENMP")) {
+    GraphCodeGen gcg(&sema);
+    OMPCG omp(&gcg, true);
+    omp.genCode(parser.getAST());
+    tgt_code = omp.getCode();
+  } else if (!std::strcmp(tgt_lang.c_str(), "NUMPY")) {
     NumpyDirectCG npcg(&sema);
     npcg.visitProgram(parser.getAST());
     tgt_code = npcg.getCode();
-  } else if (!std::strcmp(tgt_lang.c_str(), "OpenCL")) {
-      std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ") << "Target language not support yet\n";
-      exit(0);
-  } else if (!std::strcmp(tgt_lang.c_str(), "Cuda")) {
-      std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ") << "Target language not support yet\n";
-      exit(0);
-  } else if (!std::strcmp(tgt_lang.c_str(), "Bang")) {
-      std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ") << "Target language not support yet\n";
-      exit(0);
+  } else if (!std::strcmp(tgt_lang.c_str(), "OPENCL")) {
+    std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
+              << "Target language not support yet\n";
+    exit(0);
+  } else if (!std::strcmp(tgt_lang.c_str(), "CUDA")) {
+    std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
+              << "Target language not support yet\n";
+    exit(0);
+  } else if (!std::strcmp(tgt_lang.c_str(), "BANG")) {
+    std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
+              << "Target language not support yet\n";
+    exit(0);
   } else if (!std::strcmp(tgt_lang.c_str(), "CCE")) {
-      std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ") << "Target language not support yet\n";
-      exit(0);
+    std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
+              << "Target language not support yet\n";
+    exit(0);
   } else if (!std::strcmp(tgt_lang.c_str(), "TPU")) {
-      std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ") << "Target language not support yet\n";
-      exit(0);
+    std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
+              << "Target language not support yet\n";
+    exit(0);
   }
   return tgt_code;
 }
@@ -163,7 +170,8 @@ void buildJobs(const Options &options, const ParseResult &result) {
       exit(-1);
     }
     std::filebuf *file_buf = in_ph_file_stream.rdbuf();
-    std::size_t size = file_buf->pubseekoff(0, in_ph_file_stream.end, in_ph_file_stream.in);
+    std::size_t size =
+        file_buf->pubseekoff(0, in_ph_file_stream.end, in_ph_file_stream.in);
     file_buf->pubseekpos(0, in_ph_file_stream.in);
 
     in_ph_tokens = new char[size + 1];
@@ -179,21 +187,27 @@ void buildJobs(const Options &options, const ParseResult &result) {
   // Then we need to determine the final phase.
 
   std::string tgt_lang = "";
-  // If we get here, that means we need to translate Phaeton into target language.
+  // If we get here, that means we need to translate Phaeton into target
+  // language.
   if (result.count("lang")) {
     tgt_lang = result["lang"].as<std::string>();
+    // Uniform use of upper case
+    toUpperCase(tgt_lang);
     if (!VALID_TARGET_LANG.count(tgt_lang)) {
       std::cerr << PH_COMPILER_EXE << ":" << FRED(" error: ")
-                << "Unknown target language! Now only support 'Numpy, OpenMP, OpenCL, Cuda, Bang, CCE, TPU'.\n";
+                << "Unknown target language! Now only support 'Numpy, OpenMP, "
+                   "OpenCL, Cuda, Bang, CCE, TPU'.\n";
       exit(-1);
     }
   } else {
     // Default target language is OpenMP
     tgt_lang = "OpenMP";
   }
+  // Uniform use of upper case
+  toUpperCase(tgt_lang);
 
   std::string out_tgt_src = "";
-  // If we get here, that means we get the target language.
+  // If we get here, that means we have already get the target language.
   if (result.count("output")) {
     out_tgt_src = result["output"].as<std::string>();
   } else {
@@ -210,12 +224,13 @@ void buildJobs(const Options &options, const ParseResult &result) {
     std::cout << "}" << std::endl;
   }
 
-  // If we get here, that means we have to translate Phaeton
-  // input source file into the target language output.
+  // If we get here, that means we have to perform translation to
+  // translate Phaeton input source file into the target language
+  // output.
   Parser parser(in_ph_tokens);
   if (parser.parse()) {
     std::cerr << PH_COMPILER_EXE << ":" << FRED(" error: ")
-                << "Fail to parse input Phaeton tokens\n";
+              << "Fail to parse input Phaeton tokens\n";
     exit(-1);
   }
   // parser.getAST()->dump();
@@ -227,7 +242,7 @@ void buildJobs(const Options &options, const ParseResult &result) {
     out_tgt_file_stream.close();
   } else {
     std::cerr << PH_COMPILER_EXE << ":" << FRED(" error: ")
-                << "Fail to open file " << out_tgt_src << '\n';
+              << "Fail to open file " << out_tgt_src << '\n';
     exit(-1);
   }
   Program::destroy(parser.getAST());

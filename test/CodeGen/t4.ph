@@ -5,7 +5,7 @@ type scalar : []
 var in a : scalar
 var in b : scalar
 var in c : scalar
-var d : scalar
+var out d : scalar
 
 d = a + b
 d = a - b

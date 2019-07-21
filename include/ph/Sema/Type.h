@@ -32,6 +32,7 @@ public:
   };
 
   TensorType() {}
+
   TensorType(const std::vector<int> &dims) : Dims(dims) {}
 
   void addDim(int dim) { Dims.push_back(dim); }
@@ -41,6 +42,7 @@ public:
   int getDim(unsigned i) const { return Dims.at(i); }
 
   bool operator==(const TensorType &rhs) const;
+
   bool operator!=(const TensorType &rhs) const { return !(*this == rhs); }
 
   bool equals(const std::vector<int> &dims) const {
@@ -48,6 +50,8 @@ public:
   }
 
   const std::string getDimString() const;
+
+  const std::vector<int> &getDims() const { return Dims; }
 };
 
 #endif // __TYPE_H__

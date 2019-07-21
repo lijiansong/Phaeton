@@ -73,6 +73,7 @@ void NumpyDirectCG::visitBrackExprEpilogue(const BrackExpr *be) {
   append(Builder.getFragment());
 }
 
+#if 0
 NumpyGraphCG::NumpyGraphCG(const Sema *sema, const std::string &prefix)
     : GraphCodeGen(sema), Builder(prefix) {}
 
@@ -137,3 +138,4 @@ void NumpyGraphCG::emitDivExpr(const std::string &result,
   Builder.buildDivExpr(result, lhs, rhs);
   append(Builder.getFragment());
 }
+#endif // if 0

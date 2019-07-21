@@ -15,6 +15,7 @@
 #define __COMMON_OPTIONS_PARSER_H__
 
 #include "ph/Tooling/Colors.h"
+#include "ph/Tooling/ToolingUtils.h"
 #include "ph/Tooling/third-party/cxxopts/cxxopts.hpp"
 
 // TODO: Refactoring command line options parser.
