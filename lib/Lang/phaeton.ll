@@ -38,8 +38,18 @@ MUL       "*"
 DIV       "/"
 PRODUCT   "#"
 EQUAL     "="
+COMMA     ","
 INT       [0-9]+
 ID        [_a-zA-Z][_a-zA-Z0-9]*
+
+/* data types*/
+INT8      "i8"
+INT16     "i16"
+INT32     "i32"
+FLOAT8    "f8"
+FLOAT16   "f16"
+FLOAT32   "f32"
+FLOAT64   "f64"
 
 %%
 
