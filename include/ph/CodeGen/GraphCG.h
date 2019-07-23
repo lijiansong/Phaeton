@@ -50,6 +50,7 @@ private:
 
 public:
   GraphCodeGen(const Sema *sema);
+  GraphCodeGen(const Sema *sema, const std::string &fn_name);
 
 public:
   virtual void visitStmt(const Stmt *) override;

@@ -22,12 +22,22 @@ CodeGen::CodeGen(const Sema *sema) : TheSema(sema), TempCounter(0), Code("") {
   ENBuilder = new ExprNodeBuilder;
 }
 
+CodeGen::CodeGen(const Sema *sema, const std::string &fn_name)
+    : TheSema(sema), TempCounter(0), Code(""), FuncName(fn_name) {
+  ENBuilder = new ExprNodeBuilder;
+}
+
 CodeGen::~CodeGen() { delete ENBuilder; }
 
 std::string CodeGen::getTemp() { return "t" + std::to_string(TempCounter++); }
 
 bool CodeGen::typeEmitted(const TensorType *type) const {
   return EmittedTypes.count(type);
+}
+
+void CodeGen::addFuncArg(const std::string &name) {
+  const int position = FuncArgs.size();
+  FuncArgs.push_back({position, name});
 }
 
 const std::string &CodeGen::getEmittedTypeName(const TensorType *type) const {

@@ -26,6 +26,11 @@ void OMPCG::genCode(const Program *p) {
   nestingLevel = initialNestingLevel = 0;
   // Emit kernel description
   append("// ----- Autogen kernel by Phaeton -----\n\n");
+
+  if (EmitWrapper) {
+    append("static inline\n");
+  }
+
   // Emit C function name signature
   emitSignature();
 
@@ -110,6 +115,32 @@ void OMPCG::genCode(const Program *p) {
 
   // Close the block of C function body
   append("}\n");
+
+  // Emit wrapper kernel.
+  if (EmitWrapper) {
+    const int numArgs = getNumFuncArgs();
+
+    append("\n");
+    append("void " + getFuncName() + "(" + getFPTypeName() + " *args[" +
+           std::to_string(numArgs) + "]){\n");
+
+    const std::string &functionCall = getFuncNameWrapped() + "(";
+    // Emit the call to wrapper function 'FuncName'
+    OMP_CG_INDENT(OMP_INDENT_PER_LEVEL)
+    append(functionCall);
+    // Emit arguments list of wrapper 'FuncName'
+    for (int i = 0; i < numArgs; i++) {
+      if (i != 0) {
+        append(",\n");
+        OMP_CG_INDENT(OMP_INDENT_PER_LEVEL + functionCall.length())
+      }
+
+      append("args[" + std::to_string(i) + "]");
+    }
+    append(");\n");
+
+    append("}\n");
+  }
 }
 
 std::string OMPCG::getIndex() { return "i" + std::to_string(IndexCounter++); }
@@ -119,7 +150,13 @@ void OMPCG::emitSignature() {
   const Sema &sema = *getSema();
 
   bool isFirstArgument = true;
-  append("void omp_func(\n");
+  const std::string &fn_name = getFuncName();
+  if (!fn_name.size()) {
+    append("void omp_func(\n");
+  } else {
+    // append("void " + getFuncName() + "(\n");
+    append("void " + getFuncNameWrapped() + "(\n");
+  }
 
   // FIXME: Emit inputs as function arguments
   for (auto in = sema.inputs_begin(); in != sema.inputs_end(); in++) {
@@ -130,9 +167,11 @@ void OMPCG::emitSignature() {
     else
       append(",\n");
 
+    const std::string &ArgName = sym->getName();
     // Indent arguments
     OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL)
-    append(getFPTypeName() + " *" + sym->getName());
+    append(getFPTypeName() + " *" + ArgName);
+    addFuncArg(ArgName);
   }
 
   // FIXME: Emit outputs as function arguments
@@ -148,9 +187,11 @@ void OMPCG::emitSignature() {
     else
       append(",\n");
 
+    const std::string &ArgName = sym->getName();
     // Indent arguments
     OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL)
-    append(getFPTypeName() + " *" + sym->getName());
+    append(getFPTypeName() + " *" + ArgName);
+    addFuncArg(ArgName);
   }
 
   // Finish function signature.

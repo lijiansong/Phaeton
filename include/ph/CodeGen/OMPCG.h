@@ -33,6 +33,8 @@ private:
 
   const bool RowMajor;
 
+  const bool EmitWrapper;
+
 private:
   // Context for the emission of expression trees
   std::set<std::string> loopedOverIndices;
@@ -40,9 +42,10 @@ private:
   std::vector<std::string> exprIndices;
 
 public:
-  OMPCG(CodeGen *cg, bool rowMajor = true,
+  OMPCG(CodeGen *cg, bool rowMajor = true, bool emitWrapper = false,
         const std::string fpTypeName = "float")
-      : CG(cg), FPTypeName(fpTypeName), IndexCounter(0), RowMajor(rowMajor) {}
+      : CG(cg), FPTypeName(fpTypeName), IndexCounter(0), RowMajor(rowMajor),
+        EmitWrapper(emitWrapper) {}
 
   void genCode(const Program *p);
 
@@ -113,6 +116,26 @@ private:
 
   const std::vector<int> &getDims(const ExprNode *en) const {
     return en->getDims();
+  }
+
+  void addFuncArg(const std::string &name) {
+    CG->addFuncArg(name);
+  }
+
+  const std::string &getFuncName() const {
+    return CG->getFuncName();
+  }
+
+  int getNumFuncArgs() const {
+    return CG->getFuncArgs().size();
+  }
+
+  std::string getFuncNameWrapped() const {
+    std::string name = CG->getFuncName();
+    if (EmitWrapper)
+      name += "_wrapped_kernel";
+
+    return name;
   }
 };
 

@@ -34,6 +34,11 @@ GraphCodeGen::GraphCodeGen(const Sema *sema)
   curLegs.clear();
 }
 
+GraphCodeGen::GraphCodeGen(const Sema *sema, const std::string &fn_name)
+    : CodeGen(sema, fn_name), curGraph(nullptr), curEnd(nullptr) {
+  curLegs.clear();
+}
+
 void GraphCodeGen::visitStmt(const Stmt *s) {
   CodeGen::visitStmt(s);
   buildExprTreeForExpr(s->getExpr());

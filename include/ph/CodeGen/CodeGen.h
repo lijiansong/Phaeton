@@ -37,16 +37,27 @@ private:
   // which rooted at an 'ExprNode'
   std::map<const Expr *, ExprNode *> ExprTrees;
 
+  const std::string FuncName;
+
 public:
   struct Assignment {
     std::string variable;
     const ExprNode *en;
   };
 
+  struct FuncArg {
+    int Pos;
+    std::string ArgName;
+  };
+
+  using FuncArgsListTy = std::vector<FuncArg>;
+
 protected:
   ExprNodeBuilder *ENBuilder;
 
   void EXPR_TREE_MAP_ASSERT(const Expr *expr) const;
+
+  FuncArgsListTy FuncArgs;
 
 public:
   ExprNodeBuilder *getExprNodeBuilder() { return ENBuilder; }
@@ -56,6 +67,7 @@ public:
 
 public:
   CodeGen(const Sema *sema);
+  CodeGen(const Sema *sema, const std::string &functionName);
   virtual ~CodeGen();
 
   const Sema *getSema() const { return TheSema; }
@@ -80,6 +92,31 @@ public:
     return Declarations;
   }
   const std::list<const Stmt *> &getStatements() const { return Statements; }
+
+  const std::string &getFuncName() const { return FuncName; }
+
+  void addFuncArg(const std::string &name);
+
+  const FuncArgsListTy &getFuncArgs() const {
+    return FuncArgs;
+  };
+
+  const FuncArgsListTy::const_iterator
+  function_arguments_begin() const {
+    return FuncArgs.begin();
+  }
+
+  const FuncArgsListTy::const_iterator function_arguments_end() const {
+    return FuncArgs.end();
+  }
+
+  unsigned getNumFuncArgs() const { return FuncArgs.size(); };
+
+  const FuncArg &getFuncArg(unsigned i) const {
+    assert(i < getNumFuncArgs() &&
+           "internal error: index out of bounds for function arguments");
+    return FuncArgs.at(i);
+  };
 
 public:
   using List = std::vector<int>;

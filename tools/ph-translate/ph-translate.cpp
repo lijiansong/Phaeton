@@ -86,7 +86,8 @@ ParseResult parseArgs(Options &options, int &argc, char **argv) {
     auto result = options.parse(argc, argv);
     return result;
   } catch (const cxxopts::OptionException &e) {
-    std::cout << "error parsing options: " << e.what() << std::endl;
+    std::cout << PH_COMPILER_EXE << ":" << FRED(" error: ")
+              << "parsing options: " << e.what() << std::endl;
     exit(1);
   }
 }
@@ -117,6 +118,8 @@ std::string getTargetLanguageCode(const Parser &parser,
   std::string tgt_code = "";
   if (!std::strcmp(tgt_lang.c_str(), "OPENMP")) {
     GraphCodeGen gcg(&sema);
+    // FIXME: CodeGen mode must be sync with a specific codegen, i.e.
+    // if we omit the function name, the wrapper caller will be wrong.
     OMPCG omp(&gcg, true);
     omp.genCode(parser.getAST());
     tgt_code = omp.getCode();
