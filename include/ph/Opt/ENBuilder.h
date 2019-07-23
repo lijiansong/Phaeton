@@ -25,16 +25,18 @@ private:
 public:
   ~ExprNodeBuilder();
 
-#define DECL_BUILDER_CREATE_EXPR_NODE(Kind)                                    \
+#define GEN_BUILDER_CREATE_EXPR_NODE_DECL(Kind)                                \
   Kind##Expr *create##Kind##Expr(ExprNode *lhs, ExprNode *rhs);
 
-  DECL_BUILDER_CREATE_EXPR_NODE(Add)
-  DECL_BUILDER_CREATE_EXPR_NODE(Sub)
-  DECL_BUILDER_CREATE_EXPR_NODE(Mul)
-  DECL_BUILDER_CREATE_EXPR_NODE(Div)
-  DECL_BUILDER_CREATE_EXPR_NODE(Product)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Add)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Sub)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Mul)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Div)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Product)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(ScalarMul)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(ScalarDiv)
 
-#undef DECL_BUILDER_CREATE_EXPR_NODE
+#undef GEN_BUILDER_CREATE_EXPR_NODE_DECL
 
   ContractionExpr *createContractionExpr(ExprNode *lhs,
                                          const CodeGen::List &leftIndices,

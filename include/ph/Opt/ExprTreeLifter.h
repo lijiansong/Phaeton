@@ -52,19 +52,21 @@ public:
   ExprTreeLifter(CodeGen *cg, const LiftPredicate &lp)
       : CG(cg), Parent(nullptr), ChildIndex(-1), isNodeToBeLifted(lp) {}
 
-#define DECL_TRANSFORM_EXPR_NODE(Kind)                                         \
+#define GEN_TRANSFORM_EXPR_NODE_DECL(Kind)                                     \
   virtual void transform##Kind##Expr(Kind##Expr *en) override;
 
-  DECL_TRANSFORM_EXPR_NODE(Add)
-  DECL_TRANSFORM_EXPR_NODE(Sub)
-  DECL_TRANSFORM_EXPR_NODE(Mul)
-  DECL_TRANSFORM_EXPR_NODE(Div)
-  DECL_TRANSFORM_EXPR_NODE(Contraction)
-  DECL_TRANSFORM_EXPR_NODE(Product)
-  DECL_TRANSFORM_EXPR_NODE(Stack)
-  DECL_TRANSFORM_EXPR_NODE(Identifier)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Add)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Sub)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Mul)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Div)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Contraction)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Product)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Stack)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Identifier)
+  GEN_TRANSFORM_EXPR_NODE_DECL(ScalarMul)
+  GEN_TRANSFORM_EXPR_NODE_DECL(ScalarDiv)
 
-#undef DECL_TRANSFORM_EXPR_NODE
+#undef GEN_TRANSFORM_EXPR_NODE_DECL
 
   void transformNode(ExprNode *en);
   void transformChildren(ExprNode *en);

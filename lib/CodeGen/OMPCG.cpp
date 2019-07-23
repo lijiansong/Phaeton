@@ -97,7 +97,7 @@ void OMPCG::genCode(const Program *p) {
       if (en->isIdentifier()) {
         assert(0 && "internal error: assigning from identifier at top level");
       } else {
-        setResultTemp(result + subscriptString(exprIndices, dims));
+        setResultTemp(result + emitSubscriptString(exprIndices, dims));
         en->visit(this);
       }
 
@@ -183,11 +183,16 @@ void OMPCG::emitTempDefinition(unsigned indent, const std::string &temp,
   append(";\n");
 }
 
-std::string OMPCG::subscriptString(const std::vector<std::string> &indices,
-                                   const std::vector<int> &dims) const {
+std::string OMPCG::emitSubscriptString(const std::vector<std::string> &indices,
+                                       const std::vector<int> &dims) const {
   assert(indices.size() == dims.size());
 
   const int rank = dims.size();
+
+  // for processing scalar op.
+  if (rank == 0)
+    return "[0]";
+
   std::string result = "(";
 
   if (RowMajor) {
@@ -209,6 +214,22 @@ std::string OMPCG::subscriptString(const std::vector<std::string> &indices,
   }
 
   return "[" + result + "]";
+}
+
+std::string OMPCG::visitChildExpr(const ExprNode *en,
+                                  const std::vector<int> &childExprDims) {
+  std::string temp;
+
+  if (en->isIdentifier()) {
+    temp = en->getName() + emitSubscriptString(exprIndices, childExprDims);
+  } else {
+    temp = getTemp();
+    emitTempDefinition(nestingLevel * OMP_INDENT_PER_LEVEL, temp);
+    setResultTemp(temp);
+    en->visit(this);
+  }
+
+  return temp;
 }
 
 void OMPCG::emitLoopHeaderNest(const std::vector<int> &exprDims) {
@@ -254,48 +275,6 @@ void OMPCG::visitBinOpExpr(const ExprNode *en, const std::string &op) {
   assert(en->getNumChildren() == 2);
 
   const std::string result = getResultTemp();
-  std::string temps[2];
-
-  const std::vector<std::string> savedExprIndices = exprIndices;
-  const int savedNestingLevel = nestingLevel;
-
-  // Note: Type checking ensures that the dimensions of 'en' and its children
-  // agree
-  const std::vector<int> &dims = getDims(en);
-
-  for (int i = 0; i < 2; i++) {
-    if (en->getChild(i)->isIdentifier()) {
-      temps[i] =
-          en->getChild(i)->getName() + subscriptString(exprIndices, dims);
-    } else {
-      temps[i] = getTemp();
-      emitTempDefinition(nestingLevel * OMP_INDENT_PER_LEVEL, temps[i]);
-      setResultTemp(temps[i]);
-      en->getChild(i)->visit(this);
-    }
-  }
-
-  // Emit for-loop nest as appropriate
-  emitLoopHeaderNest(dims);
-
-  OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL);
-  append(result + " = " + temps[0] + " " + op + " " + temps[1] + ";\n");
-
-  exprIndices = savedExprIndices;
-}
-
-void OMPCG::visitAddExpr(const AddExpr *en) { visitBinOpExpr(en, "+"); }
-
-void OMPCG::visitSubExpr(const SubExpr *en) { visitBinOpExpr(en, "-"); }
-
-void OMPCG::visitMulExpr(const MulExpr *en) { visitBinOpExpr(en, "*"); }
-
-void OMPCG::visitDivExpr(const DivExpr *en) { visitBinOpExpr(en, "/"); }
-
-void OMPCG::visitProductExpr(const ProductExpr *en) {
-  assert(en->getNumChildren() == 2);
-
-  const std::string result = getResultTemp();
   std::string lhsTemp, rhsTemp;
 
   const std::vector<std::string> savedExprIndices = exprIndices;
@@ -309,53 +288,96 @@ void OMPCG::visitProductExpr(const ProductExpr *en) {
   const std::vector<int> &rhsDims = getDims(en->getChild(1));
 
   std::vector<std::string> lhsIndices, rhsIndices;
+  if (lhsDims.size() == 0 || rhsDims.size() == 0) {
+    // Note: One argument of binary op is a scalar, we need to
+    // split the 'exprIndices' accordingly.
+    for (int i = 0; i < lhsDims.size(); i++) {
+      const std::string &index = exprIndices[i];
+      lhsIndices.push_back(index);
+    }
+    for (int i = 0; i < rhsDims.size(); i++) {
+      const std::string &index = exprIndices[lhsDims.size() + i];
+      rhsIndices.push_back(index);
+    }
+  } else {
+    assert(lhsDims.size() == rhsDims.size());
+    // Note: Both arguments of binary op are tensors,
+    // therefore, the same 'exprIndices' must be used for both arguments.
+    lhsIndices = rhsIndices = exprIndices;
+  }
+
+  // Emit LHS.
+  exprIndices = lhsIndices;
+  lhsTemp = visitChildExpr(lhsExpr, lhsDims);
+
+  // Emit RHS.
+  exprIndices = rhsIndices;
+  rhsTemp = visitChildExpr(rhsExpr, rhsDims);
+
+  // Emit for-loop nest as appropriate.
+  exprIndices = savedExprIndices;
+  emitLoopHeaderNest(exprDims);
+
+  OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL);
+  append(result + " = " + lhsTemp + " " + op + " " + rhsTemp + ";\n");
+}
+
+void OMPCG::visitAddExpr(const AddExpr *en) { visitBinOpExpr(en, "+"); }
+
+void OMPCG::visitSubExpr(const SubExpr *en) { visitBinOpExpr(en, "-"); }
+
+void OMPCG::visitMulExpr(const MulExpr *en) { visitBinOpExpr(en, "*"); }
+
+void OMPCG::visitDivExpr(const DivExpr *en) { visitBinOpExpr(en, "/"); }
+
+void OMPCG::visitScalarMulExpr(const ScalarMulExpr *en) {
+  visitBinOpExpr(en, "*");
+}
+
+void OMPCG::visitScalarDivExpr(const ScalarDivExpr *en) {
+  visitBinOpExpr(en, "/");
+}
+
+void OMPCG::visitProductExpr(const ProductExpr *en) {
+  assert(en->getNumChildren() == 2);
+
+  const std::string result = getResultTemp();
+  std::string lhsTemp, rhsTemp;
+
+  const ExprNode *lhsExpr = en->getChild(0);
+  const ExprNode *rhsExpr = en->getChild(1);
+
+  const std::vector<int> &exprDims = getDims(en);
+  const std::vector<int> &lhsDims = getDims(en->getChild(0));
+  const std::vector<int> &rhsDims = getDims(en->getChild(1));
+
+  std::vector<std::string> lhsIndices, rhsIndices;
+  // Determine which indices belong to LHS.
   for (int i = 0; i < lhsDims.size(); i++) {
     const std::string &index = exprIndices[i];
     lhsIndices.push_back(index);
   }
+  // Determine which indices belong to RHS.
   for (int i = 0; i < rhsDims.size(); i++) {
     const std::string &index = exprIndices[lhsDims.size() + i];
     rhsIndices.push_back(index);
   }
 
-  // Visit 'lhs'
-  {
-    exprIndices = lhsIndices;
+  const std::vector<std::string> savedExprIndices = exprIndices;
 
-    if (lhsExpr->isIdentifier()) {
-      lhsTemp = lhsExpr->getName() + subscriptString(lhsIndices, lhsDims);
-    } else {
-      lhsTemp = getTemp();
-      emitTempDefinition(nestingLevel * OMP_INDENT_PER_LEVEL, lhsTemp);
-      setResultTemp(lhsTemp);
-      lhsExpr->visit(this);
-    }
+  // Visit LHS.
+  exprIndices = lhsIndices;
+  lhsTemp = visitChildExpr(lhsExpr, lhsDims);
 
-    // Emit for-loop nest for the 'lhs' early
-    emitLoopHeaderNest(lhsDims);
-  }
+  // Visit RHS, emit loop headers as necessary.
+  exprIndices = rhsIndices;
+  rhsTemp = visitChildExpr(rhsExpr, rhsDims);
 
-  // Visit 'rhs', emit loop headers as necessary
-  {
-    exprIndices = rhsIndices;
-
-    if (rhsExpr->isIdentifier()) {
-      rhsTemp = rhsExpr->getName() + subscriptString(rhsIndices, rhsDims);
-    } else {
-      rhsTemp = getTemp();
-      setResultTemp(rhsTemp);
-      emitTempDefinition(nestingLevel * OMP_INDENT_PER_LEVEL, rhsTemp);
-      rhsExpr->visit(this);
-    }
-
-    // Emit for-loop nest for the 'rhs'
-    emitLoopHeaderNest(rhsDims);
-  }
+  exprIndices = savedExprIndices;
+  emitLoopHeaderNest(exprDims);
 
   OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL);
   append(result + " = " + lhsTemp + " * " + rhsTemp + ";\n");
-
-  exprIndices = savedExprIndices;
 }
 
 void OMPCG::visitContractionExpr(const ContractionExpr *en) {
@@ -363,9 +385,6 @@ void OMPCG::visitContractionExpr(const ContractionExpr *en) {
 
   const std::string result = getResultTemp();
   std::string lhsTemp, rhsTemp;
-
-  const std::vector<std::string> savedExprIndices = exprIndices;
-  const int savedNestingLevel = nestingLevel;
 
   const ExprNode *lhsExpr = en->getChild(0);
   const ExprNode *rhsExpr = en->getChild(1);
@@ -382,6 +401,7 @@ void OMPCG::visitContractionExpr(const ContractionExpr *en) {
 
   std::vector<std::string> lhsIndices, rhsIndices;
   int exprIdxCounter = 0;
+  // Determine which indices belong to LHS.
   {
     int contrIdxCounter = 0;
 
@@ -396,6 +416,7 @@ void OMPCG::visitContractionExpr(const ContractionExpr *en) {
       lhsIndices.push_back(index);
     }
   }
+  // Determine which indices belong to RHS.
   {
     int contrIdxCounter = 0;
 
@@ -411,55 +432,34 @@ void OMPCG::visitContractionExpr(const ContractionExpr *en) {
     }
   }
 
-  // Emit for-loop nest for the result
+  // Emit for-loop nest for result.
   emitLoopHeaderNest(exprDims);
   OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL);
   append(result + " = 0.0;\n");
 
-  // Visit 'lhs'
-  {
-    exprIndices = lhsIndices;
+  const std::vector<std::string> savedExprIndices = exprIndices;
 
-    if (lhsExpr->isIdentifier()) {
-      lhsTemp = lhsExpr->getName() + subscriptString(lhsIndices, lhsDims);
-    } else {
-      lhsTemp = getTemp();
-      emitTempDefinition(nestingLevel * OMP_INDENT_PER_LEVEL, lhsTemp);
-      setResultTemp(lhsTemp);
-      lhsExpr->visit(this);
-    }
+  // Visit LHS.
+  exprIndices = lhsIndices;
+  lhsTemp = visitChildExpr(lhsExpr, lhsDims);
+  // Emit for-loop nest for LHS.
+  emitLoopHeaderNest(lhsDims);
 
-    // Emit for-loop nest for the 'lhs' early
-    emitLoopHeaderNest(lhsDims);
-  }
-
-  // Visit 'rhs', emit loop headers as necessary
-  {
-    exprIndices = rhsIndices;
-
-    if (rhsExpr->isIdentifier()) {
-      rhsTemp = rhsExpr->getName() + subscriptString(rhsIndices, rhsDims);
-    } else {
-      rhsTemp = getTemp();
-      setResultTemp(rhsTemp);
-      emitTempDefinition(nestingLevel * OMP_INDENT_PER_LEVEL, rhsTemp);
-      rhsExpr->visit(this);
-    }
-
-    // Emit for-loop nest for the 'rhs'
-    emitLoopHeaderNest(rhsDims);
-  }
+  // Visit RHS, emit loop headers when necessary.
+  exprIndices = rhsIndices;
+  rhsTemp = visitChildExpr(rhsExpr, rhsDims);
+  // Emit for-loop nest for RHS.
+  emitLoopHeaderNest(rhsDims);
 
   OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL);
   append(result + " += " + lhsTemp + " * " + rhsTemp + ";\n");
 
-  // 1. For contraction, close the for-loops that iterate over the contracted
-  // indices
+  // 1. Close for-loops that iterate over the contracted indices;
   for (int i = 0; i < contrIndices.size(); i++) {
     --nestingLevel;
     emitForLoopFooter(nestingLevel * OMP_INDENT_PER_LEVEL);
   }
-  // 2. then remove the contracted indices from 'loopedOverIndices':
+  // 2. Then remove the contracted indices from 'loopedOverIndices'.
   for (int i = 0; i < contrIndices.size(); i++)
     loopedOverIndices.erase(contrIndices[i]);
 
@@ -467,7 +467,7 @@ void OMPCG::visitContractionExpr(const ContractionExpr *en) {
 }
 
 void OMPCG::visitStackExpr(const StackExpr *en) {
-  // Current implementation of this function yields correct results
+  // FIXME: Current implementation of this function yields correct results
   // ONLY if it emits code at the top level (i.e. no nest in any for loops)
   assert(nestingLevel == initialNestingLevel);
   const std::string result = getResultTemp();
@@ -479,16 +479,16 @@ void OMPCG::visitStackExpr(const StackExpr *en) {
 
   const std::string &firstResultIndex = savedExprIndices[0];
   std::vector<std::string> childExprIndices;
-  // Skip the first index
+  // Skip the first index.
   for (int i = 1; i < savedExprIndices.size(); i++)
     childExprIndices.push_back(savedExprIndices[i]);
 
   exprIndices = childExprIndices;
 
   for (int e = 0; e < en->getNumChildren(); e++) {
-    // Replace the first index in 'result' with the constant 'e'
+    // Replace the first index in 'result' with constant 'e'.
     const std::string &firstResultConstantIndex = std::to_string(e);
-    size_t i = result.find(firstResultIndex);
+    const size_t i = result.find(firstResultIndex);
     std::string resultWithConstantFirstIndex = result;
     if (i != std::string::npos)
       resultWithConstantFirstIndex.replace(i, firstResultIndex.length(),
@@ -497,28 +497,20 @@ void OMPCG::visitStackExpr(const StackExpr *en) {
     const ExprNode *child = en->getChild(e);
     const std::vector<int> childDims = getDims(child);
 
-    std::string temp;
-    if (child->isIdentifier()) {
-      temp = child->getName() + subscriptString(childExprIndices, childDims);
-    } else {
-      temp = getTemp();
-      emitTempDefinition(nestingLevel * OMP_INDENT_PER_LEVEL, temp);
-      setResultTemp(temp);
-      child->visit(this);
-    }
-
+    exprIndices = childExprIndices;
+    std::string temp = visitChildExpr(child, childDims);
     emitLoopHeaderNest(childDims);
 
     OMP_CG_INDENT(nestingLevel * OMP_INDENT_PER_LEVEL);
     append(resultWithConstantFirstIndex + " = " + temp + ";\n");
 
-    // 1. For stack operation, close for-loops
+    // 1. Close the for-loops over 'childExprIndices';
     while (nestingLevel > savedNestingLevel) {
       --nestingLevel;
       emitForLoopFooter(nestingLevel * OMP_INDENT_PER_LEVEL);
     }
-    // 2. then remove the corresponding loop indices from 'loopedOverIndices'
-    for (int i = 0; i < exprIndices.size(); i++)
+    // 2. Then remove loop indices from 'loopedOverIndices'.
+    for (int i = 0; i < childExprIndices.size(); i++)
       loopedOverIndices.erase(exprIndices[i]);
   }
 

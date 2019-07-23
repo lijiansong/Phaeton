@@ -69,14 +69,14 @@ void ASTNodeList<T, nt, Derived>::_delete() const {
   }
 }
 
-template class ASTNodeList<Decl, ASTNode::NT_DeclList, DeclList>;
+template class ASTNodeList<const Decl, ASTNode::NT_DeclList, DeclList>;
 
 void DeclList::visit(ASTVisitor *v) const { v->visitDeclList(this); }
 
-template class ASTNodeList<Stmt, ASTNode::NT_StmtList, StmtList>;
+template class ASTNodeList<const Stmt, ASTNode::NT_StmtList, StmtList>;
 
 void StmtList::visit(ASTVisitor *v) const { v->visitStmtList(this); }
 
-template class ASTNodeList<Expr, ASTNode::NT_ExprList, ExprList>;
+template class ASTNodeList<const Expr, ASTNode::NT_ExprList, ExprList>;
 
 void ExprList::visit(ASTVisitor *v) const { v->visitExprList(this); }

@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "ph/Opt/ENBuilder.h"
 #include "ph/Opt/ExprTree.h"
+#include "ph/Opt/ENBuilder.h"
 #include "ph/Opt/ExprTreeTransformer.h"
 #include "ph/Opt/ExprTreeVisitor.h"
 #include "ph/Opt/OptUtils.h"
@@ -21,14 +21,16 @@
 #include <string>
 
 std::map<ExprNode::ExprKind, std::string> ExprNode::ExprLabel = {
-    {EK_Add, "Add"},
-    {EK_Sub, "Sub"},
-    {EK_Mul, "Mul"},
-    {EK_Div, "Div"},
-    {EK_Contraction, "Contraction"},
-    {EK_Product, "Product"},
-    {EK_Stack, "Stack"},
-    {EK_Identifier, "Identifier"}};
+    {ExprNode_Add, "Add"},
+    {ExprNode_Sub, "Sub"},
+    {ExprNode_Mul, "Mul"},
+    {ExprNode_Div, "Div"},
+    {ExprNode_Contraction, "Contraction"},
+    {ExprNode_Product, "Product"},
+    {ExprNode_Stack, "Stack"},
+    {ExprNode_ScalarMul, "ScalarMul"},
+    {ExprNode_ScalarDiv, "ScalarDiv"},
+    {ExprNode_Identifier, "Identifier"}};
 
 ExprNode::ExprNode(ExprKind ek, int numChildren, const ExprDimensions &dims)
     : ExKind(ek), NumChildren(numChildren), Dims(dims) {
@@ -59,40 +61,56 @@ void ExprNode::_delete() const {
   }
 }
 
-#define DEF_EXPR_NODE_CLASS_VISIT(Kind)                                        \
+#define GEN_EXPR_NODE_VISIT_IMPL(Kind)                                         \
   void Kind##Expr::visit(ExprTreeVisitor *v) const {                           \
     v->visit##Kind##Expr(this);                                                \
   }
 
-DEF_EXPR_NODE_CLASS_VISIT(Add)
-DEF_EXPR_NODE_CLASS_VISIT(Sub)
-DEF_EXPR_NODE_CLASS_VISIT(Mul)
-DEF_EXPR_NODE_CLASS_VISIT(Div)
-DEF_EXPR_NODE_CLASS_VISIT(Product)
-DEF_EXPR_NODE_CLASS_VISIT(Contraction)
-DEF_EXPR_NODE_CLASS_VISIT(Stack)
-DEF_EXPR_NODE_CLASS_VISIT(Identifier)
+GEN_EXPR_NODE_VISIT_IMPL(Add)
+GEN_EXPR_NODE_VISIT_IMPL(Sub)
+GEN_EXPR_NODE_VISIT_IMPL(Mul)
+GEN_EXPR_NODE_VISIT_IMPL(Div)
+GEN_EXPR_NODE_VISIT_IMPL(Product)
+GEN_EXPR_NODE_VISIT_IMPL(Contraction)
+GEN_EXPR_NODE_VISIT_IMPL(Stack)
+GEN_EXPR_NODE_VISIT_IMPL(Identifier)
+GEN_EXPR_NODE_VISIT_IMPL(ScalarMul)
+GEN_EXPR_NODE_VISIT_IMPL(ScalarDiv)
 
-#undef DEF_EXPR_NODE_CLASS_VISIT
+#undef GEN_EXPR_NODE_VISIT_IMPL
 
-#define DEF_EXPR_NODE_CLASS_TRANSFORM(Kind)                                    \
+#define GEN_EXPR_NODE_TRANSFORM_IMPL(Kind)                                     \
   void Kind##Expr::transform(ExprTreeTransformer *t) {                         \
     t->transform##Kind##Expr(this);                                            \
   }
 
-DEF_EXPR_NODE_CLASS_TRANSFORM(Add)
-DEF_EXPR_NODE_CLASS_TRANSFORM(Sub)
-DEF_EXPR_NODE_CLASS_TRANSFORM(Mul)
-DEF_EXPR_NODE_CLASS_TRANSFORM(Div)
-DEF_EXPR_NODE_CLASS_TRANSFORM(Product)
-DEF_EXPR_NODE_CLASS_TRANSFORM(Contraction)
-DEF_EXPR_NODE_CLASS_TRANSFORM(Stack)
-DEF_EXPR_NODE_CLASS_TRANSFORM(Identifier)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Add)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Sub)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Mul)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Div)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Product)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Contraction)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Stack)
+GEN_EXPR_NODE_TRANSFORM_IMPL(Identifier)
+GEN_EXPR_NODE_TRANSFORM_IMPL(ScalarMul)
+GEN_EXPR_NODE_TRANSFORM_IMPL(ScalarDiv)
 
-#undef DEF_EXPR_NODE_CLASS_TRANSFORM
+#undef GEN_EXPR_NODE_TRANSFORM_IMPL
+
+ScalarMulExpr::ScalarMulExpr(ExprNode *lhs, ExprNode *rhs)
+    : ExprNode(ExprNode_ScalarMul, /*num_children*/ 2, rhs->getDims()) {
+  setChild(0, lhs);
+  setChild(1, rhs);
+}
+
+ScalarDivExpr::ScalarDivExpr(ExprNode *lhs, ExprNode *rhs)
+    : ExprNode(ExprNode_ScalarDiv, /*num_children*/ 2, lhs->getDims()) {
+  setChild(0, lhs);
+  setChild(1, rhs);
+}
 
 ProductExpr::ProductExpr(ExprNode *lhs, ExprNode *rhs)
-    : ExprNode(EK_Product, 2) {
+    : ExprNode(ExprNode_Product, 2) {
   setChild(0, lhs);
   setChild(1, rhs);
 
@@ -108,7 +126,7 @@ ContractionExpr::ContractionExpr(ExprNode *lhs,
                                  const CodeGen::List &leftIndices,
                                  ExprNode *rhs,
                                  const CodeGen::List &rightIndices)
-    : ExprNode(EK_Contraction, 2), LeftIndices(leftIndices),
+    : ExprNode(ExprNode_Contraction, 2), LeftIndices(leftIndices),
       RightIndices(rightIndices) {
   setChild(0, lhs);
   setChild(1, rhs);
@@ -159,7 +177,7 @@ void ContractionExpr::dump(unsigned indent) const {
 }
 
 StackExpr::StackExpr(const std::vector<ExprNode *> &members)
-    : ExprNode(EK_Stack, members.size()) {
+    : ExprNode(ExprNode_Stack, members.size()) {
   for (int i = 0; i < members.size(); i++)
     setChild(i, members[i]);
 
@@ -190,7 +208,7 @@ ExprNodeBuilder::~ExprNodeBuilder() {
     delete en;
 }
 
-#define DEF_BUILDER_CREATE_EXPR_NODE(Kind)                                     \
+#define GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Kind)                                \
   Kind##Expr *ExprNodeBuilder::create##Kind##Expr(ExprNode *lhs,               \
                                                   ExprNode *rhs) {             \
     Kind##Expr *result = Kind##Expr::create(lhs, rhs);                         \
@@ -198,13 +216,15 @@ ExprNodeBuilder::~ExprNodeBuilder() {
     return result;                                                             \
   }
 
-DEF_BUILDER_CREATE_EXPR_NODE(Add)
-DEF_BUILDER_CREATE_EXPR_NODE(Sub)
-DEF_BUILDER_CREATE_EXPR_NODE(Mul)
-DEF_BUILDER_CREATE_EXPR_NODE(Div)
-DEF_BUILDER_CREATE_EXPR_NODE(Product)
+GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Add)
+GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Sub)
+GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Mul)
+GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Div)
+GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Product)
+GEN_BUILDER_CREATE_EXPR_NODE_IMPL(ScalarMul)
+GEN_BUILDER_CREATE_EXPR_NODE_IMPL(ScalarDiv)
 
-#undef DEF_BUILDER_CREATE_EXPR_NODE
+#undef GEN_BUILDER_CREATE_EXPR_NODE_IMPL
 
 ContractionExpr *ExprNodeBuilder::createContractionExpr(
     ExprNode *lhs, const CodeGen::List &leftIndices, ExprNode *rhs,

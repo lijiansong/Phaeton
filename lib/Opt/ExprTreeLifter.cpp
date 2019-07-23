@@ -59,19 +59,21 @@ void ExprTreeLifter::transformChildren(ExprNode *en) {
   setParent(parent);
 }
 
-#define DEF_TRANSFORM_EXPR_NODE(Kind)                                          \
+#define GEN_TRANSFORM_EXPR_NODE_IMPL(Kind)                                     \
   void ExprTreeLifter::transform##Kind##Expr(Kind##Expr *en) {                 \
     transformNode(en);                                                         \
   }
 
-DEF_TRANSFORM_EXPR_NODE(Add)
-DEF_TRANSFORM_EXPR_NODE(Sub)
-DEF_TRANSFORM_EXPR_NODE(Mul)
-DEF_TRANSFORM_EXPR_NODE(Div)
-DEF_TRANSFORM_EXPR_NODE(Contraction)
-DEF_TRANSFORM_EXPR_NODE(Product)
-DEF_TRANSFORM_EXPR_NODE(Stack)
+GEN_TRANSFORM_EXPR_NODE_IMPL(Add)
+GEN_TRANSFORM_EXPR_NODE_IMPL(Sub)
+GEN_TRANSFORM_EXPR_NODE_IMPL(Mul)
+GEN_TRANSFORM_EXPR_NODE_IMPL(Div)
+GEN_TRANSFORM_EXPR_NODE_IMPL(Contraction)
+GEN_TRANSFORM_EXPR_NODE_IMPL(Product)
+GEN_TRANSFORM_EXPR_NODE_IMPL(Stack)
+GEN_TRANSFORM_EXPR_NODE_IMPL(ScalarMul)
+GEN_TRANSFORM_EXPR_NODE_IMPL(ScalarDiv)
 
-#undef DECL_TRANSFORM_EXPR_NODE
+#undef GEN_TRANSFORM_EXPR_NODE_IMPL
 
 void ExprTreeLifter::transformIdentifierExpr(IdentifierExpr *en) { return; }

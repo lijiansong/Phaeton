@@ -111,10 +111,11 @@ void GraphCodeGen::visitBrackExpr(const BrackExpr *be) {
 
 void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
   const ASTNode::NodeType nt = be->getNodeType();
+  const Sema &sema = *getSema();
 
   if (nt == ASTNode::NT_ContractionExpr) {
     TupleList contractionsList;
-    if (getSema()->isListOfLists(be->getRight(), contractionsList)) {
+    if (sema.isListOfLists(be->getRight(), contractionsList)) {
       const BinaryExpr *tensor = extractTensorExprOrNull(be->getLeft());
       if (!tensor)
         assert(0 && "internal error: cannot handle general contractions yet");
@@ -135,13 +136,13 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
       ExprNode *lhs = getExprNode(left);
       ExprNode *rhs = getExprNode(right);
 
-      const TensorType *leftType = getSema()->getType(be->getLeft());
+      const TensorType *leftType = sema.getType(be->getLeft());
       const int leftRank = leftType->getRank();
       ExprNode *resNode =
           ENBuilder->createContractionExpr(lhs, {leftRank - 1}, rhs, {0});
       addExprNode(be, resNode);
 
-      const TensorType *type = getSema()->getType(be);
+      const TensorType *type = sema.getType(be);
       const int rank = type->getRank();
       GCG_Node *n = curGraph->getNode(NodeID(resNode, ".", be), rank);
 
@@ -152,13 +153,15 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
     }
     return;
   } else if (nt == ASTNode::NT_ProductExpr) {
+    // Add nodes to 'curGraph'
     be->getLeft()->visit(this);
     be->getRight()->visit(this);
     return;
   }
 
   assert(nt != ASTNode::NT_ContractionExpr && nt != ASTNode::NT_ProductExpr &&
-         "internal error: should not be here");
+         "internal error: should not be here, binary expression is NOT a "
+         "contraction, and NOT a tensor product");
 
   const Expr *left = be->getLeft();
   buildExprTreeForExpr(left);
@@ -180,11 +183,19 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
     OperatorLabel = "-";
     break;
   case ASTNode::NT_MulExpr:
-    resNode = ENBuilder->createMulExpr(lhs, rhs);
+    // for ScalarMul
+    if (sema.isScalar(*sema.getType(left)))
+      resNode = ENBuilder->createScalarMulExpr(lhs, rhs);
+    else
+      resNode = ENBuilder->createMulExpr(lhs, rhs);
     OperatorLabel = "*";
     break;
   case ASTNode::NT_DivExpr:
-    resNode = ENBuilder->createDivExpr(lhs, rhs);
+    // for ScalarDiv
+    if (sema.isScalar(*sema.getType(right)))
+      resNode = ENBuilder->createScalarDivExpr(lhs, rhs);
+    else
+      resNode = ENBuilder->createDivExpr(lhs, rhs);
     OperatorLabel = "/";
     break;
   default:
@@ -193,7 +204,7 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
 
   addExprNode(be, resNode);
 
-  const TensorType *type = getSema()->getType(be);
+  const TensorType *type = sema.getType(be);
   const int rank = type->getRank();
   GCG_Node *n = curGraph->getNode(NodeID(resNode, OperatorLabel, be), rank);
 

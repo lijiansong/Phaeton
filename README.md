@@ -22,6 +22,8 @@ $ cmake .. && make -j
 - glow: <https://github.com/pytorch/glow>
 - tvm: <https://github.com/dmlc/tvm>
 
+Note: Partial design concept of Phaeton comes from [clang](https://github.com/llvm-mirror/clang) and [mlir](https://github.com/tensorflow/mlir).
+
 # Postscript
 
 I only contribute to this project in my part-time, so this repo will be updated irregularly.

@@ -28,16 +28,18 @@ class ExprTreeTransformer;
 class ExprNode {
 public:
   enum ExprKind {
-    EK_Add,
-    EK_Sub,
-    EK_Mul,
-    EK_Div,
-    EK_Contraction,
-    EK_Product,
-    EK_Stack,
-    EK_Identifier,
+    ExprNode_Add,
+    ExprNode_Sub,
+    ExprNode_Mul,
+    ExprNode_Div,
+    ExprNode_Contraction,
+    ExprNode_Product,
+    ExprNode_Stack,
+    ExprNode_Identifier,
+    ExprNode_ScalarMul,
+    ExprNode_ScalarDiv,
 
-    EK_EXPRKIND_COUNT
+    ExprNode_EXPRKIND_COUNT
   };
 
   // FIXME: Now we only record static tensor.
@@ -66,7 +68,7 @@ public:
   }
 
 public:
-  ExprNode(ExprKind ek, int numChildren,
+  ExprNode(ExprKind expr_kind, int num_children,
            const ExprDimensions &dims = ExprDimensions());
   virtual ~ExprNode() {}
 
@@ -98,10 +100,10 @@ public:
   virtual bool isStackExpr() const { return false; }
 };
 
-#define DECL_EXPR_NODE(Kind)                                                   \
+#define GEN_EXPR_NODE_DECL(Kind)                                               \
   class Kind##Expr : public ExprNode {                                         \
   public:                                                                      \
-    Kind##Expr(ExprNode *lhs, ExprNode *rhs) : ExprNode(EK_##Kind, 2) {        \
+    Kind##Expr(ExprNode *lhs, ExprNode *rhs) : ExprNode(ExprNode_##Kind, 2) {  \
       setChild(0, lhs);                                                        \
       setChild(1, rhs);                                                        \
       /* for type checking of element-wise operation , the following must      \
@@ -118,12 +120,36 @@ public:
     }                                                                          \
   };
 
-DECL_EXPR_NODE(Add)
-DECL_EXPR_NODE(Sub)
-DECL_EXPR_NODE(Mul)
-DECL_EXPR_NODE(Div)
+GEN_EXPR_NODE_DECL(Add)
+GEN_EXPR_NODE_DECL(Sub)
+GEN_EXPR_NODE_DECL(Mul)
+GEN_EXPR_NODE_DECL(Div)
 
-#undef DECL_EXPR_NODE
+#undef GEN_EXPR_NODE_DECL
+
+class ScalarMulExpr : public ExprNode {
+public:
+  ScalarMulExpr(ExprNode *lhs, ExprNode *rhs);
+
+  virtual void visit(ExprTreeVisitor *v) const;
+  virtual void transform(ExprTreeTransformer *t);
+
+  static ScalarMulExpr *create(ExprNode *lhs, ExprNode *rhs) {
+    return new ScalarMulExpr(lhs, rhs);
+  }
+};
+
+class ScalarDivExpr : public ExprNode {
+public:
+  ScalarDivExpr(ExprNode *lhs, ExprNode *rhs);
+
+  virtual void visit(ExprTreeVisitor *v) const;
+  virtual void transform(ExprTreeTransformer *t);
+
+  static ScalarDivExpr *create(ExprNode *lhs, ExprNode *rhs) {
+    return new ScalarDivExpr(lhs, rhs);
+  }
+};
 
 class ProductExpr : public ExprNode {
 public:
@@ -184,7 +210,7 @@ private:
 
 public:
   IdentifierExpr(const std::string &name, const ExprDimensions &dims)
-      : ExprNode(EK_Identifier, 0, dims), Name(name) {}
+      : ExprNode(ExprNode_Identifier, 0, dims), Name(name) {}
 
   virtual bool isIdentifier() const override { return true; }
   virtual std::string getName() const override { return Name; }

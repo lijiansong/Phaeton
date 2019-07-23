@@ -45,15 +45,18 @@ public:
       : CG(cg), FPTypeName(fpTypeName), IndexCounter(0), RowMajor(rowMajor) {}
 
   void genCode(const Program *p);
+
   const std::string &getCode() const { return CG->getCode(); }
 
 protected:
   const std::string &getFPTypeName() const { return FPTypeName; }
 
   std::string getResultTemp() const { return resultTemp; }
+
   void setResultTemp(const std::string &temp) { resultTemp = temp; }
 
   unsigned getIndent() const { return Indent; }
+
   void setIndent(unsigned indent) { Indent = indent; }
 
   std::string getIndex();
@@ -70,27 +73,33 @@ protected:
   void emitTempDefinition(unsigned indent, const std::string &temp,
                           const std::string &init = "");
 
-  std::string subscriptString(const std::vector<std::string> &indices,
-                              const std::vector<int> &dims) const;
+  std::string emitSubscriptString(const std::vector<std::string> &indices,
+                                  const std::vector<int> &dims) const;
 
   void emitLoopHeaderNest(const std::vector<int> &exprDims);
+
   void emitLoopFooterNest();
 
-#define DECL_VISIT_EXPR_NODE(Kind)                                             \
+#define GEN_VISIT_EXPR_NODE_DECL(Kind)                                         \
   virtual void visit##Kind##Expr(const Kind##Expr *e) override;
 
-  DECL_VISIT_EXPR_NODE(Add)
-  DECL_VISIT_EXPR_NODE(Sub)
-  DECL_VISIT_EXPR_NODE(Mul)
-  DECL_VISIT_EXPR_NODE(Div)
-  DECL_VISIT_EXPR_NODE(Contraction)
-  DECL_VISIT_EXPR_NODE(Product)
-  DECL_VISIT_EXPR_NODE(Stack)
-  DECL_VISIT_EXPR_NODE(Identifier)
+  GEN_VISIT_EXPR_NODE_DECL(Add)
+  GEN_VISIT_EXPR_NODE_DECL(Sub)
+  GEN_VISIT_EXPR_NODE_DECL(Mul)
+  GEN_VISIT_EXPR_NODE_DECL(Div)
+  GEN_VISIT_EXPR_NODE_DECL(Contraction)
+  GEN_VISIT_EXPR_NODE_DECL(Product)
+  GEN_VISIT_EXPR_NODE_DECL(Stack)
+  GEN_VISIT_EXPR_NODE_DECL(Identifier)
+  GEN_VISIT_EXPR_NODE_DECL(ScalarMul)
+  GEN_VISIT_EXPR_NODE_DECL(ScalarDiv)
 
-#undef DECL_VISIT_EXPR_NODE
+#undef GEN_VISIT_EXPR_NODE_DECL
 
   void visitBinOpExpr(const ExprNode *en, const std::string &op);
+
+  std::string visitChildExpr(const ExprNode *en,
+                             const std::vector<int> &childExprDims);
 
 private:
   std::string getTemp() { return CG->getTemp(); }

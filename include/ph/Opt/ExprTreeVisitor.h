@@ -15,19 +15,21 @@
 class ExprTreeVisitor {
 
 public:
-#define DECL_VISIT_EXPR_NODE(Kind)                                             \
+#define GEN_VISIT_EXPR_NODE_DECL(Kind)                                         \
   virtual void visit##Kind##Expr(const Kind##Expr *e) = 0;
 
-  DECL_VISIT_EXPR_NODE(Add)
-  DECL_VISIT_EXPR_NODE(Sub)
-  DECL_VISIT_EXPR_NODE(Mul)
-  DECL_VISIT_EXPR_NODE(Div)
-  DECL_VISIT_EXPR_NODE(Contraction)
-  DECL_VISIT_EXPR_NODE(Product)
-  DECL_VISIT_EXPR_NODE(Stack)
-  DECL_VISIT_EXPR_NODE(Identifier)
+  GEN_VISIT_EXPR_NODE_DECL(Add)
+  GEN_VISIT_EXPR_NODE_DECL(Sub)
+  GEN_VISIT_EXPR_NODE_DECL(Mul)
+  GEN_VISIT_EXPR_NODE_DECL(Div)
+  GEN_VISIT_EXPR_NODE_DECL(Contraction)
+  GEN_VISIT_EXPR_NODE_DECL(Product)
+  GEN_VISIT_EXPR_NODE_DECL(Stack)
+  GEN_VISIT_EXPR_NODE_DECL(Identifier)
+  GEN_VISIT_EXPR_NODE_DECL(ScalarMul)
+  GEN_VISIT_EXPR_NODE_DECL(ScalarDiv)
 
-#undef DECL_VISIT_EXPR_NODE
+#undef GEN_VISIT_EXPR_NODE_DECL
 };
 
 #endif // __EXPR_TREE_VISITOR_H__
