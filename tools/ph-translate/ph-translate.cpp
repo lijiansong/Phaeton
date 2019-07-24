@@ -64,9 +64,12 @@ void createOptions(Options &options) {
   options.allow_unrecognised_options().add_options()("h, help", "Print help")(
       "i, input", "Input phaeton source file", cxxopts::value<std::string>())(
       "l, lang",
-      "Emit target language, currently supports: Numpy, OpenMP, OpenCL, Cuda, "
+      "Emit target language source code, currently supports: Numpy, OpenMP, "
+      "OpenCL, Cuda, "
       "Bang, CCE, TPU",
       cxxopts::value<std::string>()->default_value("OpenMP"))(
+      "ast-dump", "Build Phaeton ASTs and then debug dump them")(
+      "token-dump", "Build Phaeton source code and dump the tokens")(
       "o, output", "Output file",
       cxxopts::value<std::string>()->default_value("a.cpp"))(
       "positional",
@@ -86,9 +89,10 @@ ParseResult parseArgs(Options &options, int &argc, char **argv) {
     auto result = options.parse(argc, argv);
     return result;
   } catch (const cxxopts::OptionException &e) {
-    std::cout << PH_COMPILER_EXE << ":" << FRED(" error: ")
+    // FIXME: wrong cli options CANNOT be detected now.
+    std::cerr << PH_COMPILER_EXE << ":" << FRED(" error: ")
               << "parsing options: " << e.what() << std::endl;
-    exit(1);
+    exit(-1);
   }
 }
 
@@ -130,32 +134,54 @@ std::string getTargetLanguageCode(const Parser &parser,
   } else if (!std::strcmp(tgt_lang.c_str(), "OPENCL")) {
     std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "CUDA")) {
     std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "BANG")) {
     std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "CCE")) {
     std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "TPU")) {
     std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
   return tgt_code;
+}
+
+void dumpPhaetonAST(Parser &parser, char *in_ph_tokens) {
+  parser.getAST()->dump();
+  delete[] in_ph_tokens;
+  Program::destroy(parser.getAST());
+  exit(EXIT_SUCCESS);
+}
+
+void dumpPhaetonTokens(char *in_ph_tokens) {
+  Lexer lexer(in_ph_tokens);
+  while (1) {
+    int token = lexer.lex();
+    if (token == EOF)
+      break;
+
+    std::cout << Lexer::getTokenString(token) << ' ';
+  }
+  std::cout << '\n';
+
+  delete[] in_ph_tokens;
+  exit(EXIT_SUCCESS);
 }
 
 void buildJobs(const Options &options, const ParseResult &result) {
   // Dump the help text message
   if (result.count("help")) {
     std::cout << options.help({"", "Group"}) << std::endl;
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
 
   std::ifstream in_ph_file_stream;
@@ -236,19 +262,34 @@ void buildJobs(const Options &options, const ParseResult &result) {
               << "Fail to parse input Phaeton tokens\n";
     exit(-1);
   }
-  // parser.getAST()->dump();
-  delete[] in_ph_tokens;
 
-  std::ofstream out_tgt_file_stream(out_tgt_src);
-  if (out_tgt_file_stream.is_open()) {
-    out_tgt_file_stream << getTargetLanguageCode(parser, tgt_lang);
-    out_tgt_file_stream.close();
-  } else {
-    std::cerr << PH_COMPILER_EXE << ":" << FRED(" error: ")
-              << "Fail to open file " << out_tgt_src << '\n';
-    exit(-1);
+  // If we get here, that means we need to build Phaeton ASTs and dump them.
+  if (result.count("ast-dump")) {
+    dumpPhaetonAST(parser, in_ph_tokens);
   }
-  Program::destroy(parser.getAST());
+
+  // If we get here, that means we need to build Phaeton source code and dump
+  // the tokens.
+  if (result.count("token-dump")) {
+    dumpPhaetonTokens(in_ph_tokens);
+  }
+
+  // FIXME: 'in_ph_tokens' maybe double free.
+  // Phaeton translate '-o' option processing.
+  {
+    delete[] in_ph_tokens;
+    // Write the target language source code to file 'out_tgt_src'.
+    std::ofstream out_tgt_file_stream(out_tgt_src);
+    if (out_tgt_file_stream.is_open()) {
+      out_tgt_file_stream << getTargetLanguageCode(parser, tgt_lang);
+      out_tgt_file_stream.close();
+    } else {
+      std::cerr << PH_COMPILER_EXE << ":" << FRED(" error: ")
+                << "Fail to open file " << out_tgt_src << '\n';
+      exit(-1);
+    }
+    Program::destroy(parser.getAST());
+  }
 }
 
 int main(int argc, char *argv[]) {

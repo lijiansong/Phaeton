@@ -130,23 +130,23 @@ std::string getTargetLanguageCode(const Parser &parser,
   } else if (!std::strcmp(tgt_lang.c_str(), "OPENCL")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "CUDA")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "BANG")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "CCE")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "TPU")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
   return tgt_code;
 }
@@ -155,7 +155,7 @@ void buildJobs(const Options &options, const ParseResult &result) {
   // Dump the help text message
   if (result.count("help")) {
     std::cout << options.help({"", "Group"}) << std::endl;
-    exit(0);
+    exit(EXIT_SUCCESS);
   }
 
   std::ifstream in_ph_file_stream;
