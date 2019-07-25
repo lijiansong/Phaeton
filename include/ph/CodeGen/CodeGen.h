@@ -97,12 +97,9 @@ public:
 
   void addFuncArg(const std::string &name);
 
-  const FuncArgsListTy &getFuncArgs() const {
-    return FuncArgs;
-  };
+  const FuncArgsListTy &getFuncArgs() const { return FuncArgs; };
 
-  const FuncArgsListTy::const_iterator
-  function_arguments_begin() const {
+  const FuncArgsListTy::const_iterator function_arguments_begin() const {
     return FuncArgs.begin();
   }
 

@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "ph/AST/AST.h"
 #include "ph/CodeGen/DirectCG.h"
+#include "ph/AST/AST.h"
 #include "ph/Sema/Sema.h"
 #include "ph/Sema/Type.h"
 

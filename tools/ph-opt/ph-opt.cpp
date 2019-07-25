@@ -69,9 +69,8 @@ void createOptions(Options &options) {
       cxxopts::value<std::string>()->default_value("OpenMP"))(
       "o, output", "Output file",
       cxxopts::value<std::string>()->default_value("a.cpp"))(
-      "positional",
-      "These are the arguments that are entered "
-      "without an option",
+      "positional", "These are the arguments that are entered "
+                    "without an option",
       cxxopts::value<std::vector<std::string>>());
   options.parse_positional({"input", "positional"});
 }

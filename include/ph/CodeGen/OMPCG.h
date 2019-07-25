@@ -118,17 +118,11 @@ private:
     return en->getDims();
   }
 
-  void addFuncArg(const std::string &name) {
-    CG->addFuncArg(name);
-  }
+  void addFuncArg(const std::string &name) { CG->addFuncArg(name); }
 
-  const std::string &getFuncName() const {
-    return CG->getFuncName();
-  }
+  const std::string &getFuncName() const { return CG->getFuncName(); }
 
-  int getNumFuncArgs() const {
-    return CG->getFuncArgs().size();
-  }
+  int getNumFuncArgs() const { return CG->getFuncArgs().size(); }
 
   std::string getFuncNameWrapped() const {
     std::string name = CG->getFuncName();

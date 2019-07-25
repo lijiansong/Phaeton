@@ -53,6 +53,11 @@ for dir in "$@"; do
     fi
 done
 
+# FIXME: On CentOS, realpath is in 'coreutils'
+realpath() {
+[[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 # Find a dominating file, starting from a given directory and going up.
 find-dominating-file() {
     if [ -r "$1"/"$2" ]; then
@@ -82,3 +87,4 @@ for dir in "$@"; do
          -exec "${FMT}" -i '{}' \;
     popd &>/dev/null
 done
+
