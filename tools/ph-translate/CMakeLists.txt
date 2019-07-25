@@ -3,9 +3,10 @@ set(PH_COMPILER_EXE ph-translate)
 include_directories(${PHAETON_LANG_OUTPUT_DIR})
 
 add_executable(${PH_COMPILER_EXE} ph-translate.cpp)
+# FIXME: In CentOS, the linker order is necessary, 'Opt' must be behind 'CodeGen'
 target_link_libraries(${PH_COMPILER_EXE} AST
-                                         Opt
                                          CodeGen
+                                         Opt
                                          Lexer
                                          Parser
                                          Sema)
