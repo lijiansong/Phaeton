@@ -158,10 +158,9 @@ void Sema::visitStmt(const Stmt *s) {
 
   const Symbol *sym = getSymbol(id->getName());
   if (!sym) {
-    assert(0 &&
-           ("semantic error: assignment to undeclared symbol \'" +
-            id->getName() + "\'")
-               .c_str());
+    assert(0 && ("semantic error: assignment to undeclared symbol \'" +
+                 id->getName() + "\'")
+                    .c_str());
     return;
   }
 
@@ -210,10 +209,9 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
             assert(0 && "semantic error: incompatible indices in contraction");
           }
           if (index_set_to_erase.count(i)) {
-            assert(0 &&
-                   ("semantic error: index \'" + std::to_string(i) +
-                    "\' appears multiple times")
-                       .c_str());
+            assert(0 && ("semantic error: index \'" + std::to_string(i) +
+                         "\' appears multiple times")
+                            .c_str());
           }
           index_set_to_erase.insert(i);
           index_list_to_erase.push_back(i);
@@ -331,10 +329,9 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
 void Sema::visitIdentifier(const Identifier *id) {
   const Symbol *sym = getSymbol(id->getName());
   if (!sym) {
-    assert(
-        0 &&
-        ("semantic error: use of undeclared symbol \'" + id->getName() + "\'")
-            .c_str());
+    assert(0 && ("semantic error: use of undeclared symbol \'" + id->getName() +
+                 "\'")
+                    .c_str());
   }
 
   ExprTypes[id] = &sym->getType();
