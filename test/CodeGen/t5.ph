@@ -1,4 +1,5 @@
 // test case p5
+// matrix mul
 
 var in a : [3 4]
 var in b : [4 3]
