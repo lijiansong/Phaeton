@@ -11,32 +11,34 @@
 #include "ph/AST/ASTNode.h"
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"
-#include "ph/AST/Decl.h"
-#include "ph/AST/Expr.h"
-#include "ph/AST/Stmt.h"
+
+using namespace phaeton;
 
 std::map<ASTNode::NodeType, std::string> ASTNode::NodeLabel = {
-    {ASTNode::NT_Program, "Program"},
+    {NODETYPE_Program, "Program"},
 
-    {ASTNode::NT_DeclList, "DeclList"},
-    {ASTNode::NT_StmtList, "StmtList"},
-    {ASTNode::NT_ExprList, "ExprList"},
+    {NODETYPE_DeclList, "DeclList"},
+    {NODETYPE_StmtList, "StmtList"},
+    {NODETYPE_ExprList, "ExprList"},
 
-    {ASTNode::NT_VarDecl, "VarDecl"},
-    {ASTNode::NT_TypeDecl, "TypeDecl"},
+    {NODETYPE_VarDecl, "VarDecl"},
+    {NODETYPE_TypeDecl, "TypeDecl"},
 
-    {ASTNode::NT_Stmt, "Stmt"},
+    {NODETYPE_ElemDirect, "ElemDirect"},
 
-    {ASTNode::NT_ContractionExpr, "ContractionExpr"},
-    {ASTNode::NT_AddExpr, "AddExpr"},
-    {ASTNode::NT_SubExpr, "SubExpr"},
-    {ASTNode::NT_MulExpr, "MulExpr"},
-    {ASTNode::NT_DivExpr, "DivExpr"},
-    {ASTNode::NT_ProductExpr, "ProductExpr"},
-    {ASTNode::NT_Identifier, "Identifier"},
-    {ASTNode::NT_Integer, "Integer"},
-    {ASTNode::NT_BrackExpr, "BrackExpr"},
-    {ASTNode::NT_ParenExpr, "ParenExpr"},
+    {NODETYPE_Stmt, "Stmt"},
+
+    {NODETYPE_TranspositionExpr, "TranspositionExpr"},
+    {NODETYPE_ContractionExpr, "ContractionExpr"},
+    {NODETYPE_AddExpr, "AddExpr"},
+    {NODETYPE_SubExpr, "SubExpr"},
+    {NODETYPE_MulExpr, "MulExpr"},
+    {NODETYPE_DivExpr, "DivExpr"},
+    {NODETYPE_ProductExpr, "ProductExpr"},
+    {NODETYPE_Identifier, "Identifier"},
+    {NODETYPE_Integer, "Integer"},
+    {NODETYPE_BrackExpr, "BrackExpr"},
+    {NODETYPE_ParenExpr, "ParenExpr"},
 };
 
 template <typename T, ASTNode::NodeType nt, typename Derived>
@@ -69,14 +71,14 @@ void ASTNodeList<T, nt, Derived>::_delete() const {
   }
 }
 
-template class ASTNodeList<const Decl, ASTNode::NT_DeclList, DeclList>;
+template class phaeton::ASTNodeList<const Decl, ASTNode::NODETYPE_DeclList, DeclList>;
 
 void DeclList::visit(ASTVisitor *v) const { v->visitDeclList(this); }
 
-template class ASTNodeList<const Stmt, ASTNode::NT_StmtList, StmtList>;
+template class phaeton::ASTNodeList<const Stmt, ASTNode::NODETYPE_StmtList, StmtList>;
 
 void StmtList::visit(ASTVisitor *v) const { v->visitStmtList(this); }
 
-template class ASTNodeList<const Expr, ASTNode::NT_ExprList, ExprList>;
+template class phaeton::ASTNodeList<const Expr, ASTNode::NODETYPE_ExprList, ExprList>;
 
 void ExprList::visit(ASTVisitor *v) const { v->visitExprList(this); }

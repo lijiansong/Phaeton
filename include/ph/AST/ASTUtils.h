@@ -10,8 +10,8 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef __ASTUTILS_H__
-#define __ASTUTILS_H__
+#ifndef PHAETON_AST_ASTUTILS_H
+#define PHAETON_AST_ASTUTILS_H
 
 #include <cassert>
 #include <iostream>
@@ -29,4 +29,4 @@
 
 // global var, TODO: class wrapper
 
-#endif // __ASTUTILS_H__
+#endif // PHAETON_AST_ASTUTILS_H

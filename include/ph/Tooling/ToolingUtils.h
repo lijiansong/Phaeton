@@ -10,12 +10,14 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef __TOOLING_UTILS_H__
-#define __TOOLING_UTILS_H__
+#ifndef PHAETON_TOOLING_UTILS_H
+#define PHAETON_TOOLING_UTILS_H
 
 #include <algorithm>
 #include <cctype>
 #include <string>
+
+namespace phaeton {
 
 void toUpperCase(std::string &str) {
   std::transform(
@@ -23,4 +25,6 @@ void toUpperCase(std::string &str) {
       [](unsigned char c) -> unsigned char { return std::toupper(c); });
 }
 
-#endif // __TOOLING_UTILS_H__
+} // end namespace phaeton
+
+#endif // PHAETON_TOOLING_UTILS_H

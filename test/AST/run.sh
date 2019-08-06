@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+#set -e
 EXE=../../build/bin/ph-translate
 for tc in `ls *.ph`
 do

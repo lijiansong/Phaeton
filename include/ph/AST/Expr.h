@@ -8,12 +8,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __EXPR_H__
-#define __EXPR_H__
+#ifndef PHAETON_AST_EXPR_H
+#define PHAETON_AST_EXPR_H
 
 #pragma once
 
 #include "ph/AST/ASTNode.h"
+
+namespace phaeton {
 
 class Expr : public ASTNode {
 protected:
@@ -38,15 +40,13 @@ public:
 };
 
 class BinaryExpr : public Expr {
-private:
-  const Expr *LeftExpr;
-  const Expr *RightExpr;
-
 public:
   BinaryExpr(NodeType nt, const Expr *left, const Expr *right)
       : Expr(nt), LeftExpr(left), RightExpr(right) {
-    assert(nt == NT_ContractionExpr || nt == NT_AddExpr || nt == NT_SubExpr ||
-           nt == NT_MulExpr || nt == NT_DivExpr || nt == NT_ProductExpr);
+    assert(nt == NODETYPE_TranspositionExpr || nt == NODETYPE_ContractionExpr ||
+           nt == NODETYPE_AddExpr || nt == NODETYPE_SubExpr ||
+           nt == NODETYPE_MulExpr || nt == NODETYPE_DivExpr ||
+           nt == NODETYPE_ProductExpr);
   }
 
   const Expr *getLeft() const { return LeftExpr; }
@@ -61,14 +61,16 @@ public:
   }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  const Expr *LeftExpr;
+  const Expr *RightExpr;
 };
 
 class Identifier : public Factor {
-private:
-  const std::string Name;
-
 public:
-  Identifier(const std::string name) : Factor(NT_Identifier), Name(name) {}
+  Identifier(const std::string name)
+      : Factor(NODETYPE_Identifier), Name(name) {}
 
   const std::string &getName() const { return Name; }
 
@@ -83,14 +85,14 @@ public:
   virtual void visit(ASTVisitor *v) const override;
 
   virtual bool isIdentifier() const override { return true; }
+
+private:
+  const std::string Name;
 };
 
 class Integer : public Factor {
-private:
-  int Value;
-
 public:
-  Integer(int value) : Factor(NT_Integer), Value(value) {}
+  Integer(int value) : Factor(NODETYPE_Integer), Value(value) {}
 
   int getValue() const { return Value; }
 
@@ -101,16 +103,14 @@ public:
   static const Integer *create(int value) { return new Integer(value); }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  int Value;
 };
 
-class ExprList;
-
 class BrackExpr : public Factor {
-private:
-  const ExprList *Exprs;
-
 public:
-  BrackExpr(const ExprList *exprs) : Factor(NT_BrackExpr), Exprs(exprs) {}
+  BrackExpr(const ExprList *exprs) : Factor(NODETYPE_BrackExpr), Exprs(exprs) {}
 
   const ExprList *getExprs() const { return Exprs; }
 
@@ -123,14 +123,14 @@ public:
   }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  const ExprList *Exprs;
 };
 
 class ParenExpr : public Factor {
-private:
-  const Expr *NestedExpr;
-
 public:
-  ParenExpr(const Expr *expr) : Factor(NT_ParenExpr), NestedExpr(expr) {}
+  ParenExpr(const Expr *expr) : Factor(NODETYPE_ParenExpr), NestedExpr(expr) {}
 
   const Expr *getExpr() const { return NestedExpr; }
 
@@ -143,6 +143,11 @@ public:
   }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  const Expr *NestedExpr;
 };
 
-#endif // __EXPR_H__
+} // end namespace phaeton
+
+#endif // PHAETON_AST_EXPR_H

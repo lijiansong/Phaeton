@@ -11,6 +11,8 @@
 
 #include "ph/Sema/SymbolTable.h"
 
+using namespace phaeton;
+
 bool SymbolTable::addSymbol(Symbol *sym) {
   if (Symbols.count(sym->getName()))
     return false;

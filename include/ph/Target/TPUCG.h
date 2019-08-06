@@ -10,13 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __TPU_CG_H__
-#define __TPU_CG_H__
+#ifndef PHAETON_TARGET_TPU_CG_H
+#define PHAETON_TARGET_TPU_CG_H
 
 #include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
 
-// TODO: CG for Google TPU.
+namespace phaeton {
+
+/// TPUCG - This class defines the entrance for CG of Google TPU.
 class TPUCG : public DirectCodeGen {};
 
-#endif // __TPU_CG_H__
+} // end namespace phaeton
+
+#endif // PHAETON_TARGET_TPU_CG_H

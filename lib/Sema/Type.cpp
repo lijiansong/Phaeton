@@ -10,6 +10,8 @@
 
 #include "ph/Sema/Type.h"
 
+using namespace phaeton;
+
 bool TensorType::operator==(const TensorType &rhs) const {
   if (getRank() != rhs.getRank())
     return false;
@@ -25,7 +27,7 @@ bool TensorType::operator==(const TensorType &rhs) const {
 const std::string TensorType::getDimString() const {
   std::string result = "";
   for (unsigned i = 0; i < getRank(); i++) {
-    result += std::to_string(getDim(i));
+    result += std::to_string((long long)getDim(i));
     if (i != (getRank() - 1))
       result += ", ";
   }

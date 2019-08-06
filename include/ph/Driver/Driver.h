@@ -4,9 +4,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __DRIVER_H__
-#define __DRIVER_H__
+#ifndef PHAETON_DRIVER_H
+#define PHAETON_DRIVER_H
+
+namespace phaeton {
 
 class Driver {};
 
-#endif // __DRIVER_H__
+} // end namespace phaeton
+
+#endif // PHAETON_DRIVER_H

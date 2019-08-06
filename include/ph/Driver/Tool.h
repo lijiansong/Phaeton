@@ -4,9 +4,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __TOOL_H__
-#define __TOOL_H__
+#ifndef PHAETON_DRIVER_TOOL_H
+#define PHAETON_DRIVER_TOOL_H
+
+namespace phaeton {
 
 class Tools {};
 
-#endif // __TOOL_H__
+} // end namespace phaeton
+
+#endif // PHAETON_DRIVER_TOOL_H

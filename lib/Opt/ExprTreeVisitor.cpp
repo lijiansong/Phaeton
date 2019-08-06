@@ -9,3 +9,5 @@
 //===----------------------------------------------------------------------===//
 
 #include "ph/Opt/ExprTreeVisitor.h"
+
+using namespace phaeton;

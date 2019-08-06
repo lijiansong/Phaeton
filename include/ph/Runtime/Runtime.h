@@ -8,11 +8,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __RUNTIME_H__
-#define __RUNTIME_H__
+#ifndef PHAETON_RUNTIME_H
+#define PHAETON_RUNTIME_H
 
 // TODO: Runtime support for Host memory management and kernel launch,
 // refer to TVM and TensorComprehensions. We may need to add an adapter
 // for CPU, GPU, MLU, TPU and etc.
 
-#endif // __RUNTIME_H__
+#endif // PHAETON_RUNTIME_H

@@ -7,32 +7,29 @@
 //  This file defines the compiler base data type Tensor.
 //
 //===----------------------------------------------------------------------===//
-
-#ifndef __TYPE_H__
-#define __TYPE_H__
+#ifndef PHAETON_SEMA_TYPE_H
+#define PHAETON_SEMA_TYPE_H
 
 #include <string>
 #include <vector>
 
-class TensorType {
-private:
-  std::vector<int> Dims;
-  // TODO: add data type
-  // TODO: add memory hierarchy
+namespace phaeton {
 
+class TensorType {
 public:
   enum AddrSpaceType {
-    AS_Global,
-    AS_Shared,
-    AS_Neural,
-    AS_Synapse,
-    AS_Constant,
+    ADDR_SPACE_Global,
+    ADDR_SPACE_Shared,
+    ADDR_SPACE_Neural,
+    ADDR_SPACE_Synapse,
+    ADDR_SPACE_Constant,
 
-    AS_Default
+    ADDR_SPACE_Default,
+    ADDR_SPACE_AddrSpaceType_COUNT
   };
 
+public:
   TensorType() {}
-
   TensorType(const std::vector<int> &dims) : Dims(dims) {}
 
   void addDim(int dim) { Dims.push_back(dim); }
@@ -42,7 +39,6 @@ public:
   int getDim(unsigned i) const { return Dims.at(i); }
 
   bool operator==(const TensorType &rhs) const;
-
   bool operator!=(const TensorType &rhs) const { return !(*this == rhs); }
 
   bool equals(const std::vector<int> &dims) const {
@@ -52,6 +48,13 @@ public:
   const std::string getDimString() const;
 
   const std::vector<int> &getDims() const { return Dims; }
+
+private:
+  std::vector<int> Dims;
+  // TODO: add data type
+  // TODO: add memory hierarchy
 };
 
-#endif // __TYPE_H__
+} // end namespace phaeton
+
+#endif // PHAETON_SEMA_TYPE_H

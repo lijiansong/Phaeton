@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __SYMBOL_TABLE_H__
-#define __SYMBOL_TABLE_H__
+#ifndef PHAETON_SEMA_SYMBOL_TABLE_H
+#define PHAETON_SEMA_SYMBOL_TABLE_H
 
 #include "ph/AST/AST.h"
 #include "ph/Sema/Type.h"
@@ -17,22 +17,16 @@
 #include <map>
 #include <string>
 
+namespace phaeton {
+
 class Symbol {
 public:
   enum SymbolKind {
-    SK_Variable,
-    SK_Type,
+    SYM_KIND_Variable,
+    SYM_KIND_Type,
 
-    SK_SYMBOLKIND_COUNT
+    SYM_KIND_SYMBOLKIND_COUNT
   };
-
-private:
-  const SymbolKind K;
-
-  const std::string Name;
-  const TensorType &Type;
-
-  const Decl *DeclNode;
 
 public:
   Symbol(SymbolKind k, const std::string &name, const TensorType &type,
@@ -45,14 +39,19 @@ public:
   const Decl *getDecl() const { return DeclNode; }
 
   void setDecl(const Decl *decl) { DeclNode = decl; }
+
+private:
+  const SymbolKind K;
+
+  const std::string Name;
+  const TensorType &Type;
+
+  const Decl *DeclNode;
 };
 
 class SymbolTable {
 public:
   using SymbolMap = std::map<const std::string, Symbol *>;
-
-private:
-  SymbolMap Symbols;
 
 public:
   SymbolTable() {}
@@ -66,6 +65,11 @@ public:
 
   SymbolMap::const_iterator begin() const { return Symbols.begin(); }
   SymbolMap::const_iterator end() const { return Symbols.end(); }
+
+private:
+  SymbolMap Symbols;
 };
 
-#endif // __SYMBOL_TABLE_H__
+} // end namespace phaeton
+
+#endif // PHAETON_SEMA_SYMBOL_TABLE_H

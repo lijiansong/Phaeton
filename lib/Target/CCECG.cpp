@@ -1,12 +1,14 @@
-//==--- BangCG.cpp ----- Interface to code generation for Cambricon Bang ---==//
+//==--- CCECG.cpp ----- Interface to code generation for Huawei CCE --------==//
 //
 //                     The Phaeton Compiler Infrastructure
 //
 //===----------------------------------------------------------------------===//
 //
 // This provides a class for Cambricon Bang code generation targeting the
-// Cambricon MLUs.
+// Huawei Ascend accelerators.
 //
 //===----------------------------------------------------------------------===//
 
-#include "ph/CodeGen/BangCG.h"
+#include "ph/Target/CCECG.h"
+
+using namespace phaeton;

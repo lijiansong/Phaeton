@@ -20,14 +20,15 @@
 #include <iostream>
 
 #include "ph/CodeGen/GraphCG.h"
-#include "ph/CodeGen/OMPCG.h"
-#include "ph/CodeGen/PyCG.h"
+#include "ph/Target/OMPCG.h"
 #include "ph/Lex/Lexer.h"
 #include "ph/Parse/Parser.h"
 #include "ph/Sema/Sema.h"
 #include "ph/Tooling/CommonOptionsParser.h"
 
 #define PH_COMPILER_EXE "ph-translate"
+
+using namespace phaeton;
 
 namespace {
 // FIXME: Current Phaeton has no compiler driver, so the main entrance
@@ -121,16 +122,16 @@ std::string getTargetLanguageCode(const Parser &parser,
   sema.visitProgram(parser.getAST());
   std::string tgt_code = "";
   if (!std::strcmp(tgt_lang.c_str(), "OPENMP")) {
-    GraphCodeGen gcg(&sema);
+    GraphCodeGen gcg(&sema, "omp_func");
     // FIXME: CodeGen mode must be sync with a specific codegen, i.e.
     // if we omit the function name, the wrapper caller will be wrong.
     OMPCG omp(&gcg, true);
     omp.genCode(parser.getAST());
     tgt_code = omp.getCode();
   } else if (!std::strcmp(tgt_lang.c_str(), "NUMPY")) {
-    NumpyDirectCG npcg(&sema);
-    npcg.visitProgram(parser.getAST());
-    tgt_code = npcg.getCode();
+    std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
+              << "Target language not support yet\n";
+    exit(EXIT_SUCCESS);
   } else if (!std::strcmp(tgt_lang.c_str(), "OPENCL")) {
     std::cout << PH_COMPILER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";

@@ -8,24 +8,22 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __STMT_H__
-#define __STMT_H__
+#ifndef PHAETON_AST_STMT_H
+#define PHAETON_AST_STMT_H
 
 #pragma once
 
 #include "ph/AST/ASTNode.h"
 
+namespace phaeton {
+
 class Identifier;
 class Expr;
 
 class Stmt : public ASTNode {
-private:
-  const Identifier *Id;
-  const Expr *RightExpr;
-
 public:
   Stmt(const Identifier *id, const Expr *expr)
-      : ASTNode(NT_Stmt), Id(id), RightExpr(expr) {}
+      : ASTNode(NODETYPE_Stmt), Id(id), RightExpr(expr) {}
 
   const Identifier *getIdentifier() const { return Id; }
   const Expr *getExpr() const { return RightExpr; }
@@ -39,6 +37,12 @@ public:
   }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  const Identifier *Id;
+  const Expr *RightExpr;
 };
 
-#endif // __STMT_H__
+} // end namespace phaeton
+
+#endif // PHAETON_AST_STMT_H

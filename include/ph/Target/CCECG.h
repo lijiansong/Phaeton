@@ -9,13 +9,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __CCE_CG_H__
-#define __CCE_CG_H__
+#ifndef PHAETON_TARGET_CCE_CG_H
+#define PHAETON_TARGET_CCE_CG_H
 
 #include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
 
-// TODO: CG for Huawei CCE.
+namespace phaeton {
+
+/// CCECG - This class defines entrance for the CG of Huawei CCE.
 class CCECG : public DirectCodeGen {};
 
-#endif // __CCE_CG_H__
+} // end namespace phaeton
+
+#endif // PHAETON_TARGET_CCE_CG_H

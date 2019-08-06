@@ -4,9 +4,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __JOB_H__
-#define __JOB_H__
+#ifndef PHAETON_DRIVER_JOB_H
+#define PHAETON_DRIVER_JOB_H
+
+namespace phaeton {
 
 class Jobs {};
 
-#endif // __JOB_H__
+} // end namespace phaeton
+
+#endif // PHAETON_DRIVER_JOB_H

@@ -8,14 +8,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __LEXER_H__
-#define __LEXER_H__
+#ifndef PHAETON_LEXER_H
+#define PHAETON_LEXER_H
 
 #include "phaeton.tab.hh"
 
 #include <fstream>
 #include <map>
 #include <string>
+
+namespace phaeton {
 
 class Lexer {
 private:
@@ -40,4 +42,6 @@ public:
   }
 };
 
-#endif // __LEXER_H__
+} // end namespace phaeton
+
+#endif // PHAETON_LEXER_H

@@ -8,34 +8,36 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __PROGRAM_H__
-#define __PROGRAM_H__
+#ifndef PHAETON_AST_PROGRAM_H
+#define PHAETON_AST_PROGRAM_H
 
 #pragma once
 
 #include "ph/AST/ASTNode.h"
 
+namespace phaeton {
+
 class DeclList;
 class StmtList;
+class ElemDirect;
 
 class Program : public ASTNode {
-private:
-  const DeclList *Decls;
-  const StmtList *Stmts;
-
 public:
-  Program(const DeclList *decls, const StmtList *stmts)
-      : ASTNode(NT_Program), Decls(decls), Stmts(stmts) {}
+  Program(const DeclList *decls, const StmtList *stmts,
+          const ElemDirect *elem = nullptr)
+      : ASTNode(NODETYPE_Program), Decls(decls), Stmts(stmts), Elem(elem) {}
 
   const DeclList *getDecls() const { return Decls; }
   const StmtList *getStmts() const { return Stmts; }
+  const ElemDirect *getElem() const { return Elem; }
 
   virtual void dump(unsigned indent = 0) const final;
 
   virtual void _delete() const final;
 
-  static const Program *create(const DeclList *decls, const StmtList *stmts) {
-    return new Program(decls, stmts);
+  static const Program *create(const DeclList *decls, const StmtList *stmts,
+                               const ElemDirect *elem = nullptr) {
+    return new Program(decls, stmts, elem);
   }
 
   static void destroy(const Program *p) {
@@ -44,6 +46,13 @@ public:
   }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  const DeclList *Decls;
+  const StmtList *Stmts;
+  const ElemDirect *Elem;
 };
 
-#endif // __PROGRAM_H__
+} // end namespace phaeton
+
+#endif // PHAETON_AST_PROGRAM_H

@@ -9,13 +9,15 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef __CG_UTILS_H__
-#define __CG_UTILS_H__
-
-#include "ph/AST/AST.h"
+#ifndef PHAETON_CODEGEN_CGUTILS_H
+#define PHAETON_CODEGEN_CGUTILS_H
 
 #include <sstream>
 #include <string>
+
+#include "ph/AST/AST.h"
+
+namespace phaeton {
 
 template <typename Derived> class Comparable {
 public:
@@ -36,7 +38,7 @@ class GraphComponentID : public Comparable<Derived> {
 private:
   const std::string Label;
 
-  const ASTNode *AST; /* AST node */
+  const ASTNode *AST; /* corresponding AST node */
 
 public:
   GraphComponentID(const std::string label = "", const ASTNode *ast = nullptr)
@@ -62,8 +64,12 @@ public:
         ID(rhs.str()) {}
 
   virtual const std::string str() const final { return ID; }
-  bool operator==(const StringID &id) const final { return ID == id.str(); }
-  bool operator<(const StringID &id) const final { return ID < id.str(); }
+  virtual bool operator==(const StringID &id) const final {
+    return ID == id.str();
+  }
+  virtual bool operator<(const StringID &id) const final {
+    return ID < id.str();
+  }
 };
 
 template <typename T> class AddressID : public GraphComponentID<AddressID<T>> {
@@ -86,8 +92,14 @@ public:
     return ss.str();
   }
 
-  bool operator==(const AddressID &id) const final { return ID == id.get(); }
-  bool operator<(const AddressID &id) const final { return ID < id.get(); }
+  virtual bool operator==(const AddressID &id) const final {
+    return ID == id.get();
+  }
+  virtual bool operator<(const AddressID &id) const final {
+    return ID < id.get();
+  }
 };
 
-#endif // __CG_UTILS_H__
+} // end namespace phaeton
+
+#endif // PHAETON_CODEGEN_CGUTILS_H

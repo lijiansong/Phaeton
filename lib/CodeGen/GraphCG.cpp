@@ -9,10 +9,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "ph/CodeGen/GraphCG.h"
-#include "ph/AST/AST.h"
 #include "ph/Opt/ENBuilder.h"
-#include "ph/Sema/Sema.h"
-#include "ph/Sema/Type.h"
+#include "ph/Opt/ExprTree.h"
 
 #include <cassert>
 #include <fstream>
@@ -20,28 +18,27 @@
 #include <iostream>
 #include <sstream>
 
+using namespace phaeton;
+
 void GraphCodeGen::updateCurEnd(GCG_Node *n) {
   if (curEnd != nullptr) {
     curEnd->setSucc(n);
     n->setPred(curEnd);
   }
+
   curEnd = n;
   return;
 }
 
-GraphCodeGen::GraphCodeGen(const Sema *sema)
-    : CodeGen(sema), curGraph(nullptr), curEnd(nullptr) {
-  curLegs.clear();
-}
-
-GraphCodeGen::GraphCodeGen(const Sema *sema, const std::string &fn_name)
-    : CodeGen(sema, fn_name), curGraph(nullptr), curEnd(nullptr) {
+GraphCodeGen::GraphCodeGen(const Sema *sema, const std::string &functionName)
+    : CodeGen(sema, functionName), curGraph(nullptr), curEnd(nullptr) {
   curLegs.clear();
 }
 
 void GraphCodeGen::visitStmt(const Stmt *s) {
-  CodeGen::visitStmt(s);
   buildExprTreeForExpr(s->getExpr());
+
+  CodeGen::visitStmt(s);
 }
 
 void GraphCodeGen::buildExprTreeForExpr(const Expr *expr) {
@@ -49,14 +46,17 @@ void GraphCodeGen::buildExprTreeForExpr(const Expr *expr) {
   GCG_Legs savedLegs = curLegs;
   GCG_Node *savedEnd = curEnd;
 
-  GCG_Graph temporaryGraph;
-  curGraph = &temporaryGraph;
-  curLegs.clear();
-  curEnd = nullptr;
+  {
+    GCG_Graph temporaryGraph;
+    curGraph = &temporaryGraph;
+    curLegs.clear();
+    curEnd = nullptr;
 
-  expr->visit(this);
+    // Here we builds the graph for 'expr' into 'curGraph'.
+    expr->visit(this);
 
-  addExprNode(expr, buildExprTreeForGraph(curGraph));
+    addExprNode(expr, buildExprTreeForGraph(curGraph));
+  }
 
   curGraph = savedGraph;
   curLegs = savedLegs;
@@ -115,10 +115,10 @@ void GraphCodeGen::visitBrackExpr(const BrackExpr *be) {
 }
 
 void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
-  const ASTNode::NodeType nt = be->getNodeType();
   const Sema &sema = *getSema();
+  const ASTNode::NodeType nt = be->getNodeType();
 
-  if (nt == ASTNode::NT_ContractionExpr) {
+  if (nt == ASTNode::NODETYPE_ContractionExpr) {
     TupleList contractionsList;
     if (sema.isListOfLists(be->getRight(), contractionsList)) {
       const BinaryExpr *tensor = extractTensorExprOrNull(be->getLeft());
@@ -157,16 +157,43 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
       updateCurEnd(n);
     }
     return;
-  } else if (nt == ASTNode::NT_ProductExpr) {
-    // Add nodes to 'curGraph'
+  } else if (nt == ASTNode::NODETYPE_ProductExpr) {
+    // simply add nodes to 'curGraph'
     be->getLeft()->visit(this);
     be->getRight()->visit(this);
     return;
+  } else if (nt == ASTNode::NODETYPE_TranspositionExpr) {
+    const Expr *left = be->getLeft();
+    // need a single expression node at which the
+    // expression tree for 'left' is rooted
+    buildExprTreeForExpr(left);
+
+    TupleList indexPairs;
+    if (!Sema::isListOfLists(be->getRight(), indexPairs))
+      assert(0 && "internal error: right member of transposition not a list");
+
+    if (indexPairs.empty())
+      assert(0 && "internal error: cannot have an empty list here");
+
+    ExprNode *resNode =
+        ENBuilder->createTranspositionExpr(getExprNode(left), indexPairs);
+    addExprNode(be, resNode);
+
+    const TensorType *type = sema.getType(be);
+    const int rank = type->getRank();
+    GCG_Node *n = curGraph->getNode(NodeID(resNode, "transpose", be), rank);
+
+    for (int i = 0; i < rank; i++)
+      curLegs.push_back(GCG_Edge::NodeIndexPair(n, i));
+
+    updateCurEnd(n);
+    return;
   }
 
-  assert(nt != ASTNode::NT_ContractionExpr && nt != ASTNode::NT_ProductExpr &&
-         "internal error: should not be here, binary expression is NOT a "
-         "contraction, and NOT a tensor product");
+  assert(nt != ASTNode::NODETYPE_ContractionExpr &&
+         nt != ASTNode::NODETYPE_ProductExpr &&
+         nt != ASTNode::NODETYPE_TranspositionExpr &&
+         "internal error: should not be here");
 
   const Expr *left = be->getLeft();
   buildExprTreeForExpr(left);
@@ -179,24 +206,22 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
   ExprNode *resNode, *lhs = getExprNode(left), *rhs = getExprNode(right);
   std::string OperatorLabel;
   switch (nt) {
-  case ASTNode::NT_AddExpr:
+  case ASTNode::NODETYPE_AddExpr:
     resNode = ENBuilder->createAddExpr(lhs, rhs);
     OperatorLabel = "+";
     break;
-  case ASTNode::NT_SubExpr:
+  case ASTNode::NODETYPE_SubExpr:
     resNode = ENBuilder->createSubExpr(lhs, rhs);
     OperatorLabel = "-";
     break;
-  case ASTNode::NT_MulExpr:
-    // for ScalarMul
+  case ASTNode::NODETYPE_MulExpr:
     if (sema.isScalar(*sema.getType(left)))
       resNode = ENBuilder->createScalarMulExpr(lhs, rhs);
     else
       resNode = ENBuilder->createMulExpr(lhs, rhs);
     OperatorLabel = "*";
     break;
-  case ASTNode::NT_DivExpr:
-    // for ScalarDiv
+  case ASTNode::NODETYPE_DivExpr:
     if (sema.isScalar(*sema.getType(right)))
       resNode = ENBuilder->createScalarDivExpr(lhs, rhs);
     else
@@ -238,18 +263,22 @@ void GraphCodeGen::visitContraction(const Expr *e, const TupleList &indices) {
   int rankL = typeL->getRank();
 
   TupleList contrL, contrR, contrMixed;
-  // Classify these index pairs into three categories:
-  // - contractions of the left sub-expression, i.e. 'contrL'
-  // - contractions of the right sub-expression, i.e. 'contrR'
-  // - having one index from each sub-expression, i.e. 'contrMixed'
+  // Here we classify index pairs into the following three categories:
+  // - 'contrL', contractions of the left sub-expression;
+  // - 'contrR', contractions of the right sub-expression;
+  // - 'contrMixed', having one index from each sub-expression.
   partitionPairList(rankL, indices, contrL, contrR, contrMixed);
 
   GCG_Legs savedLegs = curLegs;
   curLegs.clear();
   visitContraction(tensorL, contrL);
 
+  // Here we determine the rank of the resulting left sub-expression after
+  // contraction has been performed over the set of index pairs 'contrL'.
   int rankContractedL = rankL - 2 * contrL.size();
 
+  // Note: the index pairs of the right sub-expression must be adjusted by
+  // the rank of the left sub-expression.
   TupleList shiftedR = contrR;
   shiftTupleList(-rankContractedL, shiftedR);
 
@@ -260,17 +289,23 @@ void GraphCodeGen::visitContraction(const Expr *e, const TupleList &indices) {
 
   List indL, indR;
   unpackPairList(contrMixed, indL, indR);
+  // Note: only contractions in 'contrL' affect the adjustments
+  // of the left indices in 'indL'.
   adjustForContractions(indL, contrL);
+  // Note that adjustments of the right indices in 'indR' are affected by
+  // the contractions in both 'contrL' and 'contrR'.
   adjustForContractions(indR, contrL);
   adjustForContractions(indR, contrR);
 
   assert(indL.size() == indR.size() &&
-         "internal error: mismatched numbers of indices to be contracted");
+         "internal error: mis-matched numbers of indices to be contracted");
 
   for (int k = 0; k < indL.size(); k++) {
     int iL = indL[k];
     int iR = indR[k];
 
+    // For contraction, the 'src' node correcponds to the left tensor in the
+    // contraction.
     const GCG_Node *srcNode = curLegs[iL].first;
     const int srcIndex = curLegs[iL].second;
     const GCG_Node *tgtNode = curLegs[iR].first;
@@ -322,6 +357,7 @@ ExprNode *GraphCodeGen::buildExprTreeForGraph(GCG_Graph *graph) {
       const GCG_Node &edgeSrc = *e->getSrcNode();
       const GCG_Node &edgeTgt = *e->getTgtNode();
 
+      // Note that the order here matters, 'src' carries lower indices.
       assert((edgeSrc == src && edgeTgt == tgt));
       srcIndices.push_back(e->getSrcIndex());
       tgtIndices.push_back(e->getTgtIndex());
@@ -330,6 +366,7 @@ ExprNode *GraphCodeGen::buildExprTreeForGraph(GCG_Graph *graph) {
     ExprNode *resNode = ENBuilder->createContractionExpr(
         src.getID().get(), srcIndices, tgt.getID().get(), tgtIndices);
 
+    // Here we find edges that remain at 'src' or 'tgt' after the contraction.
     EdgeSet edgesAtSrc, edgesAtTgt;
     getRemainingEdgesAtNode(edgesAtSrc, src, toContract);
     getRemainingEdgesAtNode(edgesAtTgt, tgt, toContract);
@@ -342,15 +379,19 @@ ExprNode *GraphCodeGen::buildExprTreeForGraph(GCG_Graph *graph) {
     replaceEdgesAtNode(*graph, tgt, edgesAtTgt, *n,
                        src.getRank() - toContract.size(), toContract);
 
+    // Here we erase all edges that have been contracted over.
     for (const auto *e : toContract)
       graph->eraseEdge(e->getID());
 
+    // Here we erase the nodes that are contracted.
     success = graph->eraseNode(src.getID());
     assert(success && "internal error: should not fail to erase source node");
     success = graph->eraseNode(tgt.getID());
     assert(success && "internal error: should not fail to erase target node");
   }
 
+  // Here graph has no edges left, hence, form the tensor product
+  // of the remaining nodes from left to right.
   const GCG_Node *n = graph->getStartNode();
   ExprNode *resNode = n->getID().get();
   while (n->hasSucc()) {
@@ -380,8 +421,8 @@ void GraphCodeGen::replaceEdgesAtNode(GCG_Graph &graph, const GCG_Node &oldNode,
                                       const EdgeSet &edgesAtOldNode,
                                       const GCG_Node &newNode, int shift,
                                       const EdgeSet &toContract) {
-  std::function<int(int)> adjustForContractions = [oldNode,
-                                                   toContract](int index) {
+  std::function<int(int)> adjustForContractions =
+      [oldNode, toContract](int index) -> int {
     int adjustment = 0;
     for (const auto *e : toContract) {
       int oldNodeIndex =
@@ -428,6 +469,7 @@ void GraphCodeGen::selectEdgesToContract(EdgeSet &result,
   if (!g.getNumEdges())
     return;
 
+  // Try to find edges that connect predecessor and succesor.
   const GCG_Node *n = g.getStartNode();
   GCG_Graph::EdgeMap tmp;
 
@@ -442,6 +484,8 @@ void GraphCodeGen::selectEdgesToContract(EdgeSet &result,
     n = succ;
   }
 
+  // Cannot yet handle graphs with no contraction between
+  // predecessor and successor node pairs.
   assert(!tmp.empty() && "internal error: malformed contraction");
 
   for (const auto &it : tmp) {

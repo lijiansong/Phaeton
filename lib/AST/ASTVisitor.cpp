@@ -11,6 +11,8 @@
 #include "ph/AST/ASTVisitor.h"
 #include "ph/AST/ASTUtils.h"
 
+using namespace phaeton;
+
 template <typename T, ASTNode::NodeType nt, typename Derived>
 void ASTVisitor::visitASTNodeList(const ASTNodeList<T, nt, Derived> *list) {
   for (const auto &i : *list)
@@ -28,6 +30,13 @@ DEF_VISIT_LIST(ExprList)
 
 void ASTVisitor::visitProgram(const Program *p) {
   p->getDecls()->visit(this);
+
+  // Note: the element directive may not be present in a program,
+  // so 'ed == nullptr' is possible. we need to process this corner case.
+  const ElemDirect *ed = p->getElem();
+  if (ed)
+    ed->visit(this);
+
   p->getStmts()->visit(this);
 }
 

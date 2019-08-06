@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __CODEGEN_H__
-#define __CODEGEN_H__
+#ifndef PHAETON_CODEGEN_H
+#define PHAETON_CODEGEN_H
 
 #include "ph/Sema/Sema.h"
 #include "ph/Sema/Type.h"
@@ -19,107 +19,68 @@
 #include <string>
 #include <vector>
 
+namespace phaeton {
+
 class ExprNode;
 class ExprNodeBuilder;
 
-// TODO: add wrappers for Codegen module
 class CodeGen : public ASTVisitor {
-private:
-  const Sema *TheSema;
-
-  int TempCounter;
-
-  std::string Code;
-
-  std::map<const TensorType *, std::string> EmittedTypes;
-
-  // map for each 'Expr' in the AST to an expression tree,
-  // which rooted at an 'ExprNode'
-  std::map<const Expr *, ExprNode *> ExprTrees;
-
-  const std::string FuncName;
-
 public:
+  // Note: A program consists of delcared identifiers and assignments.
+  // A program has input and output specifier, both of which
+  // are generated as function arguments.
   struct Assignment {
-    std::string variable;
-    const ExprNode *en;
+    ExprNode *lhs;
+    ExprNode *rhs;
   };
-
-  struct FuncArg {
-    int Pos;
-    std::string ArgName;
+  struct FunctionArgument {
+    int position;
+    std::string name;
   };
-
-  using FuncArgsListTy = std::vector<FuncArg>;
-
-protected:
-  ExprNodeBuilder *ENBuilder;
-
-  void EXPR_TREE_MAP_ASSERT(const Expr *expr) const;
-
-  FuncArgsListTy FuncArgs;
+  using DeclaredIdListTy = std::list<ExprNode *>;
+  using AssignmentsListTy = std::list<Assignment>;
+  using FunctionArgumentsListTy = std::vector<FunctionArgument>;
 
 public:
-  ExprNodeBuilder *getExprNodeBuilder() { return ENBuilder; }
-
-  void addExprNode(const Expr *expr, ExprNode *en) { ExprTrees[expr] = en; }
-  ExprNode *getExprNode(const Expr *expr) const { return ExprTrees.at(expr); }
-
-public:
-  CodeGen(const Sema *sema);
   CodeGen(const Sema *sema, const std::string &functionName);
   virtual ~CodeGen();
 
+  // Helper methods for accessing and manipulating this object's state.
   const Sema *getSema() const { return TheSema; }
   std::string getTemp();
   const std::string &getCode() const { return Code; }
-
   void append(const std::string &code) { Code += code; }
+  const std::string &getFunctionName() const { return FunctionName; }
 
-  bool typeEmitted(const TensorType *type) const;
-  const std::string &getEmittedTypeName(const TensorType *type) const;
-  void addEmittedType(const TensorType *type, const std::string &name);
+  // Helper methods for accessing and manipulating state
+  // that is built up during CodeGen.
+  ExprNodeBuilder *getENBuilder() { return ENBuilder; }
 
-private:
-  std::list<const Decl *> Declarations;
-  std::list<const Stmt *> Statements;
+  virtual void addDeclaredId(const Decl *d);
+  virtual void addAssignment(const Stmt *s);
+  virtual void addFunctionArgument(const std::string &name);
 
-public:
-  virtual void visitDecl(const Decl *d) override;
-  virtual void visitStmt(const Stmt *s) override;
+  DeclaredIdListTy &getDeclaredIds() { return DeclaredIds; }
+  AssignmentsListTy &getAssignments() { return Assignments; }
+  FunctionArgumentsListTy &getFunctionArguments() { return FunctionArguments; }
 
-  const std::list<const Decl *> &getDeclarations() const {
-    return Declarations;
-  }
-  const std::list<const Stmt *> &getStatements() const { return Statements; }
-
-  const std::string &getFuncName() const { return FuncName; }
-
-  void addFuncArg(const std::string &name);
-
-  const FuncArgsListTy &getFuncArgs() const { return FuncArgs; };
-
-  const FuncArgsListTy::const_iterator function_arguments_begin() const {
-    return FuncArgs.begin();
-  }
-
-  const FuncArgsListTy::const_iterator function_arguments_end() const {
-    return FuncArgs.end();
-  }
-
-  unsigned getNumFuncArgs() const { return FuncArgs.size(); };
-
-  const FuncArg &getFuncArg(unsigned i) const {
-    assert(i < getNumFuncArgs() &&
-           "internal error: index out of bounds for function arguments");
-    return FuncArgs.at(i);
+  const DeclaredIdListTy &getDeclaredIds() const { return DeclaredIds; }
+  const AssignmentsListTy &getAssignments() const { return Assignments; }
+  const FunctionArgumentsListTy &getFunctionArguments() const {
+    return FunctionArguments;
   };
 
-public:
+  unsigned getNumFunctionArguments() const { return FunctionArguments.size(); };
+  const FunctionArgument &getFunctionArgument(unsigned i) const;
+
+  // Decl and Stmt visitor for CodeGen.
+  virtual void visitDecl(const Decl *decl) override;
+  virtual void visitStmt(const Stmt *stmt) override;
+
+  // Helper methods for CodeGen.
   using List = std::vector<int>;
   using Tuple = std::vector<int>;
   using TupleList = std::vector<Tuple>;
-
   enum Comparison {
     CMP_Less,
     CMP_LessEqual,
@@ -129,9 +90,7 @@ public:
 
     CMP_COMPARISON_COUNT
   };
-
   static bool allCompare(const List &list, Comparison cmp, int pivot);
-
   static bool isPairList(const TupleList &list);
   static bool partitionPairList(int pivot, const TupleList &list,
                                 TupleList &left, TupleList &right,
@@ -142,10 +101,58 @@ public:
   static void unpackPairList(const TupleList &list, List &left, List &right);
   static void adjustForContractions(List &indices,
                                     const TupleList &contractions);
-
   static const std::string getListString(const List &list);
   static const std::string getTupleListString(const TupleList &list);
-
   static const BinaryExpr *extractTensorExprOrNull(const Expr *e);
+  using DimsTy = std::vector<int>;
+  using TempVecTy = std::vector<std::string>;
+
+  std::string getTempWithDims(const DimsTy &dims) {
+    TempVecTy &temps = FreeTemps[dims];
+
+    if (temps.size() == 0) {
+      return getTemp();
+    } else {
+      auto result = temps.back();
+      temps.pop_back();
+      return result;
+    }
+  }
+
+  void freeTempWithDims(const std::string &name, const DimsTy &dims) {
+    TempVecTy &temps = FreeTemps[dims];
+    temps.push_back(name);
+  }
+
+protected:
+  // States that are built up during code generation.
+
+  // ENBuilder is used for creating new 'ExprNode' objects, so we
+  // need to record some information.
+  ExprNodeBuilder *ENBuilder;
+
+  // Some components of the result target language program.
+  DeclaredIdListTy DeclaredIds;
+  AssignmentsListTy Assignments;
+  FunctionArgumentsListTy FunctionArguments;
+
+  // Note: map for Expr in AST, each 'Expr' in the AST be mapped to an
+  // 'ExprNode'.
+  std::map<const Expr *, ExprNode *> ExprTrees;
+  void EXPR_TREE_MAP_ASSERT(const Expr *expr) const;
+
+  void addExprNode(const Expr *expr, ExprNode *en) { ExprTrees[expr] = en; }
+  ExprNode *getExprNode(const Expr *expr) const { return ExprTrees.at(expr); }
+
+private:
+  std::map<DimsTy, TempVecTy> FreeTemps;
+  // Member variables that tracks the state of this object.
+  const Sema *TheSema;
+  int TempCounter;
+  std::string Code;
+  const std::string FunctionName;
 };
-#endif // __CODEGEN_H__
+
+} // end namespace phaeton
+
+#endif // PHAETON_CODEGEN_H

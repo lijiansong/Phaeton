@@ -11,16 +11,20 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __COMMON_OPTIONS_PARSER_H__
-#define __COMMON_OPTIONS_PARSER_H__
+#ifndef PHAETON_TOOLING_COMMON_OPTIONS_PARSER_H
+#define PHAETON_TOOLING_COMMON_OPTIONS_PARSER_H
 
 #include "ph/Tooling/Colors.h"
 #include "ph/Tooling/ToolingUtils.h"
 #include "ph/Tooling/third-party/cxxopts/cxxopts.hpp"
+
+namespace phaeton {
 
 // TODO: Refactoring command line options parser.
 using ParseResult = cxxopts::ParseResult;
 using Options = cxxopts::Options;
 using OptionAdder = cxxopts::OptionAdder;
 
-#endif // __COMMON_OPTIONS_PARSER_H__
+} // end namespace phaeton
+
+#endif // PHAETON_TOOLING_COMMON_OPTIONS_PARSER_H

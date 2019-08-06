@@ -3,4 +3,6 @@ add_library(Opt STATIC
             ExprTreeTransformer.cpp
             ExprTreeVisitor.cpp
             ENBuilder.cpp
-            ExprTreeLifter.cpp)
+            IdentifierCopier.cpp
+            StackExprRemover.cpp
+            ExprTreeLoopLifter.cpp)

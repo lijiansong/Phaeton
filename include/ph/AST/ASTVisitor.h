@@ -8,14 +8,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __ASTVISITOR_H__
-#define __ASTVISITOR_H__
+#ifndef PHAETON_AST_ASTVISITOR_H
+#define PHAETON_AST_ASTVISITOR_H
 
 #include "ph/AST/ASTNode.h"
 #include "ph/AST/Decl.h"
+#include "ph/AST/ElemDirect.h"
 #include "ph/AST/Expr.h"
 #include "ph/AST/Program.h"
 #include "ph/AST/Stmt.h"
+
+namespace phaeton {
 
 class ASTVisitor {
 public:
@@ -24,36 +27,38 @@ public:
   template <typename T, ASTNode::NodeType nt, typename Derived>
   void visitASTNodeList(const ASTNodeList<T, nt, Derived> *list);
 
-#define DECL_VISIT_LIST(Derived)                                               \
+#define GEN_VISIT_LIST_DECL(Derived)                                           \
   virtual void visit##Derived(const Derived *list);
 
-  DECL_VISIT_LIST(DeclList)
-  DECL_VISIT_LIST(StmtList)
-  DECL_VISIT_LIST(ExprList)
+  GEN_VISIT_LIST_DECL(DeclList)
+  GEN_VISIT_LIST_DECL(StmtList)
+  GEN_VISIT_LIST_DECL(ExprList)
 
-#undef DECL_VISIT_LIST
+#undef GEN_VISIT_LIST_DECL
 
-#define DECL_PURE_VISIT_ASTNode(NodeName)                                      \
+#define GEN_PURE_VISIT_ASTNODE_DECL(NodeName)                                  \
   virtual void visit##NodeName(const NodeName *) = 0;
 
-  DECL_PURE_VISIT_ASTNode(Decl)
-  DECL_PURE_VISIT_ASTNode(Stmt)
+  GEN_PURE_VISIT_ASTNODE_DECL(Decl)
+  GEN_PURE_VISIT_ASTNODE_DECL(Stmt)
+  GEN_PURE_VISIT_ASTNODE_DECL(BinaryExpr)
+  GEN_PURE_VISIT_ASTNODE_DECL(Identifier)
+  GEN_PURE_VISIT_ASTNODE_DECL(Integer)
+  GEN_PURE_VISIT_ASTNODE_DECL(BrackExpr)
+  GEN_PURE_VISIT_ASTNODE_DECL(ElemDirect)
 
-  DECL_PURE_VISIT_ASTNode(BinaryExpr)
-  DECL_PURE_VISIT_ASTNode(Identifier)
-  DECL_PURE_VISIT_ASTNode(Integer)
-  DECL_PURE_VISIT_ASTNode(BrackExpr)
+#undef GEN_PURE_VISIT_ASTNODE_DECL
 
-#undef DECL_PURE_VISIT_ASTNode
-
-#define DECL_VISIT_ASTNode(NodeName)                                           \
+#define GEN_VISIT_ASTNODE_DECL(NodeName)                                       \
   virtual void visit##NodeName(const NodeName *);
 
-  DECL_VISIT_ASTNode(Expr)
-  DECL_VISIT_ASTNode(Factor)
-  DECL_VISIT_ASTNode(ParenExpr)
+  GEN_VISIT_ASTNODE_DECL(Expr)
+  GEN_VISIT_ASTNODE_DECL(Factor)
+  GEN_VISIT_ASTNODE_DECL(ParenExpr)
 
-#undef DECL_VISIT_ASTNode
+#undef GEN_VISIT_ASTNODE_DECL
 };
 
-#endif // __ASTVISITOR_H__
+} // end namespace phaeton
+
+#endif // PHAETON_AST_ASTVISITOR_H

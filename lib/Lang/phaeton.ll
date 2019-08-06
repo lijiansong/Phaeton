@@ -45,6 +45,10 @@ DIV_EQUAL "/="
 COMMA     ","
 INT       [0-9]+
 ID        [_a-zA-Z][_a-zA-Z0-9]*
+KW_ELEM   "elem"
+KW_FIRST  "first"
+KW_LAST   "last"
+CARET     "\^"
 
 /* data types */
 INT8      "i8"
@@ -76,6 +80,10 @@ FLOAT64   "f64"
 {DIV}       { return DIV; }
 {PRODUCT}   { return PRODUCT; }
 {EQUAL}     { return EQUAL; }
+{KW_ELEM}   { return KW_ELEM; }
+{KW_FIRST}  { return KW_FIRST; }
+{KW_LAST}   { return KW_LAST; }
+{CARET}     { return CARET; }
 {INT}       { 
               yylval->integer_literal = atoi(yytext);
               return INT;

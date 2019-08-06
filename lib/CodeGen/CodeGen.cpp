@@ -18,36 +18,22 @@
 #include <list>
 #include <vector>
 
-CodeGen::CodeGen(const Sema *sema) : TheSema(sema), TempCounter(0), Code("") {
-  ENBuilder = new ExprNodeBuilder;
-}
+using namespace phaeton;
 
-CodeGen::CodeGen(const Sema *sema, const std::string &fn_name)
-    : TheSema(sema), TempCounter(0), Code(""), FuncName(fn_name) {
+CodeGen::CodeGen(const Sema *sema, const std::string &functionName)
+    : TheSema(sema), TempCounter(0), Code(""), FunctionName(functionName) {
   ENBuilder = new ExprNodeBuilder;
 }
 
 CodeGen::~CodeGen() { delete ENBuilder; }
 
-std::string CodeGen::getTemp() { return "t" + std::to_string(TempCounter++); }
-
-bool CodeGen::typeEmitted(const TensorType *type) const {
-  return EmittedTypes.count(type);
+std::string CodeGen::getTemp() {
+  return "t" + std::to_string((long long)TempCounter++);
 }
 
-void CodeGen::addFuncArg(const std::string &name) {
-  const int position = FuncArgs.size();
-  FuncArgs.push_back({position, name});
-}
-
-const std::string &CodeGen::getEmittedTypeName(const TensorType *type) const {
-  assert(typeEmitted(type));
-  return EmittedTypes.at(type);
-}
-
-void CodeGen::addEmittedType(const TensorType *type, const std::string &name) {
-  assert(!typeEmitted(type));
-  EmittedTypes[type] = name;
+void CodeGen::addFunctionArgument(const std::string &name) {
+  const int position = FunctionArguments.size();
+  FunctionArguments.push_back({position, name});
 }
 
 void CodeGen::EXPR_TREE_MAP_ASSERT(const Expr *expr) const {
@@ -55,12 +41,46 @@ void CodeGen::EXPR_TREE_MAP_ASSERT(const Expr *expr) const {
     assert(0 && "internal error: no expression tree for 'Expr' node");
 }
 
-void CodeGen::visitDecl(const Decl *d) { Declarations.push_back(d); }
+void CodeGen::visitDecl(const Decl *d) {
+  if (d->getNodeType() == ASTNode::NODETYPE_TypeDecl)
+    return;
 
-void CodeGen::visitStmt(const Stmt *s) { Statements.push_back(s); }
+  addDeclaredId(d);
+}
+
+void CodeGen::visitStmt(const Stmt *s) { addAssignment(s); }
+
+void CodeGen::addDeclaredId(const Decl *d) {
+  const Sema *sema = getSema();
+  const std::string &name = d->getIdentifier()->getName();
+  const TensorType &type = sema->getSymbol(name)->getType();
+  ExprNode *id = ENBuilder->createIdentifierExpr(name, type.getDims());
+
+  DeclaredIds.push_back(id);
+}
+
+void CodeGen::addAssignment(const Stmt *s) {
+  const Sema *sema = getSema();
+  const std::string &name = s->getIdentifier()->getName();
+  const TensorType &type = sema->getSymbol(name)->getType();
+  ExprNode *lhs = ENBuilder->createIdentifierExpr(name, type.getDims());
+
+  const Expr *e = s->getExpr();
+  EXPR_TREE_MAP_ASSERT(e);
+  ExprNode *rhs = ExprTrees[e];
+
+  Assignments.push_back({lhs, rhs});
+}
+
+const CodeGen::FunctionArgument &
+CodeGen::getFunctionArgument(unsigned i) const {
+  assert(i < getNumFunctionArguments() &&
+         "internal error: index out of bounds for function arguments");
+  return FunctionArguments.at(i);
+};
 
 bool CodeGen::allCompare(const List &list, Comparison cmp, int pivot) {
-  std::function<bool(int)> compare = [cmp, pivot](int i) {
+  std::function<bool(int)> compare = [cmp, pivot](int i) -> bool {
     switch (cmp) {
     case CMP_Less:
       return i < pivot;
@@ -76,6 +96,7 @@ bool CodeGen::allCompare(const List &list, Comparison cmp, int pivot) {
       assert(0 && "internal error: invalid comparison");
     }
   };
+
   for (const auto &i : list) {
     if (!compare(i))
       return false;
@@ -151,8 +172,13 @@ void CodeGen::adjustForContractions(List &indices,
                                     const TupleList &contractions) {
   assert(isPairList(contractions));
 
+  // FIXME: The following nested loop has a runtime that is roughly quadratic
+  // in the size of 'contractions', here we assume that 'indices.size()' ~
+  // 'contractions.size()'.
   for (int i = 0; i < indices.size(); i++) {
     int index = indices[i];
+    // determine the number of contracted indices
+    // that are smaller than 'index'
     int adj = 0;
     for (const Tuple &t : contractions)
       adj += (t[0] < index) + (t[1] < index);
@@ -164,7 +190,7 @@ void CodeGen::adjustForContractions(List &indices,
 const std::string CodeGen::getListString(const List &list) {
   std::string result = "[";
   for (int l = 0; l < list.size(); l++) {
-    result += std::to_string(list[l]);
+    result += std::to_string((long long)list[l]);
     if (l != (list.size() - 1))
       result += ", ";
   }
@@ -192,9 +218,10 @@ const BinaryExpr *CodeGen::extractTensorExprOrNull(const Expr *e) {
     else
       return nullptr;
   }
+  // if we get here, tensor should NOT be 'nullptr'.
   assert(tensor);
 
-  if (tensor->getNodeType() != ASTNode::NT_ProductExpr)
+  if (tensor->getNodeType() != ASTNode::NODETYPE_ProductExpr)
     return nullptr;
 
   return tensor;

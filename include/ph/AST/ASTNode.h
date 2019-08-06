@@ -8,57 +8,48 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __ASTNODE_H_
-#define __ASTNODE_H_
-
-#pragma once
+#ifndef PHAETON_AST_AST_NODE_H
+#define PHAETON_AST_AST_NODE_H
 
 #include <cassert>
 #include <map>
 #include <string>
 #include <vector>
 
-// namespace ph {
+namespace phaeton {
 
 class ASTVisitor;
 
 class ASTNode {
 public:
   enum NodeType {
-    NT_Program,
+    NODETYPE_Program,
 
-    NT_DeclList,
-    NT_StmtList,
-    NT_ExprList,
+    NODETYPE_DeclList,
+    NODETYPE_StmtList,
+    NODETYPE_ExprList,
 
-    NT_VarDecl,
-    NT_TypeDecl,
+    NODETYPE_VarDecl,
+    NODETYPE_TypeDecl,
 
-    NT_Stmt,
+    NODETYPE_ElemDirect,
 
-    NT_ContractionExpr,
-    NT_AddExpr,
-    NT_SubExpr,
-    NT_MulExpr,
-    NT_DivExpr,
-    NT_ProductExpr,
-    NT_Identifier,
-    NT_Integer,
-    NT_BrackExpr,
-    NT_ParenExpr,
+    NODETYPE_Stmt,
 
-    NT_NODETYPE_COUNT
+    NODETYPE_TranspositionExpr,
+    NODETYPE_ContractionExpr,
+    NODETYPE_AddExpr,
+    NODETYPE_SubExpr,
+    NODETYPE_MulExpr,
+    NODETYPE_DivExpr,
+    NODETYPE_ProductExpr,
+    NODETYPE_Identifier,
+    NODETYPE_Integer,
+    NODETYPE_BrackExpr,
+    NODETYPE_ParenExpr,
+
+    NODETYPE_NodeType_Count
   };
-
-private:
-  NodeType NdType;
-
-protected:
-  ASTNode(NodeType nt) : NdType(nt) {}
-  virtual ~ASTNode() {}
-
-protected:
-  static std::map<NodeType, std::string> NodeLabel;
 
 public:
   NodeType getNodeType() const { return NdType; };
@@ -68,6 +59,14 @@ public:
   virtual void dump(unsigned indent = 0) const = 0;
 
   virtual void visit(ASTVisitor *v) const = 0;
+
+protected:
+  ASTNode(NodeType nt) : NdType(nt) {}
+  virtual ~ASTNode() {}
+  static std::map<NodeType, std::string> NodeLabel;
+
+private:
+  NodeType NdType;
 };
 
 template <typename T, ASTNode::NodeType nt, typename Derived>
@@ -75,13 +74,8 @@ class ASTNodeList : public ASTNode {
 public:
   using Container = std::vector<T *>;
 
-private:
-  Container elements;
-
-public:
   ASTNodeList() : ASTNode(nt) {}
   ASTNodeList(T *);
-
   virtual ~ASTNodeList() {}
 
   void append(T *t) { elements.push_back(t); }
@@ -107,13 +101,17 @@ public:
   typename Container::const_iterator end() const { return elements.end(); }
 
   virtual void visit(ASTVisitor *v) const override {}
+
+private:
+  Container elements;
 };
 
 class Expr;
 class ExprList
-    : public ASTNodeList<const Expr, ASTNode::NT_ExprList, ExprList> {
+    : public ASTNodeList<const Expr, ASTNode::NODETYPE_ExprList, ExprList> {
 public:
-  ExprList() : ASTNodeList() {}
+  ExprList()
+      : ASTNodeList<const Expr, ASTNode::NODETYPE_ExprList, ExprList>() {}
   ExprList(const Expr *e) : ASTNodeList(e) {}
 
   virtual void visit(ASTVisitor *v) const override;
@@ -121,9 +119,10 @@ public:
 
 class Stmt;
 class StmtList
-    : public ASTNodeList<const Stmt, ASTNode::NT_StmtList, StmtList> {
+    : public ASTNodeList<const Stmt, ASTNode::NODETYPE_StmtList, StmtList> {
 public:
-  StmtList() : ASTNodeList() {}
+  StmtList()
+      : ASTNodeList<const Stmt, ASTNode::NODETYPE_StmtList, StmtList>() {}
   StmtList(const Stmt *s) : ASTNodeList(s) {}
 
   virtual void visit(ASTVisitor *v) const override;
@@ -131,14 +130,15 @@ public:
 
 class Decl;
 class DeclList
-    : public ASTNodeList<const Decl, ASTNode::NT_DeclList, DeclList> {
+    : public ASTNodeList<const Decl, ASTNode::NODETYPE_DeclList, DeclList> {
 public:
-  DeclList() : ASTNodeList() {}
+  DeclList()
+      : ASTNodeList<const Decl, ASTNode::NODETYPE_DeclList, DeclList>() {}
   DeclList(const Decl *d) : ASTNodeList(d) {}
 
   virtual void visit(ASTVisitor *v) const override;
 };
 
-//} // end of namespace ph
+} // end namespace phaeton
 
-#endif // __ASTNODE_H_
+#endif // PHAETON_AST_AST_NODE_H

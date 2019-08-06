@@ -8,11 +8,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __PARSER_H__
-#define __PARSER_H__
+#ifndef PHAETON_PARSER_H
+#define PHAETON_PARSER_H
 
 #include "ph/AST/AST.h"
 #include "ph/Lex/Lexer.h"
+
+namespace phaeton {
 
 class Parser {
 private:
@@ -30,4 +32,6 @@ public:
   const Program *getAST() const { return ast; }
 };
 
-#endif // __PARSER_H__
+} // end namespace phaeton
+
+#endif // PHAETON_PARSER_H

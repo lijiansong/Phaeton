@@ -8,10 +8,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __DECL_H__
-#define __DECL_H__
+#ifndef PHAETON_AST_DECL_H
+#define PHAETON_AST_DECL_H
 
 #include "ph/AST/ASTNode.h"
+
+namespace phaeton {
 
 class Identifier;
 class Expr;
@@ -24,22 +26,16 @@ public:
     IO_Output = 1 << 1,
   };
 
-private:
-  const Identifier *Id;
-  const Expr *TypeExpr;
-
-  const InOutSpecifier InOutSpec;
-
 public:
   Decl(NodeType nt, const Identifier *id, const Expr *expr,
        InOutSpecifier iospec = IO_Empty)
       : ASTNode(nt), Id(id), TypeExpr(expr), InOutSpec(iospec) {
-    assert(nt == NT_VarDecl || nt == NT_TypeDecl);
+    assert(nt == NODETYPE_VarDecl || nt == NODETYPE_TypeDecl);
   }
 
   const Identifier *getIdentifier() const { return Id; }
   const Expr *getTypeExpr() const { return TypeExpr; }
-  const InOutSpecifier getInOutSpecifier() const { return InOutSpec; }
+  InOutSpecifier getInOutSpecifier() const { return InOutSpec; }
 
   virtual void _delete() const final;
 
@@ -51,6 +47,14 @@ public:
   }
 
   virtual void visit(ASTVisitor *v) const override;
+
+private:
+  const Identifier *Id;
+  const Expr *TypeExpr;
+
+  const InOutSpecifier InOutSpec;
 };
 
-#endif // __DECL_H__
+} // end namespace phaeton
+
+#endif // PHAETON_AST_DECL_H

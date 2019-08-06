@@ -11,8 +11,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __EXPR_TREE_LIFTER_H__
-#define __EXPR_TREE_LIFTER_H__
+#ifndef PHAETON_OPT_EXPR_TREE_LIFTER_H
+#define PHAETON_OPT_EXPR_TREE_LIFTER_H
 
 #include "ph/CodeGen/CodeGen.h"
 #include "ph/Opt/ENBuilder.h"
@@ -23,48 +23,30 @@
 #include <list>
 #include <string>
 
+namespace phaeton {
+
+/// ExprTreeLifter - This class can lift nodes out of expression trees and
+/// replace them with temporary variables. This can help generate better C code.
 class ExprTreeLifter : public ExprTreeTransformer {
 public:
-  using LiftPredicate = std::function<bool(const ExprNode *)>;
-
-private:
-  CodeGen *CG;
-
-  ExprNode *Parent;
-  int ChildIndex;
-
-  const LiftPredicate isNodeToBeLifted;
-
-protected:
-  void setParent(ExprNode *p) { Parent = p; }
-  ExprNode *getParent() const { return Parent; }
-
-  void setChildIndex(int index) { ChildIndex = index; }
-  int getChildIndex() const { return ChildIndex; }
-
-public:
-  using AssignmentsListTy = std::list<CodeGen::Assignment>;
-
-private:
-  AssignmentsListTy Assignments;
-
-public:
+  using LiftPredicate = std::function<bool(const ExprNode *, const ExprNode *)>;
   ExprTreeLifter(CodeGen *cg, const LiftPredicate &lp)
-      : CG(cg), Parent(nullptr), ChildIndex(-1), isNodeToBeLifted(lp) {}
+      : CG(cg), Assignments(CG->getAssignments()), isNodeToBeLifted(lp) {}
 
-#define GEN_TRANSFORM_EXPR_NODE_DECL(Kind)                                     \
-  virtual void transform##Kind##Expr(Kind##Expr *en) override;
+#define GEN_TRANSFORM_EXPR_NODE_DECL(ExprName)                                 \
+  virtual void transform##ExprName##Expr(ExprName##Expr *en) override;
 
   GEN_TRANSFORM_EXPR_NODE_DECL(Add)
   GEN_TRANSFORM_EXPR_NODE_DECL(Sub)
   GEN_TRANSFORM_EXPR_NODE_DECL(Mul)
+  GEN_TRANSFORM_EXPR_NODE_DECL(ScalarMul)
   GEN_TRANSFORM_EXPR_NODE_DECL(Div)
+  GEN_TRANSFORM_EXPR_NODE_DECL(ScalarDiv)
   GEN_TRANSFORM_EXPR_NODE_DECL(Contraction)
   GEN_TRANSFORM_EXPR_NODE_DECL(Product)
   GEN_TRANSFORM_EXPR_NODE_DECL(Stack)
+  GEN_TRANSFORM_EXPR_NODE_DECL(Transposition)
   GEN_TRANSFORM_EXPR_NODE_DECL(Identifier)
-  GEN_TRANSFORM_EXPR_NODE_DECL(ScalarMul)
-  GEN_TRANSFORM_EXPR_NODE_DECL(ScalarDiv)
 
 #undef GEN_TRANSFORM_EXPR_NODE_DECL
 
@@ -72,17 +54,36 @@ public:
   void transformChildren(ExprNode *en);
   void liftNode(ExprNode *en);
 
-  const AssignmentsListTy &getAssignments() const { return Assignments; };
-  const AssignmentsListTy::const_iterator assignments_begin() const {
-    return Assignments.begin();
-  }
-  const AssignmentsListTy::const_iterator assignments_end() const {
-    return Assignments.end();
-  }
+  void transformAssignments();
 
+protected:
+  void setRoot(ExprNode *r) { Root = r; }
+  ExprNode *getRoot() const { return Root; }
+
+  void setParent(ExprNode *p) { Parent = p; }
+  ExprNode *getParent() const { return Parent; }
+
+  void setChildIndex(int index) { ChildIndex = index; }
+  int getChildIndex() const { return ChildIndex; }
+
+  // helper methods that implement functionality from the code generator 'cg'
 private:
-  std::string getTemp() { return CG->getTemp(); }
-  ExprNodeBuilder *getExprNodeBuilder() { return CG->getExprNodeBuilder(); }
+  std::string getTempWithDims(const std::vector<int> &dims) {
+    return CG->getTempWithDims(dims);
+  }
+  void freeTempWithDims(const std::string &name, const std::vector<int> &dims) {
+    CG->freeTempWithDims(name, dims);
+  }
+  ExprNodeBuilder *getENBuilder() { return CG->getENBuilder(); }
+  CodeGen *CG;
+  CodeGen::AssignmentsListTy &Assignments;
+  ExprNode *Root;
+  ExprNode *Parent;
+  int ChildIndex;
+  CodeGen::AssignmentsListTy::iterator curPos;
+  const LiftPredicate isNodeToBeLifted;
 };
 
-#endif // __EXPR_TREE_LIFTER_H__
+} // end namespace phaeton
+
+#endif // PHAETON_OPT_EXPR_TREE_LIFTER_H

@@ -12,6 +12,8 @@
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"
 
+using namespace phaeton;
+
 void Decl::dump(unsigned indent) const {
   std::string str = NodeLabel[getNodeType()];
 
@@ -21,7 +23,7 @@ void Decl::dump(unsigned indent) const {
   FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str();
 
-  if (getNodeType() == NT_VarDecl) {
+  if (getNodeType() == NODETYPE_VarDecl) {
     if (getInOutSpecifier() & IO_Input)
       std::cout << " input";
     if (getInOutSpecifier() & IO_Output)
@@ -44,7 +46,3 @@ void Decl::_delete() const {
 }
 
 void Decl::visit(ASTVisitor *v) const { v->visitDecl(this); }
-template <typename T, ASTNode::NodeType nt, typename Derived>
-ASTNodeList<T, nt, Derived>::ASTNodeList(T *t) : ASTNodeList() {
-  append(t);
-}

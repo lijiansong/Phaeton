@@ -4,9 +4,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __ACTION_H__
-#define __ACTION_H__
+#ifndef PHAETON_DRIVER_ACTION_H
+#define PHAETON_DRIVER_ACTION_H
+
+namespace phaeton [
 
 class Actions {};
 
-#endif // __ACTION_H__
+} // end namespace phaeton
+
+#endif // PHAETON_DRIVER_ACTION_H

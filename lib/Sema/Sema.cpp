@@ -23,9 +23,13 @@
       assert(0 && "internal error: type of 'Expr' node not in map");           \
   }
 
+using namespace phaeton;
+
 Sema::Sema() {
   scalar = new TensorType(std::vector<int>());
   Types.push_back(scalar);
+
+  elemInfo.present = false;
 }
 
 Sema::~Sema() {
@@ -50,6 +54,15 @@ const TensorType *Sema::getType(const std::vector<int> &dims) {
   return createType(dims);
 }
 
+const TensorType *Sema::getType(const std::vector<int> &dims) const {
+  for (auto it : Types) {
+    if (it->equals(dims))
+      return it;
+  }
+
+  return nullptr;
+}
+
 const Symbol *Sema::createSymbol(Symbol::SymbolKind k, const std::string &name,
                                  const TensorType &type, const Decl *decl) {
   Symbol *sym = new Symbol(k, name, type, decl);
@@ -71,7 +84,7 @@ bool Sema::isTypeName(const Expr *e, const TensorType *&type) const {
     return false;
 
   const Symbol *sym = getSymbol(id->getName());
-  if (!sym || (sym->getKind() != Symbol::SK_Type))
+  if (!sym || (sym->getKind() != Symbol::SYM_KIND_Type))
     return false;
 
   type = &sym->getType();
@@ -128,9 +141,9 @@ const TensorType *Sema::visitTypeExpr(const Expr *e) {
 }
 
 void Sema::visitDecl(const Decl *d) {
-  Symbol::SymbolKind k = (d->getNodeType() == ASTNode::NT_VarDecl)
-                             ? Symbol::SK_Variable
-                             : Symbol::SK_Type;
+  Symbol::SymbolKind k = (d->getNodeType() == ASTNode::NODETYPE_VarDecl)
+                             ? Symbol::SYM_KIND_Variable
+                             : Symbol::SYM_KIND_Type;
   const std::string &name = d->getIdentifier()->getName();
   const TensorType *type = visitTypeExpr(d->getTypeExpr());
 
@@ -144,11 +157,11 @@ void Sema::visitDecl(const Decl *d) {
   const Symbol *sym = createSymbol(k, name, *type, d);
 
   if (d->getInOutSpecifier() & Decl::IO_Input)
-    Inputs.insert(sym);
+    Inputs.push_back(sym);
   if (d->getInOutSpecifier() & Decl::IO_Output)
-    Outputs.insert(sym);
+    Outputs.push_back(sym);
 
-  if (k == Symbol::SK_Type)
+  if (k == Symbol::SYM_KIND_Type)
     NamedTypes[type] = sym;
 }
 
@@ -158,10 +171,9 @@ void Sema::visitStmt(const Stmt *s) {
 
   const Symbol *sym = getSymbol(id->getName());
   if (!sym) {
-    assert(0 &&
-           ("semantic error: assignment to undeclared symbol \'" +
-            id->getName() + "\'")
-               .c_str());
+    assert(0 && ("semantic error: assignment to undeclared symbol \'" +
+                 id->getName() + "\'")
+                    .c_str());
     return;
   }
 
@@ -178,7 +190,7 @@ void Sema::visitStmt(const Stmt *s) {
 void Sema::visitBinaryExpr(const BinaryExpr *be) {
   const ASTNode::NodeType nt = be->getNodeType();
 
-  if (nt == ASTNode::NT_ContractionExpr) {
+  if (nt == ASTNode::NODETYPE_ContractionExpr) {
     const Expr *left = be->getLeft();
     left->visit(this);
     TYPE_MAP_ASSERT(left);
@@ -186,9 +198,13 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
 
     std::vector<std::vector<int>> lists;
     if (isListOfLists(be->getRight(), lists)) {
+      // assert(0 && "semantic error: right member of contraction not a list");
 
       if (lists.empty())
         assert(0 && "semantic error: contracting over empty index list");
+
+      if (type0->getRank() == 0)
+        assert(0 && "semantic error: cannot contract scalar");
 
       std::vector<int> res;
       for (int i = 0; i < type0->getRank(); i++)
@@ -197,6 +213,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
       std::set<int> index_set_to_erase;
       std::list<int> index_list_to_erase;
       for (const auto &list : lists) {
+        // skip empty lists:
         if (!list.size())
           continue;
 
@@ -211,7 +228,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
           }
           if (index_set_to_erase.count(i)) {
             assert(0 &&
-                   ("semantic error: index \'" + std::to_string(i) +
+                   ("semantic error: index \'" + std::to_string((long long)i) +
                     "\' appears multiple times")
                        .c_str());
           }
@@ -236,6 +253,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
       const int rank0 = type0->getRank();
       const int rank1 = type1->getRank();
 
+      // contract the last index from 'left' with the first index from 'right':
       if (rank0 == 0 || rank1 == 0) {
         assert(0 && "semantic error: cannot contract scalar");
       }
@@ -252,10 +270,53 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
       ExprTypes[be] = getType(res);
       return;
     }
+    // each branch of the above if-statement should return:
     assert(0 && "internal error: should have returned");
+  } else if (nt == ASTNode::NODETYPE_TranspositionExpr) {
+    const Expr *left = be->getLeft();
+    left->visit(this);
+    TYPE_MAP_ASSERT(left);
+    const TensorType *type0 = ExprTypes[left];
+    const int rank = type0->getRank();
+
+    std::vector<std::vector<int>> lists;
+    if (!isListOfLists(be->getRight(), lists)) {
+      assert(0 && "semantic error: right member of transposition not a list");
+    }
+
+    if (lists.empty()) {
+      assert(0 && "semantic error: empty index list in transposition");
+    }
+
+    std::vector<int> dimsToTranspose = type0->getDims();
+    for (const auto &list : lists) {
+      if (list.size() != 2) {
+        assert(0 && "semantic error: non-pair in transposition indices");
+      }
+
+      const int i0 = list[0], i1 = list[1];
+
+      if (i0 == i1) {
+        assert(0 && "semantic error: equal transposition indices");
+      }
+
+      if (!(i0 < rank) || !(i1 < rank)) {
+        assert(0 && "semantic error: transposition index out of range");
+      }
+
+      // transpose the dimensions:
+      const int dim0 = dimsToTranspose[i0];
+      dimsToTranspose[i0] = dimsToTranspose[i1];
+      dimsToTranspose[i1] = dim0;
+    }
+
+    ExprTypes[be] = getType(dimsToTranspose);
+    return;
   }
 
-  assert(nt != ASTNode::NT_ContractionExpr &&
+  // binary expression is NOT a contraction and NOT a transposition:
+  assert(nt != ASTNode::NODETYPE_ContractionExpr &&
+         nt != ASTNode::NODETYPE_TranspositionExpr &&
          "internal error: should not be here");
 
   const Expr *left = be->getLeft();
@@ -270,8 +331,8 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
 
   const TensorType *resultType;
   switch (nt) {
-  case ASTNode::NT_AddExpr:
-  case ASTNode::NT_SubExpr: {
+  case ASTNode::NODETYPE_AddExpr:
+  case ASTNode::NODETYPE_SubExpr: {
     if (leftType != rightType) {
       assert(0 && "semantic error: adding/subtracting non-equal types");
       return;
@@ -279,7 +340,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
     resultType = &leftType;
     break;
   }
-  case ASTNode::NT_MulExpr: {
+  case ASTNode::NODETYPE_MulExpr: {
     if (isScalar(leftType)) {
       resultType = &rightType;
     } else {
@@ -291,7 +352,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
     }
     break;
   }
-  case ASTNode::NT_DivExpr: {
+  case ASTNode::NODETYPE_DivExpr: {
     if (isScalar(rightType)) {
       resultType = &leftType;
     } else {
@@ -303,7 +364,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
     }
     break;
   }
-  case ASTNode::NT_ProductExpr: {
+  case ASTNode::NODETYPE_ProductExpr: {
     std::vector<int> dims;
 
     if (isScalar(leftType) || isScalar(rightType)) {
@@ -331,10 +392,9 @@ void Sema::visitBinaryExpr(const BinaryExpr *be) {
 void Sema::visitIdentifier(const Identifier *id) {
   const Symbol *sym = getSymbol(id->getName());
   if (!sym) {
-    assert(
-        0 &&
-        ("semantic error: use of undeclared symbol \'" + id->getName() + "\'")
-            .c_str());
+    assert(0 && ("semantic error: use of undeclared symbol \'" + id->getName() +
+                 "\'")
+                    .c_str());
   }
 
   ExprTypes[id] = &sym->getType();
@@ -351,6 +411,8 @@ void Sema::visitBrackExpr(const BrackExpr *be) {
   TYPE_MAP_ASSERT(exprs[0]);
   const TensorType *type = getType(exprs[0]);
 
+  // skip the first expression in the list,
+  // it has already been visited above:
   for (unsigned i = 1; i < exprs.size(); i++) {
     const Expr *e = exprs[i];
     e->visit(this);
@@ -383,4 +445,37 @@ const Symbol *Sema::getTypeSymbol(const TensorType *type) const {
     return nullptr;
 
   return NamedTypes.at(type);
+}
+
+void Sema::visitElemDirect(const ElemDirect *ed) {
+  if (elemInfo.present) {
+    // If we get here, this means it is an 'internal error', NOT a 'semantic
+    // error'. Since the grammar allows only a single 'ElemDirect', if there are
+    // more than one 'ElemDirect', the parser should have exited due to a syntax
+    // error, and we should not get to the semantic analysis.
+    assert(0 && "internal error: only a single element directive is allowed");
+  }
+
+  elemInfo.present = true;
+  elemInfo.pos = ed->getPOSSpecifier();
+  elemInfo.dim = ed->getInteger()->getValue();
+
+  const BrackExpr *be = dynamic_cast<const BrackExpr *>(ed->getIdentifiers());
+  if (!be)
+    assert(0 && "semantic error: expected list of expressions in brackets");
+
+  const ExprList &elist = *be->getExprs();
+  for (unsigned i = 0; i < elist.size(); i++) {
+    const Identifier *id = dynamic_cast<const Identifier *>(elist[i]);
+    if (!id)
+      assert(0 && "semantic error: expected identifier in element directive");
+
+    const Symbol *s = getSymbol(id->getName());
+    if (!s)
+      assert(0 && "semantic error: undefined symbol");
+    if (s->getKind() != Symbol::SYM_KIND_Variable)
+      assert(0 && "semantic error: expected variable name");
+
+    elemInfo.syms.insert(s);
+  }
 }

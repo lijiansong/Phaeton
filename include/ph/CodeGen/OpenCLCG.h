@@ -8,41 +8,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __OPENCL_CG_H__
-#define __OPENCL_CG_H__
+#ifndef PHAETON_CODEGEN_OPENCL_CG_H
+#define PHAETON_CODEGEN_OPENCL_CG_H
 
-#if 0
 #include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
-#include "ph/CodeGen/PyFragBuilder.h"
 
-#include <string>
+namespace phaeton {
 
-class OpenCLCG : public DirectCodeGen {
-protected:
-  PythonFragBuilder Builder;
+class OpenCLCG : public DirectCodeGen {};
 
-public:
-  NumpyDirectCG(const Sema *sema, const std::string &prefix = "np");
+} // end namespace phaeton
 
-  virtual void visitProgramPrologue(const Program *p) override;
-
-  virtual void visitDeclEpilogue(const Decl *d) override;
-  virtual void visitStmtEpilogue(const Stmt *s) override;
-
-  virtual const std::string
-  visitContractionEpilogue(const Expr *e, const std::string &lhs,
-                           const std::string &rhs,
-                           const TupleList &LeftAndRightIndices);
-
-  virtual void visitAddExprEpilogue(const BinaryExpr *be) override;
-  virtual void visitSubExprEpilogue(const BinaryExpr *be) override;
-  virtual void visitMulExprEpilogue(const BinaryExpr *be) override;
-  virtual void visitDivExprEpilogue(const BinaryExpr *be) override;
-  virtual void visitProductExprEpilogue(const BinaryExpr *be) override;
-
-  virtual void visitBrackExprEpilogue(const BrackExpr *be) override;
-};
-#endif
-
-#endif // __OPENCL_CG_H__
+#endif // PHAETON_CODEGEN_OPENCL_CG_H

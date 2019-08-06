@@ -9,12 +9,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __TOOLING_H__
-#define __TOOLING_H__
+#ifndef PHAETON_TOOLING_H
+#define PHAETON_TOOLING_H
+
+namespace phaeton {
 
 class ToolAction {
 public:
   virtual ~ToolAction();
 };
 
-#endif // __TOOLING_H__
+} // end namespace phaeton
+
+#endif // PHAETON_TOOLING_H

@@ -9,8 +9,8 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef __OPT_UTILS_H__
-#define __OPT_UTILS_H__
+#ifndef PHAETON_OPT_OPT_UTILS_H
+#define PHAETON_OPT_OPT_UTILS_H
 
 #include <iostream>
 #include <sstream>
@@ -24,4 +24,4 @@
     std::cout.unsetf(std::ios::adjustfield);                                   \
   }
 
-#endif // __OPT_UTILS_H__
+#endif // PHAETON_OPT_OPT_UTILS_H

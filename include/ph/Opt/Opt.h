@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __OPT_H__
-#define __OPT_H__
+#ifndef PHAETON_OPT_H
+#define PHAETON_OPT_H
 
-#endif // __OPT_H__
+#endif // PHAETON_OPT_H

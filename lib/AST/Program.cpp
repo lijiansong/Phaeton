@@ -12,6 +12,8 @@
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"
 
+using namespace phaeton;
+
 void Program::dump(unsigned indent) const {
   std::string str = NodeLabel[getNodeType()];
 
@@ -21,6 +23,7 @@ void Program::dump(unsigned indent) const {
   FORMAT_AST_INDENT(indent)
   std::cout << "(" << str << ss.str() << "\n";
   Decls->dump(indent + str.length() + 1);
+  Elem->dump(indent + str.length() + 1);
   Stmts->dump(indent + str.length() + 1);
   FORMAT_AST_INDENT(indent + 1)
   std::cout << ")\n";
@@ -32,6 +35,11 @@ void Program::_delete() const {
 
   Stmts->_delete();
   delete Stmts;
+
+  if (Elem) {
+    Elem->_delete();
+    delete Elem;
+  }
 }
 
 void Program::visit(ASTVisitor *v) const { v->visitProgram(this); }

@@ -1,42 +1,34 @@
-//==------ TensorGraph.h - Representation of tensor graph ------------------==//
+//==------ GraphCGUtils.h - Helper functions for GraphCG ------------------==//
 //
 //                     The Phaeton Compiler Infrastructure
 //
 //===----------------------------------------------------------------------===//
 //
-// This file defines tensor graph which is used for high order tensor contract
-// calculation, this idea is inspired by:
+// This file defines helper methods for GraphCG. Tensor graph is used for high
+// order tensor contract calculation, this idea is inspired by:
 // https://liwt31.github.io/2018/01/22/graphical_matrix
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __TENSOR_GRAPH_H__
-#define __TENSOR_GRAPH_H__
+#ifndef PHAETON_CODEGEN_GRAPHCG_UTILS_H
+#define PHAETON_CODEGEN_GRAPHCG_UTILS_H
 
 #include "ph/CodeGen/CGUtils.h"
 
+#include <cassert>
 #include <fstream>
 #include <map>
+#include <sstream>
 #include <utility>
 #include <vector>
+
+namespace phaeton {
 
 template <typename NodeID, typename EdgeID> class GraphEdge;
 template <typename NodeID, typename EdgeID> class TensorGraph;
 
 template <typename NodeID, typename EdgeID>
 class GraphNode : public Comparable<GraphNode<NodeID, EdgeID>> {
-private:
-  NodeID ID;
-
-  const int Rank;
-
-  std::vector<const GraphEdge<NodeID, EdgeID> *> Legs;
-
-  struct {
-    GraphNode<NodeID, EdgeID> *Pred;
-    GraphNode<NodeID, EdgeID> *Succ;
-  } Seq;
-
 public:
   GraphNode(NodeID &&id, int rank);
 
@@ -79,19 +71,21 @@ public:
   virtual bool operator<(const GraphNode<NodeID, EdgeID> &rhs) const final {
     return getID() < rhs.getID();
   }
+
+private:
+  NodeID ID;
+  const int Rank;
+  std::vector<const GraphEdge<NodeID, EdgeID> *> Legs;
+  struct {
+    GraphNode<NodeID, EdgeID> *Pred;
+    GraphNode<NodeID, EdgeID> *Succ;
+  } Seq;
 };
 
 template <typename NodeID, typename EdgeID>
 class GraphEdge : public Comparable<GraphEdge<NodeID, EdgeID>> {
 public:
   using NodeIndexPair = std::pair<const GraphNode<NodeID, EdgeID> *, int>;
-
-private:
-  EdgeID ID;
-
-  std::pair<NodeIndexPair, NodeIndexPair> Edge;
-
-public:
   GraphEdge(EdgeID &&id, const NodeIndexPair &src, const NodeIndexPair &tgt);
   GraphEdge(EdgeID &&id, const GraphNode<NodeID, EdgeID> *srcNode, int srcIndex,
             const GraphNode<NodeID, EdgeID> *tgtNode, int tgtIndex);
@@ -102,33 +96,36 @@ public:
   const GraphNode<NodeID, EdgeID> *getSrcNode() const {
     return Edge.first.first;
   }
+
   int getSrcIndex() const { return Edge.first.second; }
+
   const NodeID &getSrcID() const { return getSrcNode()->getID(); }
 
   const GraphNode<NodeID, EdgeID> *getTgtNode() const {
     return Edge.second.first;
   }
+
   int getTgtIndex() const { return Edge.second.second; }
+
   const NodeID &getTgtID() const { return getTgtNode()->getID(); }
 
   virtual bool operator==(const GraphEdge<NodeID, EdgeID> &rhs) const final {
     return getID() == rhs.getID();
   }
+
   virtual bool operator<(const GraphEdge<NodeID, EdgeID> &rhs) const final {
     return getID() < rhs.getID();
   }
+
+private:
+  EdgeID ID;
+  std::pair<NodeIndexPair, NodeIndexPair> Edge;
 };
 
 template <typename NodeID, typename EdgeID> class TensorGraph {
 public:
   using NodeMap = std::map<NodeID, GraphNode<NodeID, EdgeID> *>;
   using EdgeMap = std::map<EdgeID, GraphEdge<NodeID, EdgeID> *>;
-
-private:
-  NodeMap Nodes;
-  EdgeMap Edges;
-
-public:
   TensorGraph() {}
   ~TensorGraph();
 
@@ -139,7 +136,9 @@ public:
   int getNumEdges() const;
   int getNumEdges(const NodeID &id) const;
 
-  void getEdgesAtNode(EdgeMap &result,
+  void getEdgesFromNode(EdgeMap &result,
+                        const GraphNode<NodeID, EdgeID> *n) const;
+  void getEdgesToNode(EdgeMap &result,
                       const GraphNode<NodeID, EdgeID> *n) const;
   void getEdgesBetweenNodes(EdgeMap &result,
                             const GraphNode<NodeID, EdgeID> *src,
@@ -173,6 +172,10 @@ public:
   typename EdgeMap::const_iterator edges_end() const { return Edges.end(); }
 
   const GraphNode<NodeID, EdgeID> *getStartNode() const;
+
+private:
+  NodeMap Nodes;
+  EdgeMap Edges;
 };
 
 template <typename NodeID, typename EdgeID>
@@ -300,13 +303,23 @@ int TensorGraph<NodeID, EdgeID>::getNumEdges(const NodeID &id) const {
 }
 
 template <typename NodeID, typename EdgeID>
-void TensorGraph<NodeID, EdgeID>::getEdgesAtNode(
+void TensorGraph<NodeID, EdgeID>::getEdgesFromNode(
     EdgeMap &result, const GraphNode<NodeID, EdgeID> *n) const {
   for (const auto &e : Edges) {
     const GraphNode<NodeID, EdgeID> &src = *e.second->getSrcNode();
+
+    if (*n == src)
+      result[e.first] = e.second;
+  }
+}
+
+template <typename NodeID, typename EdgeID>
+void TensorGraph<NodeID, EdgeID>::getEdgesToNode(
+    EdgeMap &result, const GraphNode<NodeID, EdgeID> *n) const {
+  for (const auto &e : Edges) {
     const GraphNode<NodeID, EdgeID> &tgt = *e.second->getTgtNode();
 
-    if (*n == src || *n == tgt)
+    if (*n == tgt)
       result[e.first] = e.second;
   }
 }
@@ -316,7 +329,7 @@ void TensorGraph<NodeID, EdgeID>::getEdgesBetweenNodes(
     EdgeMap &result, const GraphNode<NodeID, EdgeID> *src,
     const GraphNode<NodeID, EdgeID> *tgt) const {
   EdgeMap tmp;
-  getEdgesAtNode(tmp, src);
+  getEdgesFromNode(tmp, src);
 
   for (const auto &e : tmp) {
     const GraphNode<NodeID, EdgeID> &edgeSrc = *e.second->getSrcNode();
@@ -382,7 +395,7 @@ bool TensorGraph<NodeID, EdgeID>::eraseNode(const NodeID &id) {
 
   GraphNode<NodeID, EdgeID> *n = Nodes[id];
   if (n->anySet())
-    // Cannot erase this node if it has outgoing edges:
+    // Note: if this node has outgoing edges, we cannot erase it.
     return false;
 
   if (n->hasPred()) {
@@ -511,4 +524,6 @@ TensorGraph<NodeID, EdgeID>::getStartNode() const {
   return n;
 }
 
-#endif // __TENSOR_GRAPH_H__
+} // end namespace phaeton
+
+#endif // PHAETON_CODEGEN_GRAPHCG_UTILS_H

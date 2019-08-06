@@ -12,6 +12,8 @@
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"
 
+using namespace phaeton;
+
 void Expr::visit(ASTVisitor *v) const {
   assert(0 && "internal error: base class 'Expr' should not be visited");
 }

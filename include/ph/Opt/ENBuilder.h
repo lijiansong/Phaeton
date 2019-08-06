@@ -11,30 +11,31 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef __EXPR_NODE_BUILDER_H__
-#define __EXPR_NODE_BUILDER_H__
+#ifndef PHAETON_OPT_EXPR_NODE_BUILDER_H
+#define PHAETON_OPT_EXPR_NODE_BUILDER_H
 
 #include "ph/Opt/ExprTree.h"
 
 #include <set>
 
-class ExprNodeBuilder {
-private:
-  std::set<const ExprNode *> AllocatedNodes;
+namespace phaeton {
 
+/// ExprNodeBuilder - This class is used to keep track of memory that has been
+/// allocated for nodes of expression trees.
+class ExprNodeBuilder {
 public:
   ~ExprNodeBuilder();
 
-#define GEN_BUILDER_CREATE_EXPR_NODE_DECL(Kind)                                \
-  Kind##Expr *create##Kind##Expr(ExprNode *lhs, ExprNode *rhs);
+#define GEN_BUILDER_CREATE_EXPR_NODE_DECL(ExprName)                            \
+  ExprName##Expr *create##ExprName##Expr(ExprNode *lhs, ExprNode *rhs);
 
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(Add)
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(Sub)
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(Mul)
-  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Div)
-  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Product)
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(ScalarMul)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Div)
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(ScalarDiv)
+  GEN_BUILDER_CREATE_EXPR_NODE_DECL(Product)
 
 #undef GEN_BUILDER_CREATE_EXPR_NODE_DECL
 
@@ -44,8 +45,19 @@ public:
                                          const CodeGen::List &rightIndices);
 
   StackExpr *createStackExpr(const std::vector<ExprNode *> &members);
+
+  TranspositionExpr *
+  createTranspositionExpr(ExprNode *en, const CodeGen::TupleList &indexPairs);
+
   IdentifierExpr *createIdentifierExpr(const std::string &name,
                                        const ExprNode::ExprDimensions &dims);
+
+private:
+  /// set to keep track of memory that has been allocated for nodes of
+  /// expression trees.
+  std::set<const ExprNode *> AllocatedNodes;
 };
 
-#endif // __EXPR_NODE_BUILDER_H__
+} // end namespace phaeton
+
+#endif // PHAETON_OPT_EXPR_NODE_BUILDER_H

@@ -12,6 +12,8 @@
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"
 
+using namespace phaeton;
+
 void Stmt::dump(unsigned indent) const {
   std::string str = NodeLabel[getNodeType()];
 

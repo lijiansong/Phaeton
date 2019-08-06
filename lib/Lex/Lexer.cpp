@@ -15,6 +15,8 @@
 #include <map>
 #include <string>
 
+using namespace phaeton;
+
 Lexer::Lexer(const char *input) : Input(input) {
   yylex_init(&Scanner);
   yy_scan_string(Input, Scanner);

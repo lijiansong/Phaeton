@@ -8,9 +8,8 @@
 // builds ASTs.
 //
 //===----------------------------------------------------------------------===//
-
-#ifndef __SEMA_H__
-#define __SEMA_H__
+#ifndef PHAETON_SEMA_H
+#define PHAETON_SEMA_H
 
 #include "ph/AST/AST.h"
 #include "ph/Sema/SymbolTable.h"
@@ -19,23 +18,24 @@
 #include <list>
 #include <map>
 #include <set>
+#include <vector>
+
+namespace phaeton {
 
 class Sema : public ASTVisitor {
-private:
-  const TensorType *scalar;
-  std::list<const TensorType *> Types;
+public:
+  struct ElemInfo {
+    // Is directive for element loop present
+    bool present;
 
-  SymbolTable Symbols;
+    // Position of element index, e.g. first, last
+    ElemDirect::POSSpecifier pos;
 
-  // map for 'Expr' nodes in the AST to types
-  std::map<const Expr *, const TensorType *> ExprTypes;
+    unsigned dim;
 
-  // set fpr symbols of variables that are declared with in out specifiers
-  std::set<const Symbol *> Inputs;
-  std::set<const Symbol *> Outputs;
-
-  // map for user-defined types to the corresponding symbols
-  std::map<const TensorType *, const Symbol *> NamedTypes;
+    // Symbols for Identifiers that take an element index
+    std::set<const Symbol *> syms;
+  };
 
 public:
   Sema();
@@ -43,6 +43,7 @@ public:
 
   const TensorType *createType(const std::vector<int> &dims);
   const TensorType *getType(const std::vector<int> &dims);
+  const TensorType *getType(const std::vector<int> &dims) const;
   const TensorType *getType(const Expr *e) const { return ExprTypes.at(e); }
   const TensorType &getScalar() const { return *scalar; }
   bool isScalar(const TensorType &t) const { return (t == getScalar()); }
@@ -50,6 +51,7 @@ public:
   const Symbol *createSymbol(Symbol::SymbolKind k, const std::string &name,
                              const TensorType &type,
                              const Decl *decl = nullptr);
+
   const Symbol *getSymbol(const std::string &name) const;
 
   bool isTypeName(const Expr *e, const TensorType *&type) const;
@@ -62,6 +64,8 @@ public:
   virtual void visitDecl(const Decl *d) override;
   virtual void visitStmt(const Stmt *s) override;
 
+  virtual void visitElemDirect(const ElemDirect *ed) override;
+
   virtual void visitBinaryExpr(const BinaryExpr *be) override;
   virtual void visitIdentifier(const Identifier *id) override;
   virtual void visitInteger(const Integer *i) override;
@@ -71,42 +75,74 @@ public:
   std::list<const TensorType *>::const_iterator types_begin() const {
     return Types.begin();
   }
-
   std::list<const TensorType *>::const_iterator types_end() const {
     return Types.end();
   }
 
-  std::set<const Symbol *>::const_iterator inputs_begin() const {
+  bool is_in_inputs(const std::string &name) const {
+    const Symbol *sym = getSymbol(name);
+    for (auto s : Inputs) {
+      if (s == sym)
+        return true;
+    }
+    return false;
+  }
+
+  std::vector<const Symbol *>::const_iterator inputs_begin() const {
     return Inputs.begin();
   }
 
-  std::set<const Symbol *>::const_iterator inputs_end() const {
+  std::vector<const Symbol *>::const_iterator inputs_end() const {
     return Inputs.end();
   }
 
   int inputs_size() const { return Inputs.size(); }
 
-  std::set<const Symbol *>::const_iterator outputs_begin() const {
+  bool is_in_outputs(const std::string &name) const {
+    const Symbol *sym = getSymbol(name);
+    for (auto s : Outputs) {
+      if (s == sym)
+        return true;
+    }
+    return false;
+  }
+
+  std::vector<const Symbol *>::const_iterator outputs_begin() const {
     return Outputs.begin();
   }
 
-  std::set<const Symbol *>::const_iterator outputs_end() const {
+  std::vector<const Symbol *>::const_iterator outputs_end() const {
     return Outputs.end();
   }
 
   int outputs_size() const { return Outputs.size(); }
 
-  bool is_in_inputs(const std::string &name) const {
-    return (Inputs.find(getSymbol(name)) != Inputs.end());
-  }
-
-  bool is_in_outputs(const std::string &name) const {
-    return (Outputs.find(getSymbol(name)) != Outputs.end());
-  }
-
   bool isNamedType(const TensorType *type) const;
 
   const Symbol *getTypeSymbol(const TensorType *type) const;
+
+  const ElemInfo &getElemInfo() const { return elemInfo; }
+
+private:
+  const TensorType *scalar;
+  std::list<const TensorType *> Types;
+
+  SymbolTable Symbols;
+
+  // map for 'Expr' AST nodes to types
+  std::map<const Expr *, const TensorType *> ExprTypes;
+
+  // vector for symbols of variables that are declared with in out specifiers
+  std::vector<const Symbol *> Inputs;
+  std::vector<const Symbol *> Outputs;
+
+  // map user-defined types to the corresponding symbols holding the type names
+  std::map<const TensorType *, const Symbol *> NamedTypes;
+
+  // for elem directive
+  ElemInfo elemInfo;
 };
 
-#endif // __SEMA_H__
+} // end namespace phaeton
+
+#endif // PHAETON_SEMA_H
