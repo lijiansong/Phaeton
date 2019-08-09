@@ -14,9 +14,9 @@
 #include "ph/Opt/ExprTreeLifter.h"
 #include "ph/Opt/ExprTreeTransformer.h"
 #include "ph/Opt/ExprTreeVisitor.h"
-#include "ph/Support/ErrorHandling.h"
 #include "ph/Sema/Sema.h"
 #include "ph/Sema/Type.h"
+#include "ph/Support/ErrorHandling.h"
 
 #include <vector>
 
@@ -33,7 +33,7 @@ void TheanoCG::genCode(const Program *Prog) {
 
   std::map<const TensorType *, std::string> EmittedTypes;
   for (const auto *Id : CG->getDeclaredIds()) {
-    assert(Id->isIdentifier() && INTERNAL_ERROR"expected 'IdentifierExpr'");
+    assert(Id->isIdentifier() && INTERNAL_ERROR "expected 'IdentifierExpr'");
 
     const std::string &Name = Id->getName();
     const TensorType *Type = Sema.getType(Id->getDims());
@@ -55,8 +55,8 @@ void TheanoCG::genCode(const Program *Prog) {
   }
 
   for (const auto &Assign : CG->getAssignments()) {
-    assert(Assign.LHS->isIdentifier() &&
-           INTERNAL_ERROR "LHS must be indentifier");
+    assert(Assign.LHS->isIdentifier() && INTERNAL_ERROR
+           "LHS must be indentifier");
     const std::string Result = Assign.LHS->getName();
     const ExprNode *Node = Assign.RHS;
 
@@ -233,5 +233,6 @@ void TheanoCG::visitTranspositionExpr(const TranspositionExpr *E) {
 }
 
 void TheanoCG::visitIdentifierExpr(const IdentifierExpr *E) {
-  ph_unreachable(INTERNAL_ERROR "code generation for identifier has been optimized out");
+  ph_unreachable(INTERNAL_ERROR
+                 "code generation for identifier has been optimized out");
 }

@@ -19,9 +19,9 @@
 #include "ph/Opt/IdentifierFinder.h"
 #include "ph/Opt/ParentFinder.h"
 #include "ph/Opt/StackRemover.h"
-#include "ph/Support/ErrorHandling.h"
 #include "ph/Sema/Sema.h"
 #include "ph/Sema/Type.h"
+#include "ph/Support/ErrorHandling.h"
 
 #define OMP_CG_INDENT(Indent)                                                  \
   { appendCode(std::string((Indent), ' ')); }
@@ -92,7 +92,8 @@ void OMPCG::genCode(const Program *Prog) {
         [&RHSToLHSMap](const ExprNode *Node, const ExprNode *Root) -> bool {
       if (Node->isStackExpr()) {
         // Note that tensor stack expressions should not occur here.
-        ph_unreachable(INTERNAL_ERROR "stack expressions should not occur any more");
+        ph_unreachable(INTERNAL_ERROR
+                       "stack expressions should not occur any more");
       }
 
       if (Node->isContractionExpr()) {
@@ -179,8 +180,8 @@ void OMPCG::genCode(const Program *Prog) {
   for (; AssignIt != AssignIE; AssignIt++) {
     const auto &NextAssign = std::next(AssignIt);
 
-    assert(AssignIt->LHS->isIdentifier() &&
-           INTERNAL_ERROR "LHS must be an identifier expression");
+    assert(AssignIt->LHS->isIdentifier() && INTERNAL_ERROR
+           "LHS must be an identifier expression");
 
     const IdentifierExpr *Result =
         static_cast<const IdentifierExpr *>(AssignIt->LHS);
@@ -1003,5 +1004,6 @@ void OMPCG::visitTopLevelIdentifier(const ExprNode *Id) {
 }
 
 void OMPCG::visitIdentifierExpr(const IdentifierExpr *Id) {
-  ph_unreachable(INTERNAL_ERROR "code generation for identifier has been optimized out");
+  ph_unreachable(INTERNAL_ERROR
+                 "code generation for identifier has been optimized out");
 }

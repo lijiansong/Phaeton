@@ -76,7 +76,7 @@ void GraphCodeGen::visitIdentifier(const Identifier *Id) {
 
 void GraphCodeGen::visitInteger(const Integer *I) {
   ph_unreachable(INTERNAL_ERROR
-         "integer should not be visited for graph code generation");
+                 "integer should not be visited for graph code generation");
 }
 
 void GraphCodeGen::visitParenExpr(const ParenExpr *PE) {
@@ -304,8 +304,8 @@ void GraphCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
   adjustForContractions(IndexRight, ContrLeft);
   adjustForContractions(IndexRight, ContrRight);
 
-  assert(IndexLeft.size() == IndexRight.size() &&
-         INTERNAL_ERROR "mismatched numbers of indices to be contracted");
+  assert(IndexLeft.size() == IndexRight.size() && INTERNAL_ERROR
+         "mismatched numbers of indices to be contracted");
 
   for (int I = 0; I < IndexLeft.size(); ++I) {
     int IndLeft = IndexLeft[I];
@@ -356,8 +356,8 @@ ExprNode *GraphCodeGen::buildExprTreeForGraph(GraphCGGraph *Graph) {
   while (Graph->getNumEdges()) {
     EdgeSet EdgesToContract;
     selectEdgesToContract(EdgesToContract, *Graph);
-    assert(!EdgesToContract.empty() &&
-           INTERNAL_ERROR "graph should still have edges");
+    assert(!EdgesToContract.empty() && INTERNAL_ERROR
+           "graph should still have edges");
 
     const GraphCGEdge *FirstEdge = *EdgesToContract.begin();
     GraphCGNode &Src = *Graph->getNode(FirstEdge->getSrcID());
@@ -503,8 +503,8 @@ void GraphCodeGen::selectEdgesToContract(EdgeSet &Result,
 
   // FIXME: Now we cannot yet handle graphs with no contractions between
   // pred and succ node pairs.
-  assert(!Tmp.empty() &&
-         INTERNAL_ERROR "cannot handle malformed contraction yet");
+  assert(!Tmp.empty() && INTERNAL_ERROR
+         "cannot handle malformed contraction yet");
 
   for (const auto &It : Tmp) {
     Result.insert(It.second);

@@ -21,7 +21,7 @@
 #define ASSERT_TYPE_MAP(Expr)                                                  \
   {                                                                            \
     if (ExprTypes.find((Expr)) == ExprTypes.end())                             \
-      ph_unreachable(INTERNAL_ERROR "type of 'Expr' node not in map");           \
+      ph_unreachable(INTERNAL_ERROR "type of 'Expr' node not in map");         \
   }
 
 using namespace phaeton;
@@ -179,8 +179,8 @@ void Sema::visitStmt(const Stmt *S) {
   const Symbol *Sym = getSymbol(Id->getName());
   if (!Sym) {
     ph_unreachable(("semantic error: assignment to undeclared symbol \'" +
-                 Id->getName() + "\'")
-                    .c_str());
+                    Id->getName() + "\'")
+                       .c_str());
     return;
   }
 
@@ -213,7 +213,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
       }
 
       if (Type0->getRank() == 0) {
-        ph_unreachable(SEMANTIC_ERROR"cannot contract scalar");
+        ph_unreachable(SEMANTIC_ERROR "cannot contract scalar");
       }
 
       std::vector<int> Res;
@@ -234,13 +234,14 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
             ph_unreachable(SEMANTIC_ERROR "contracted index out of range");
           }
           if (Type0->getDim(i) != Dim) {
-            ph_unreachable(SEMANTIC_ERROR"incompatible indices in contraction");
+            ph_unreachable(SEMANTIC_ERROR
+                           "incompatible indices in contraction");
           }
           if (IndexSetToErase.count(i)) {
-            ph_unreachable(
-                   ("semantic error: index \'" + std::to_string((long long)i) +
-                    "\' appears multiple times")
-                       .c_str());
+            ph_unreachable(("semantic error: index \'" +
+                            std::to_string((long long)i) +
+                            "\' appears multiple times")
+                               .c_str());
           }
           IndexSetToErase.insert(i);
           IndexListToErase.push_back(i);
@@ -293,7 +294,7 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
 
     std::vector<std::vector<int>> Lists;
     if (!isListOfLists(BE->getRight(), Lists)) {
-      ph_unreachable(SEMANTIC_ERROR"right member of transposition not a list");
+      ph_unreachable(SEMANTIC_ERROR "right member of transposition not a list");
     }
 
     if (Lists.empty()) {
@@ -381,7 +382,8 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
     std::vector<int> Dims;
 
     if (isScalar(LeftType) || isScalar(RightType)) {
-      ph_unreachable(SEMANTIC_ERROR "cannot form the tensor product with a scalar");
+      ph_unreachable(SEMANTIC_ERROR
+                     "cannot form the tensor product with a scalar");
       return;
     }
 
@@ -404,9 +406,9 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
 void Sema::visitIdentifier(const Identifier *Id) {
   const Symbol *Sym = getSymbol(Id->getName());
   if (!Sym) {
-    ph_unreachable(("semantic error: use of undeclared symbol \'" + Id->getName() +
-                 "\'")
-                    .c_str());
+    ph_unreachable(
+        ("semantic error: use of undeclared symbol \'" + Id->getName() + "\'")
+            .c_str());
   }
 
   ExprTypes[Id] = &Sym->getType();
@@ -467,7 +469,8 @@ void Sema::visitElementDirective(const ElementDirective *ED) {
     // error'. Since the grammar allows only a single 'ElementDirective', if
     // there are more than one 'ElementDirective', the parser should have exited
     // due to a syntax error, and we should not get to the semantic analysis.
-    ph_unreachable(INTERNAL_ERROR "only one single element directive is allowed");
+    ph_unreachable(INTERNAL_ERROR
+                   "only one single element directive is allowed");
   }
 
   ElementInfo.Present = true;

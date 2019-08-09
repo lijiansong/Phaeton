@@ -15,9 +15,9 @@
 #include "ph/Opt/ExprTreeLifter.h"
 #include "ph/Opt/ExprTreeTransformer.h"
 #include "ph/Opt/ExprTreeVisitor.h"
-#include "ph/Support/ErrorHandling.h"
 #include "ph/Sema/Sema.h"
 #include "ph/Sema/Type.h"
+#include "ph/Support/ErrorHandling.h"
 
 #include <vector>
 
@@ -124,5 +124,6 @@ void JuliaCG::visitTranspositionExpr(const TranspositionExpr *E) {
 }
 
 void JuliaCG::visitIdentifierExpr(const IdentifierExpr *E) {
-  ph_unreachable(INTERNAL_ERROR "code generation for identifier has been optimized out");
+  ph_unreachable(INTERNAL_ERROR
+                 "code generation for identifier has been optimized out");
 }

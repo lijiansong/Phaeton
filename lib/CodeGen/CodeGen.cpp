@@ -75,8 +75,8 @@ void CodeGen::addAssignment(const Stmt *Stmt) {
 }
 
 const CodeGen::FuncArg &CodeGen::getFuncArg(unsigned Index) const {
-  assert(Index < getNumFuncArgs() &&
-         INTERNAL_ERROR "index out of bounds for auto-gen function args");
+  assert(Index < getNumFuncArgs() && INTERNAL_ERROR
+         "index out of bounds for auto-gen function args");
   return FuncArgs.at(Index);
 };
 
