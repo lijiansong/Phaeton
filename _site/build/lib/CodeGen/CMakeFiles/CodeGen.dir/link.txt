@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../libCodeGen.a  CMakeFiles/CodeGen.dir/CodeGen.cpp.o CMakeFiles/CodeGen.dir/DirectCG.cpp.o CMakeFiles/CodeGen.dir/GraphCG.cpp.o CMakeFiles/CodeGen.dir/PyCG.cpp.o CMakeFiles/CodeGen.dir/OMPCG.cpp.o CMakeFiles/CodeGen.dir/PyFragBuilder.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../libCodeGen.a

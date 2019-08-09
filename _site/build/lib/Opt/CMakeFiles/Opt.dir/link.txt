@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../libOpt.a  CMakeFiles/Opt.dir/ExprTree.cpp.o CMakeFiles/Opt.dir/ExprTreeTransformer.cpp.o CMakeFiles/Opt.dir/ExprTreeVisitor.cpp.o CMakeFiles/Opt.dir/ENBuilder.cpp.o CMakeFiles/Opt.dir/ExprTreeLifter.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../libOpt.a
