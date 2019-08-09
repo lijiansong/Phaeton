@@ -19,10 +19,10 @@
 #include <string>
 #include <vector>
 
-namespace ph {
+namespace phaeton {
 
 /// TODO: re-implement these STL latter.
 
-} // end namespace ph
+} // end namespace phaeton
 
 #endif // PHAETON_ADT_H
