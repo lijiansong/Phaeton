@@ -10,5 +10,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "ph/Target/TPUCG.h"
+#include "ph/Opt/ExprTreeTransformer.h"
+#include "ph/Opt/ExprTreeVisitor.h"
+#include "ph/Sema/Sema.h"
+#include "ph/Sema/Type.h"
 
 using namespace phaeton;

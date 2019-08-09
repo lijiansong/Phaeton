@@ -1,15 +1,15 @@
-//==--- BangCG.cpp ----- Interface to code generation for Cambricon Bang ---==//
+//==--- CudaCG.cpp ----- Interface to code generation for NVIDIA Cuda ------==//
 //
 //                     The Phaeton Compiler Infrastructure
 //
 //===----------------------------------------------------------------------===//
 //
-// This provides a class for Cambricon Bang code generation targeting the
-// Cambricon MLUs.
+// This provides a class for Nvidia Cuda code generation targeting the
+// NVIDIA GPUs.
 //
 //===----------------------------------------------------------------------===//
 
-#include "ph/Target/BangCG.h"
+#include "ph/Target/CudaCG.h"
 #include "ph/Opt/ExprTreeTransformer.h"
 #include "ph/Opt/ExprTreeVisitor.h"
 #include "ph/Sema/Sema.h"

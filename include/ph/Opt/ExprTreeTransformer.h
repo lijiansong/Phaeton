@@ -13,13 +13,16 @@
 #ifndef PHAETON_OPT_EXPR_TREE_TRANSFORMER_H
 #define PHAETON_OPT_EXPR_TREE_TRANSFORMER_H
 
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
 
 namespace phaeton {
+
+/// ExprTreeTransformer - This class defines the common interface for expression
+/// tree transformer of each expression node.
 class ExprTreeTransformer {
 public:
 #define GEN_TRANSFORM_EXPR_NODE_DECL(ExprName)                                 \
-  virtual void transform##ExprName##Expr(ExprName##Expr *e) = 0;
+  virtual void transform##ExprName##Expr(ExprName##Expr *E) = 0;
 
   GEN_TRANSFORM_EXPR_NODE_DECL(Add)
   GEN_TRANSFORM_EXPR_NODE_DECL(Sub)

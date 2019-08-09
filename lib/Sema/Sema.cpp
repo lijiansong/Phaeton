@@ -10,6 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "ph/Sema/Sema.h"
+#include "ph/Support/ErrorHandling.h"
 
 #include <cassert>
 #include <list>
@@ -17,465 +18,485 @@
 #include <string>
 #include <vector>
 
-#define TYPE_MAP_ASSERT(expr)                                                  \
+#define ASSERT_TYPE_MAP(Expr)                                                  \
   {                                                                            \
-    if (ExprTypes.find((expr)) == ExprTypes.end())                             \
-      assert(0 && "internal error: type of 'Expr' node not in map");           \
+    if (ExprTypes.find((Expr)) == ExprTypes.end())                             \
+      ph_unreachable(INTERNAL_ERROR "type of 'Expr' node not in map");           \
   }
 
 using namespace phaeton;
 
 Sema::Sema() {
-  scalar = new TensorType(std::vector<int>());
-  Types.push_back(scalar);
+  Scalar = new TensorType(std::vector<int>());
+  Types.push_back(Scalar);
 
-  elemInfo.present = false;
+  ElementInfo.Present = false;
 }
 
 Sema::~Sema() {
-  for (auto it : Types)
-    delete it;
-  for (auto it : Symbols)
-    delete it.second;
+  for (auto It : Types)
+    delete It;
+  for (auto It : Symbols)
+    delete It.second;
 }
 
-const TensorType *Sema::createType(const std::vector<int> &dims) {
-  const TensorType *type = new TensorType(dims);
-  Types.push_back(type);
-  return type;
+const TensorType *Sema::createType(const std::vector<int> &Dims) {
+  const TensorType *Type = new TensorType(Dims);
+  Types.push_back(Type);
+  return Type;
 }
 
-const TensorType *Sema::getType(const std::vector<int> &dims) {
-  for (auto it : Types) {
-    if (it->equals(dims))
-      return it;
+const TensorType *Sema::getType(const std::vector<int> &Dims) {
+  for (auto It : Types) {
+    if (It->equals(Dims))
+      return It;
   }
 
-  return createType(dims);
+  return createType(Dims);
 }
 
-const TensorType *Sema::getType(const std::vector<int> &dims) const {
-  for (auto it : Types) {
-    if (it->equals(dims))
-      return it;
+const TensorType *Sema::getType(const std::vector<int> &Dims) const {
+  for (auto It : Types) {
+    if (It->equals(Dims))
+      return It;
   }
 
   return nullptr;
 }
 
-const Symbol *Sema::createSymbol(Symbol::SymbolKind k, const std::string &name,
-                                 const TensorType &type, const Decl *decl) {
-  Symbol *sym = new Symbol(k, name, type, decl);
-  Symbols.addSymbol(sym);
-  return sym;
+const Symbol *Sema::createSymbol(Symbol::SymbolKind SK, const std::string &Name,
+                                 const TensorType &Type, const Decl *Decl) {
+  Symbol *Sym = new Symbol(SK, Name, Type, Decl);
+  Symbols.addSymbol(Sym);
+  return Sym;
 }
 
-const Symbol *Sema::getSymbol(const std::string &name) const {
-  Symbol *sym;
-  if (!Symbols.getSymbol(name, sym))
+const Symbol *Sema::getSymbol(const std::string &Name) const {
+  Symbol *Sym;
+  if (!Symbols.getSymbol(Name, Sym)) {
     return nullptr;
+  }
 
-  return sym;
+  return Sym;
 }
 
-bool Sema::isTypeName(const Expr *e, const TensorType *&type) const {
-  const Identifier *id = dynamic_cast<const Identifier *>(e);
-  if (!id)
+bool Sema::isTypeName(const Expr *E, const TensorType *&Type) const {
+  const Identifier *Id = dynamic_cast<const Identifier *>(E);
+  if (!Id) {
+    return false;
+  }
+
+  const Symbol *Sym = getSymbol(Id->getName());
+  if (!Sym || (Sym->getSymbolKind() != Symbol::SYM_KIND_Type))
     return false;
 
-  const Symbol *sym = getSymbol(id->getName());
-  if (!sym || (sym->getKind() != Symbol::SYM_KIND_Type))
-    return false;
-
-  type = &sym->getType();
+  Type = &Sym->getType();
   return true;
 }
 
-bool Sema::isIntegerList(const Expr *e, std::vector<int> &ints) {
-  const BrackExpr *be = dynamic_cast<const BrackExpr *>(e);
-  if (!be)
+bool Sema::isIntegerList(const Expr *E, std::vector<int> &Ints) {
+  const BrackExpr *BE = dynamic_cast<const BrackExpr *>(E);
+  if (!BE) {
     return false;
+  }
 
-  const ExprList *list = be->getExprs();
-  ints.clear();
-  for (const auto &it : *list) {
-    const Integer *integer = dynamic_cast<const Integer *>(it);
-    if (!integer)
+  const ExprList *List = BE->getExprs();
+  Ints.clear();
+  for (const auto &It : *List) {
+    const Integer *Int = dynamic_cast<const Integer *>(It);
+    if (!Int) {
       return false;
-
-    ints.push_back(integer->getValue());
+    }
+    Ints.push_back(Int->getValue());
   }
 
   return true;
 }
 
-bool Sema::isListOfLists(const Expr *e, std::vector<std::vector<int>> &lists) {
-  const BrackExpr *be = dynamic_cast<const BrackExpr *>(e);
-  if (!be)
+bool Sema::isListOfLists(const Expr *E, std::vector<std::vector<int>> &Lists) {
+  const BrackExpr *BE = dynamic_cast<const BrackExpr *>(E);
+  if (!BE) {
     return false;
+  }
 
-  const ExprList *list = be->getExprs();
-  lists.clear();
-  for (const Expr *const &expr : *list) {
-    std::vector<int> integers;
-    if (!isIntegerList(expr, integers))
+  const ExprList *List = BE->getExprs();
+  Lists.clear();
+  for (const Expr *const &Expr : *List) {
+    std::vector<int> Integers;
+    if (!isIntegerList(Expr, Integers)) {
       return false;
+    }
 
-    lists.push_back(integers);
+    Lists.push_back(Integers);
   }
 
   return true;
 }
 
-const TensorType *Sema::visitTypeExpr(const Expr *e) {
-  const TensorType *type;
-  if (isTypeName(e, type))
-    return type;
+const TensorType *Sema::visitTypeExpr(const Expr *E) {
+  const TensorType *Type;
+  if (isTypeName(E, Type)) {
+    return Type;
+  }
 
-  std::vector<int> dims;
-  if (isIntegerList(e, dims))
-    return getType(dims);
+  std::vector<int> Dims;
+  if (isIntegerList(E, Dims)) {
+    return getType(Dims);
+  }
 
-  assert(0 && "semantic error: invalid type expression");
+  ph_unreachable(SEMANTIC_ERROR "invalid type expression");
   return nullptr;
 }
 
-void Sema::visitDecl(const Decl *d) {
-  Symbol::SymbolKind k = (d->getNodeType() == ASTNode::NODETYPE_VarDecl)
-                             ? Symbol::SYM_KIND_Variable
-                             : Symbol::SYM_KIND_Type;
-  const std::string &name = d->getIdentifier()->getName();
-  const TensorType *type = visitTypeExpr(d->getTypeExpr());
+void Sema::visitDecl(const Decl *D) {
+  Symbol::SymbolKind Kind =
+      (D->getASTNodeKind() == ASTNode::AST_NODE_KIND_VarDecl)
+          ? Symbol::SYM_KIND_Variable
+          : Symbol::SYM_KIND_Type;
+  const std::string &Name = D->getIdentifier()->getName();
+  const TensorType *Type = visitTypeExpr(D->getTypeExpr());
 
-  if (getSymbol(name)) {
-    assert(
-        0 &&
-        ("semantic error: symbol \'" + name + "\' already declared").c_str());
+  if (getSymbol(Name)) {
+    ph_unreachable(("symbol \'" + Name + "\' already declared").c_str());
     return;
   }
 
-  const Symbol *sym = createSymbol(k, name, *type, d);
+  const Symbol *Sym = createSymbol(Kind, Name, *Type, D);
 
-  if (d->getInOutSpecifier() & Decl::IO_Input)
-    Inputs.push_back(sym);
-  if (d->getInOutSpecifier() & Decl::IO_Output)
-    Outputs.push_back(sym);
+  if (D->getInOutSpecifier() & Decl::IO_SPEC_Input)
+    Inputs.push_back(Sym);
+  if (D->getInOutSpecifier() & Decl::IO_SPEC_Output)
+    Outputs.push_back(Sym);
 
-  if (k == Symbol::SYM_KIND_Type)
-    NamedTypes[type] = sym;
+  if (Kind == Symbol::SYM_KIND_Type)
+    NamedTypes[Type] = Sym;
 }
 
-void Sema::visitStmt(const Stmt *s) {
-  const Identifier *id = s->getIdentifier();
-  const Expr *expr = s->getExpr();
+void Sema::visitStmt(const Stmt *S) {
+  const Identifier *Id = S->getIdentifier();
+  const Expr *Expr = S->getExpr();
 
-  const Symbol *sym = getSymbol(id->getName());
-  if (!sym) {
-    assert(0 && ("semantic error: assignment to undeclared symbol \'" +
-                 id->getName() + "\'")
+  const Symbol *Sym = getSymbol(Id->getName());
+  if (!Sym) {
+    ph_unreachable(("semantic error: assignment to undeclared symbol \'" +
+                 Id->getName() + "\'")
                     .c_str());
     return;
   }
 
-  expr->visit(this);
-  TYPE_MAP_ASSERT(expr)
+  Expr->visit(this);
+  ASSERT_TYPE_MAP(Expr)
 
-  const TensorType *type = ExprTypes[expr];
-  if (*type != sym->getType()) {
-    assert(0 && "semantic error: assigning non-equal types");
+  const TensorType *Type = ExprTypes[Expr];
+  if (*Type != Sym->getType()) {
+    ph_unreachable("semantic error: assigning non-equal types");
     return;
   }
 }
 
-void Sema::visitBinaryExpr(const BinaryExpr *be) {
-  const ASTNode::NodeType nt = be->getNodeType();
+// TODO: Refer clang to refactor this method.
+void Sema::visitBinaryExpr(const BinaryExpr *BE) {
+  const ASTNode::ASTNodeKind NK = BE->getASTNodeKind();
 
-  if (nt == ASTNode::NODETYPE_ContractionExpr) {
-    const Expr *left = be->getLeft();
-    left->visit(this);
-    TYPE_MAP_ASSERT(left);
-    const TensorType *type0 = ExprTypes[left];
+  if (NK == ASTNode::AST_NODE_KIND_ContractionExpr) {
+    const Expr *Left = BE->getLeft();
+    Left->visit(this);
+    ASSERT_TYPE_MAP(Left);
+    const TensorType *Type0 = ExprTypes[Left];
 
-    std::vector<std::vector<int>> lists;
-    if (isListOfLists(be->getRight(), lists)) {
-      // assert(0 && "semantic error: right member of contraction not a list");
+    std::vector<std::vector<int>> Lists;
+    if (isListOfLists(BE->getRight(), Lists)) {
+      // ph_unreachable(SEMANTIC_ERROR"right member of contraction not a list");
 
-      if (lists.empty())
-        assert(0 && "semantic error: contracting over empty index list");
+      if (Lists.empty()) {
+        ph_unreachable(SEMANTIC_ERROR "contracting over empty index list");
+      }
 
-      if (type0->getRank() == 0)
-        assert(0 && "semantic error: cannot contract scalar");
+      if (Type0->getRank() == 0) {
+        ph_unreachable(SEMANTIC_ERROR"cannot contract scalar");
+      }
 
-      std::vector<int> res;
-      for (int i = 0; i < type0->getRank(); i++)
-        res.push_back(type0->getDim(i));
+      std::vector<int> Res;
+      for (int i = 0; i < Type0->getRank(); i++)
+        Res.push_back(Type0->getDim(i));
 
-      std::set<int> index_set_to_erase;
-      std::list<int> index_list_to_erase;
-      for (const auto &list : lists) {
-        // skip empty lists:
-        if (!list.size())
+      std::set<int> IndexSetToErase;
+      std::list<int> IndexListToErase;
+      for (const auto &List : Lists) {
+        // skip empty Lists
+        if (!List.size())
           continue;
 
-        const int dim = type0->getDim(list[0]);
-        const int rank = type0->getRank();
-        for (int i : list) {
-          if (!(i < rank)) {
-            assert(0 && "semantic error: contracted index out of range");
+        const int Dim = Type0->getDim(List[0]);
+        const int Rank = Type0->getRank();
+        for (int i : List) {
+          if (!(i < Rank)) {
+            ph_unreachable(SEMANTIC_ERROR "contracted index out of range");
           }
-          if (type0->getDim(i) != dim) {
-            assert(0 && "semantic error: incompatible indices in contraction");
+          if (Type0->getDim(i) != Dim) {
+            ph_unreachable(SEMANTIC_ERROR"incompatible indices in contraction");
           }
-          if (index_set_to_erase.count(i)) {
-            assert(0 &&
+          if (IndexSetToErase.count(i)) {
+            ph_unreachable(
                    ("semantic error: index \'" + std::to_string((long long)i) +
                     "\' appears multiple times")
                        .c_str());
           }
-          index_set_to_erase.insert(i);
-          index_list_to_erase.push_back(i);
+          IndexSetToErase.insert(i);
+          IndexListToErase.push_back(i);
         }
       }
 
-      index_list_to_erase.sort();
-      int erased = 0;
-      for (int i : index_list_to_erase)
-        res.erase(res.begin() + i - (erased++));
+      IndexListToErase.sort();
+      int Erased = 0;
+      for (int i : IndexListToErase)
+        Res.erase(Res.begin() + i - (Erased++));
 
-      ExprTypes[be] = getType(res);
+      ExprTypes[BE] = getType(Res);
       return;
     } else {
-      const Expr *right = be->getRight();
-      right->visit(this);
-      TYPE_MAP_ASSERT(right);
-      const TensorType *type1 = ExprTypes[right];
+      const Expr *Right = BE->getRight();
+      Right->visit(this);
+      ASSERT_TYPE_MAP(Right);
+      const TensorType *Type1 = ExprTypes[Right];
 
-      const int rank0 = type0->getRank();
-      const int rank1 = type1->getRank();
+      const int Rank0 = Type0->getRank();
+      const int Rank1 = Type1->getRank();
 
-      // contract the last index from 'left' with the first index from 'right':
-      if (rank0 == 0 || rank1 == 0) {
-        assert(0 && "semantic error: cannot contract scalar");
+      // Note: Contract the last index from 'Left' with the first index from
+      // 'Right'.
+      if (Rank0 == 0 || Rank1 == 0) {
+        ph_unreachable(SEMANTIC_ERROR "cannot contract scalar");
       }
-      if (type0->getDim(rank0 - 1) != type1->getDim(0)) {
-        assert(0 && "semantic error: contracted dimensions do not match");
+      if (Type0->getDim(Rank0 - 1) != Type1->getDim(0)) {
+        ph_unreachable(SEMANTIC_ERROR "contracted dimensions do not match");
       }
 
-      std::vector<int> res;
-      for (int i = 0; i < (rank0 - 1); i++)
-        res.push_back(type0->getDim(i));
-      for (int i = 1; i < rank1; i++)
-        res.push_back(type1->getDim(i));
+      std::vector<int> Res;
+      for (int i = 0; i < (Rank0 - 1); i++)
+        Res.push_back(Type0->getDim(i));
+      for (int i = 1; i < Rank1; i++)
+        Res.push_back(Type1->getDim(i));
 
-      ExprTypes[be] = getType(res);
+      ExprTypes[BE] = getType(Res);
       return;
     }
-    // each branch of the above if-statement should return:
-    assert(0 && "internal error: should have returned");
-  } else if (nt == ASTNode::NODETYPE_TranspositionExpr) {
-    const Expr *left = be->getLeft();
-    left->visit(this);
-    TYPE_MAP_ASSERT(left);
-    const TensorType *type0 = ExprTypes[left];
-    const int rank = type0->getRank();
+    // Note that each branch of the above if-statement should return.
+    // If we get here, this must be an internal ERROR!
+    ph_unreachable(INTERNAL_ERROR "should have returned");
+  } else if (NK == ASTNode::AST_NODE_KIND_TranspositionExpr) {
+    const Expr *Left = BE->getLeft();
+    Left->visit(this);
+    ASSERT_TYPE_MAP(Left);
+    const TensorType *Type0 = ExprTypes[Left];
+    const int Rank = Type0->getRank();
 
-    std::vector<std::vector<int>> lists;
-    if (!isListOfLists(be->getRight(), lists)) {
-      assert(0 && "semantic error: right member of transposition not a list");
+    std::vector<std::vector<int>> Lists;
+    if (!isListOfLists(BE->getRight(), Lists)) {
+      ph_unreachable(SEMANTIC_ERROR"right member of transposition not a list");
     }
 
-    if (lists.empty()) {
-      assert(0 && "semantic error: empty index list in transposition");
+    if (Lists.empty()) {
+      ph_unreachable(SEMANTIC_ERROR "empty index list in transposition");
     }
 
-    std::vector<int> dimsToTranspose = type0->getDims();
-    for (const auto &list : lists) {
-      if (list.size() != 2) {
-        assert(0 && "semantic error: non-pair in transposition indices");
+    std::vector<int> DimsToTranspose = Type0->getDims();
+    for (const auto &List : Lists) {
+      if (List.size() != 2) {
+        ph_unreachable(SEMANTIC_ERROR "not a pair in transposition indices");
       }
 
-      const int i0 = list[0], i1 = list[1];
+      const int I0 = List[0], I1 = List[1];
 
-      if (i0 == i1) {
-        assert(0 && "semantic error: equal transposition indices");
+      if (I0 == I1) {
+        ph_unreachable(SEMANTIC_ERROR "equal transposition indices");
       }
 
-      if (!(i0 < rank) || !(i1 < rank)) {
-        assert(0 && "semantic error: transposition index out of range");
+      if (!(I0 < Rank) || !(I1 < Rank)) {
+        ph_unreachable(SEMANTIC_ERROR "transposition index out of range");
       }
 
-      // transpose the dimensions:
-      const int dim0 = dimsToTranspose[i0];
-      dimsToTranspose[i0] = dimsToTranspose[i1];
-      dimsToTranspose[i1] = dim0;
+      // Note: Here we transpose the dimensions.
+      const int Dim0 = DimsToTranspose[I0];
+      DimsToTranspose[I0] = DimsToTranspose[I1];
+      DimsToTranspose[I1] = Dim0;
     }
 
-    ExprTypes[be] = getType(dimsToTranspose);
+    ExprTypes[BE] = getType(DimsToTranspose);
     return;
   }
 
-  // binary expression is NOT a contraction and NOT a transposition:
-  assert(nt != ASTNode::NODETYPE_ContractionExpr &&
-         nt != ASTNode::NODETYPE_TranspositionExpr &&
+  // Note that binary expression is neither a contraction nor a transposition,
+  // if we get here, that means an internal ERROR!
+  assert(NK != ASTNode::AST_NODE_KIND_ContractionExpr &&
+         NK != ASTNode::AST_NODE_KIND_TranspositionExpr &&
          "internal error: should not be here");
 
-  const Expr *left = be->getLeft();
-  left->visit(this);
-  TYPE_MAP_ASSERT(left);
-  const TensorType &leftType = *ExprTypes[left];
+  const Expr *Left = BE->getLeft();
+  Left->visit(this);
+  ASSERT_TYPE_MAP(Left);
+  const TensorType &LeftType = *ExprTypes[Left];
 
-  const Expr *right = be->getRight();
-  right->visit(this);
-  TYPE_MAP_ASSERT(right);
-  const TensorType &rightType = *ExprTypes[right];
+  const Expr *Right = BE->getRight();
+  Right->visit(this);
+  ASSERT_TYPE_MAP(Right);
+  const TensorType &RightType = *ExprTypes[Right];
 
-  const TensorType *resultType;
-  switch (nt) {
-  case ASTNode::NODETYPE_AddExpr:
-  case ASTNode::NODETYPE_SubExpr: {
-    if (leftType != rightType) {
-      assert(0 && "semantic error: adding/subtracting non-equal types");
+  const TensorType *ResultType;
+  switch (NK) {
+  case ASTNode::AST_NODE_KIND_AddExpr:
+  case ASTNode::AST_NODE_KIND_SubExpr: {
+    if (LeftType != RightType) {
+      ph_unreachable(SEMANTIC_ERROR "add or sub non-equal types");
       return;
     }
-    resultType = &leftType;
+    ResultType = &LeftType;
     break;
   }
-  case ASTNode::NODETYPE_MulExpr: {
-    if (isScalar(leftType)) {
-      resultType = &rightType;
+  case ASTNode::AST_NODE_KIND_MulExpr: {
+    if (isScalar(LeftType)) {
+      ResultType = &RightType;
     } else {
-      if (leftType != rightType) {
-        assert(0 && "semantic error: multiplying non-equal types");
+      if (LeftType != RightType) {
+        ph_unreachable(SEMANTIC_ERROR "mul non-equal types");
         return;
       }
-      resultType = &leftType;
+      ResultType = &LeftType;
     }
     break;
   }
-  case ASTNode::NODETYPE_DivExpr: {
-    if (isScalar(rightType)) {
-      resultType = &leftType;
+  case ASTNode::AST_NODE_KIND_DivExpr: {
+    if (isScalar(RightType)) {
+      ResultType = &LeftType;
     } else {
-      if (leftType != rightType) {
-        assert(0 && "semantic error: dividing non-equal types");
+      if (LeftType != RightType) {
+        ph_unreachable(SEMANTIC_ERROR "div non-equal types");
         return;
       }
-      resultType = &leftType;
+      ResultType = &LeftType;
     }
     break;
   }
-  case ASTNode::NODETYPE_ProductExpr: {
-    std::vector<int> dims;
+  case ASTNode::AST_NODE_KIND_ProductExpr: {
+    std::vector<int> Dims;
 
-    if (isScalar(leftType) || isScalar(rightType)) {
-      assert(0 &&
-             "semantic error: cannot form the tensor product with a scalar");
+    if (isScalar(LeftType) || isScalar(RightType)) {
+      ph_unreachable(SEMANTIC_ERROR "cannot form the tensor product with a scalar");
       return;
     }
 
-    for (int i0 = 0; i0 < leftType.getRank(); i0++)
-      dims.push_back(leftType.getDim(i0));
-    for (int i1 = 0; i1 < rightType.getRank(); i1++)
-      dims.push_back(rightType.getDim(i1));
+    for (int I0 = 0; I0 < LeftType.getRank(); I0++)
+      Dims.push_back(LeftType.getDim(I0));
+    for (int I1 = 0; I1 < RightType.getRank(); I1++)
+      Dims.push_back(RightType.getDim(I1));
 
-    resultType = getType(dims);
+    ResultType = getType(Dims);
     break;
   }
   default:
-    assert(0 && "internal error: invalid binary expression");
+    ph_unreachable(INTERNAL_ERROR "invalid binary expression");
   }
 
-  ExprTypes[be] = resultType;
+  ExprTypes[BE] = ResultType;
   return;
 }
 
-void Sema::visitIdentifier(const Identifier *id) {
-  const Symbol *sym = getSymbol(id->getName());
-  if (!sym) {
-    assert(0 && ("semantic error: use of undeclared symbol \'" + id->getName() +
+void Sema::visitIdentifier(const Identifier *Id) {
+  const Symbol *Sym = getSymbol(Id->getName());
+  if (!Sym) {
+    ph_unreachable(("semantic error: use of undeclared symbol \'" + Id->getName() +
                  "\'")
                     .c_str());
   }
 
-  ExprTypes[id] = &sym->getType();
+  ExprTypes[Id] = &Sym->getType();
 }
 
-void Sema::visitInteger(const Integer *i) { ExprTypes[i] = scalar; }
+void Sema::visitInteger(const Integer *I) { ExprTypes[I] = Scalar; }
 
-void Sema::visitBrackExpr(const BrackExpr *be) {
-  const ExprList &exprs = *be->getExprs();
-  if (!exprs.size())
-    assert(0 && "semantic error: tensor stack cannot be empty");
+void Sema::visitBrackExpr(const BrackExpr *BE) {
+  const ExprList &List = *BE->getExprs();
+  if (!List.size())
+    ph_unreachable(SEMANTIC_ERROR "tensor stack cannot be empty");
 
-  exprs[0]->visit(this);
-  TYPE_MAP_ASSERT(exprs[0]);
-  const TensorType *type = getType(exprs[0]);
+  List[0]->visit(this);
+  ASSERT_TYPE_MAP(List[0]);
+  const TensorType *Type = getType(List[0]);
 
-  // skip the first expression in the list,
-  // it has already been visited above:
-  for (unsigned i = 1; i < exprs.size(); i++) {
-    const Expr *e = exprs[i];
-    e->visit(this);
-    TYPE_MAP_ASSERT(e);
-    if (getType(e) != type)
-      assert(0 && "semantic error: type mismatch in tensor stack");
+  // Note that here we skip the first expression in the list,
+  // since it has already been visited above.
+  for (unsigned i = 1; i < List.size(); ++i) {
+    const Expr *E = List[i];
+    E->visit(this);
+    ASSERT_TYPE_MAP(E);
+    if (getType(E) != Type)
+      ph_unreachable(SEMANTIC_ERROR "type mismatch in tensor stack");
   }
 
-  std::vector<int> dims;
-  dims.push_back(exprs.size());
-  for (unsigned i = 0; i < type->getRank(); i++)
-    dims.push_back(type->getDim(i));
+  std::vector<int> Dims;
+  Dims.push_back(List.size());
+  for (unsigned i = 0; i < Type->getRank(); ++i)
+    Dims.push_back(Type->getDim(i));
 
-  ExprTypes[be] = getType(dims);
+  ExprTypes[BE] = getType(Dims);
 }
 
-void Sema::visitParenExpr(const ParenExpr *pe) {
-  const Expr *e = pe->getExpr();
-  e->visit(this);
-  TYPE_MAP_ASSERT(e);
-  ExprTypes[pe] = getType(e);
+void Sema::visitParenExpr(const ParenExpr *PE) {
+  const Expr *E = PE->getExpr();
+  E->visit(this);
+  ASSERT_TYPE_MAP(E);
+  ExprTypes[PE] = getType(E);
 }
 
-bool Sema::isNamedType(const TensorType *type) const {
-  return NamedTypes.count(type);
+bool Sema::isNamedType(const TensorType *Type) const {
+  return NamedTypes.count(Type);
 }
 
-const Symbol *Sema::getTypeSymbol(const TensorType *type) const {
-  if (!isNamedType(type))
+const Symbol *Sema::getTypeSymbol(const TensorType *Type) const {
+  if (!isNamedType(Type)) {
     return nullptr;
+  }
 
-  return NamedTypes.at(type);
+  return NamedTypes.at(Type);
 }
 
-void Sema::visitElemDirect(const ElemDirect *ed) {
-  if (elemInfo.present) {
+void Sema::visitElementDirective(const ElementDirective *ED) {
+  if (ElementInfo.Present) {
+    // We should NOT get here!
     // If we get here, this means it is an 'internal error', NOT a 'semantic
-    // error'. Since the grammar allows only a single 'ElemDirect', if there are
-    // more than one 'ElemDirect', the parser should have exited due to a syntax
-    // error, and we should not get to the semantic analysis.
-    assert(0 && "internal error: only a single element directive is allowed");
+    // error'. Since the grammar allows only a single 'ElementDirective', if
+    // there are more than one 'ElementDirective', the parser should have exited
+    // due to a syntax error, and we should not get to the semantic analysis.
+    ph_unreachable(INTERNAL_ERROR "only one single element directive is allowed");
   }
 
-  elemInfo.present = true;
-  elemInfo.pos = ed->getPOSSpecifier();
-  elemInfo.dim = ed->getInteger()->getValue();
+  ElementInfo.Present = true;
+  ElementInfo.Pos = ED->getPOSSpecifier();
+  ElementInfo.Dim = ED->getInteger()->getValue();
 
-  const BrackExpr *be = dynamic_cast<const BrackExpr *>(ed->getIdentifiers());
-  if (!be)
-    assert(0 && "semantic error: expected list of expressions in brackets");
+  const BrackExpr *BE = dynamic_cast<const BrackExpr *>(ED->getIdentifiers());
+  if (!BE) {
+    // Here 'BE' is expected to be a list of expressions in brackets.
+    ph_unreachable(SEMANTIC_ERROR "expected list of expressions in brackets");
+  }
 
-  const ExprList &elist = *be->getExprs();
-  for (unsigned i = 0; i < elist.size(); i++) {
-    const Identifier *id = dynamic_cast<const Identifier *>(elist[i]);
-    if (!id)
-      assert(0 && "semantic error: expected identifier in element directive");
+  const ExprList &List = *BE->getExprs();
+  for (unsigned i = 0; i < List.size(); i++) {
+    const Identifier *Id = dynamic_cast<const Identifier *>(List[i]);
+    if (!Id) {
+      ph_unreachable(SEMANTIC_ERROR "expected identifier in element directive");
+    }
 
-    const Symbol *s = getSymbol(id->getName());
-    if (!s)
-      assert(0 && "semantic error: undefined symbol");
-    if (s->getKind() != Symbol::SYM_KIND_Variable)
-      assert(0 && "semantic error: expected variable name");
+    const Symbol *Sym = getSymbol(Id->getName());
+    if (!Sym) {
+      ph_unreachable(SEMANTIC_ERROR "undefined symbol");
+    }
+    if (Sym->getSymbolKind() != Symbol::SYM_KIND_Variable) {
+      ph_unreachable(SEMANTIC_ERROR "expected variable name");
+    }
 
-    elemInfo.syms.insert(s);
+    ElementInfo.Syms.insert(Sym);
   }
 }
+
+#undef ASSERT_TYPE_MAP

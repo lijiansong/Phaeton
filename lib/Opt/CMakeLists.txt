@@ -1,8 +1,6 @@
 add_library(Opt STATIC
-            ExprTree.cpp
-            ExprTreeTransformer.cpp
-            ExprTreeVisitor.cpp
+            TensorExprTree.cpp
             ENBuilder.cpp
             IdentifierCopier.cpp
-            StackExprRemover.cpp
+            StackRemover.cpp
             ExprTreeLoopLifter.cpp)

@@ -30,127 +30,126 @@ public:
   // A program has input and output specifier, both of which
   // are generated as function arguments.
   struct Assignment {
-    ExprNode *lhs;
-    ExprNode *rhs;
+    ExprNode *LHS;
+    ExprNode *RHS;
   };
-  struct FunctionArgument {
-    int position;
-    std::string name;
+  struct FuncArg {
+    int Position;
+    std::string Name;
   };
   using DeclaredIdListTy = std::list<ExprNode *>;
   using AssignmentsListTy = std::list<Assignment>;
-  using FunctionArgumentsListTy = std::vector<FunctionArgument>;
+  using FuncArgsListTy = std::vector<FuncArg>;
 
 public:
-  CodeGen(const Sema *sema, const std::string &functionName);
+  // FIXME: remove CG function name latter.
+  CodeGen(const Sema *S, const std::string &FuncName);
   virtual ~CodeGen();
 
   // Helper methods for accessing and manipulating this object's state.
   const Sema *getSema() const { return TheSema; }
   std::string getTemp();
-  const std::string &getCode() const { return Code; }
-  void append(const std::string &code) { Code += code; }
-  const std::string &getFunctionName() const { return FunctionName; }
+  const std::string &getTgtLangCode() const { return TgtLangCode; }
+  void appendCode(const std::string &Code) { TgtLangCode += Code; }
+  const std::string &getCGFuncName() const { return CGFuncName; }
 
   // Helper methods for accessing and manipulating state
   // that is built up during CodeGen.
   ExprNodeBuilder *getENBuilder() { return ENBuilder; }
 
-  virtual void addDeclaredId(const Decl *d);
-  virtual void addAssignment(const Stmt *s);
-  virtual void addFunctionArgument(const std::string &name);
+  virtual void addDeclaredId(const Decl *D);
+  virtual void addAssignment(const Stmt *S);
+  virtual void addFuncArg(const std::string &Name);
 
   DeclaredIdListTy &getDeclaredIds() { return DeclaredIds; }
   AssignmentsListTy &getAssignments() { return Assignments; }
-  FunctionArgumentsListTy &getFunctionArguments() { return FunctionArguments; }
+  FuncArgsListTy &getFuncArgs() { return FuncArgs; }
 
   const DeclaredIdListTy &getDeclaredIds() const { return DeclaredIds; }
   const AssignmentsListTy &getAssignments() const { return Assignments; }
-  const FunctionArgumentsListTy &getFunctionArguments() const {
-    return FunctionArguments;
-  };
+  const FuncArgsListTy &getFuncArgs() const { return FuncArgs; };
 
-  unsigned getNumFunctionArguments() const { return FunctionArguments.size(); };
-  const FunctionArgument &getFunctionArgument(unsigned i) const;
+  unsigned getNumFuncArgs() const { return FuncArgs.size(); };
+  const FuncArg &getFuncArg(unsigned I) const;
 
   // Decl and Stmt visitor for CodeGen.
-  virtual void visitDecl(const Decl *decl) override;
-  virtual void visitStmt(const Stmt *stmt) override;
+  virtual void visitDecl(const Decl *D) override;
+  virtual void visitStmt(const Stmt *S) override;
 
   // Helper methods for CodeGen.
   using List = std::vector<int>;
   using Tuple = std::vector<int>;
   using TupleList = std::vector<Tuple>;
-  enum Comparison {
+  enum ComparisonKind {
     CMP_Less,
     CMP_LessEqual,
     CMP_Equal,
     CMP_GreaterEqual,
     CMP_Greater,
 
-    CMP_COMPARISON_COUNT
+    CMP_ComparisonKind_COUNT
   };
-  static bool allCompare(const List &list, Comparison cmp, int pivot);
-  static bool isPairList(const TupleList &list);
-  static bool partitionPairList(int pivot, const TupleList &list,
-                                TupleList &left, TupleList &right,
-                                TupleList &mixed);
-  static void shiftList(int shiftAmount, List &list);
-  static void shiftTupleList(int shiftAmount, TupleList &tuple);
-  static void flattenTupleList(const TupleList &list, std::list<int> &result);
-  static void unpackPairList(const TupleList &list, List &left, List &right);
-  static void adjustForContractions(List &indices,
-                                    const TupleList &contractions);
-  static const std::string getListString(const List &list);
-  static const std::string getTupleListString(const TupleList &list);
-  static const BinaryExpr *extractTensorExprOrNull(const Expr *e);
+  static bool allCompare(const List &L, ComparisonKind Cmp, int Pivot);
+  static bool isPairList(const TupleList &TList);
+  static bool partitionPairList(int Pivot, const TupleList &TList,
+                                TupleList &Left, TupleList &Right,
+                                TupleList &Mixed);
+  static void shiftList(int ShiftAmount, List &L);
+  static void shiftTupleList(int ShiftAmount, TupleList &TList);
+  static void flattenTupleList(const TupleList &TList, std::list<int> &Result);
+  static void unpackPairList(const TupleList &TList, List &Left, List &Right);
+  static void adjustForContractions(List &Indices,
+                                    const TupleList &Contractions);
+  static const std::string getListString(const List &L);
+  static const std::string getTupleListString(const TupleList &TList);
+  static const BinaryExpr *extractTensorExprOrNull(const Expr *E);
   using DimsTy = std::vector<int>;
   using TempVecTy = std::vector<std::string>;
 
-  std::string getTempWithDims(const DimsTy &dims) {
-    TempVecTy &temps = FreeTemps[dims];
+  std::string getTempWithDims(const DimsTy &Dims) {
+    TempVecTy &Temps = FreeTemps[Dims];
 
-    if (temps.size() == 0) {
+    if (Temps.size() == 0) {
       return getTemp();
     } else {
-      auto result = temps.back();
-      temps.pop_back();
-      return result;
+      auto Result = Temps.back();
+      Temps.pop_back();
+      return Result;
     }
   }
 
-  void freeTempWithDims(const std::string &name, const DimsTy &dims) {
-    TempVecTy &temps = FreeTemps[dims];
-    temps.push_back(name);
+  void freeTempWithDims(const std::string &Name, const DimsTy &Dims) {
+    TempVecTy &Temps = FreeTemps[Dims];
+    Temps.push_back(Name);
   }
 
 protected:
   // States that are built up during code generation.
 
-  // ENBuilder is used for creating new 'ExprNode' objects, so we
-  // need to record some information.
+  // ENBuilder is used for creating new 'ExprNode' objects, hence we
+  // need to keep track of these information.
   ExprNodeBuilder *ENBuilder;
 
   // Some components of the result target language program.
   DeclaredIdListTy DeclaredIds;
   AssignmentsListTy Assignments;
-  FunctionArgumentsListTy FunctionArguments;
+  FuncArgsListTy FuncArgs;
 
-  // Note: map for Expr in AST, each 'Expr' in the AST be mapped to an
+  // Note: map for Expr in AST, each 'Expr' in the AST is mapped to an
   // 'ExprNode'.
   std::map<const Expr *, ExprNode *> ExprTrees;
-  void EXPR_TREE_MAP_ASSERT(const Expr *expr) const;
+  void assertExprTreeMap(const Expr *E) const;
 
-  void addExprNode(const Expr *expr, ExprNode *en) { ExprTrees[expr] = en; }
-  ExprNode *getExprNode(const Expr *expr) const { return ExprTrees.at(expr); }
+  void addExprNode(const Expr *E, ExprNode *ENode) { ExprTrees[E] = ENode; }
+  ExprNode *getExprNode(const Expr *E) const { return ExprTrees.at(E); }
 
 private:
   std::map<DimsTy, TempVecTy> FreeTemps;
   // Member variables that tracks the state of this object.
   const Sema *TheSema;
   int TempCounter;
-  std::string Code;
-  const std::string FunctionName;
+  std::string TgtLangCode;
+  const std::string CGFuncName;
 };
 
 } // end namespace phaeton

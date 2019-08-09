@@ -19,38 +19,38 @@ namespace phaeton {
 
 class DeclList;
 class StmtList;
-class ElemDirect;
+class ElementDirective;
 
 class Program : public ASTNode {
 public:
-  Program(const DeclList *decls, const StmtList *stmts,
-          const ElemDirect *elem = nullptr)
-      : ASTNode(NODETYPE_Program), Decls(decls), Stmts(stmts), Elem(elem) {}
+  Program(const DeclList *Decls, const StmtList *Stmts,
+          const ElementDirective *ED = nullptr)
+      : ASTNode(AST_NODE_KIND_Program), Decls(Decls), Stmts(Stmts), Elem(ED) {}
 
   const DeclList *getDecls() const { return Decls; }
   const StmtList *getStmts() const { return Stmts; }
-  const ElemDirect *getElem() const { return Elem; }
+  const ElementDirective *getElem() const { return Elem; }
 
-  virtual void dump(unsigned indent = 0) const final;
+  virtual void dump(unsigned Indent = 0) const final;
 
   virtual void _delete() const final;
 
-  static const Program *create(const DeclList *decls, const StmtList *stmts,
-                               const ElemDirect *elem = nullptr) {
-    return new Program(decls, stmts, elem);
+  static const Program *create(const DeclList *Decls, const StmtList *Stmts,
+                               const ElementDirective *ED = nullptr) {
+    return new Program(Decls, Stmts, ED);
   }
 
-  static void destroy(const Program *p) {
-    p->_delete();
-    delete p;
+  static void destroy(const Program *Prog) {
+    Prog->_delete();
+    delete Prog;
   }
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 
 private:
   const DeclList *Decls;
   const StmtList *Stmts;
-  const ElemDirect *Elem;
+  const ElementDirective *Elem;
 };
 
 } // end namespace phaeton

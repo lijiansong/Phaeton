@@ -14,18 +14,18 @@
 
 using namespace phaeton;
 
-void Program::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
+void Program::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
 
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
 
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str() << "\n";
-  Decls->dump(indent + str.length() + 1);
-  Elem->dump(indent + str.length() + 1);
-  Stmts->dump(indent + str.length() + 1);
-  FORMAT_AST_INDENT(indent + 1)
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str() << "\n";
+  Decls->dump(Indent + Str.length() + 1);
+  Elem->dump(Indent + Str.length() + 1);
+  Stmts->dump(Indent + Str.length() + 1);
+  FORMAT_AST_INDENT(Indent + 1)
   std::cout << ")\n";
 }
 
@@ -42,4 +42,4 @@ void Program::_delete() const {
   }
 }
 
-void Program::visit(ASTVisitor *v) const { v->visitProgram(this); }
+void Program::visit(ASTVisitor *Visitor) const { Visitor->visitProgram(this); }

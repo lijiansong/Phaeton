@@ -11,13 +11,13 @@
 #ifndef PHAETON_TARGET_CUDA_CG_H
 #define PHAETON_TARGET_CUDA_CG_H
 
-#include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
+#include "ph/CodeGen/NaiveCG.h"
 
 namespace phaeton {
 
 /// CudaCG - This class is the entrance for NVIDIA Cuda code generation.
-class CudaCG : public DirectCodeGen {};
+class CudaCG : public NaiveCodeGen {};
 
 } // end namespace phaeton
 

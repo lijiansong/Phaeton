@@ -10,8 +10,9 @@
 
 #include "ph/CodeGen/CodeGen.h"
 #include "ph/Opt/ENBuilder.h"
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
 #include "ph/Sema/Type.h"
+#include "ph/Support/ErrorHandling.h"
 
 #include <cassert>
 #include <functional>
@@ -20,8 +21,8 @@
 
 using namespace phaeton;
 
-CodeGen::CodeGen(const Sema *sema, const std::string &functionName)
-    : TheSema(sema), TempCounter(0), Code(""), FunctionName(functionName) {
+CodeGen::CodeGen(const Sema *S, const std::string &FuncName)
+    : TheSema(S), TempCounter(0), TgtLangCode(""), CGFuncName(FuncName) {
   ENBuilder = new ExprNodeBuilder;
 }
 
@@ -31,198 +32,208 @@ std::string CodeGen::getTemp() {
   return "t" + std::to_string((long long)TempCounter++);
 }
 
-void CodeGen::addFunctionArgument(const std::string &name) {
-  const int position = FunctionArguments.size();
-  FunctionArguments.push_back({position, name});
+void CodeGen::addFuncArg(const std::string &Name) {
+  const int Position = FuncArgs.size();
+  FuncArgs.push_back({Position, Name});
 }
 
-void CodeGen::EXPR_TREE_MAP_ASSERT(const Expr *expr) const {
-  if (ExprTrees.find((expr)) == ExprTrees.end())
-    assert(0 && "internal error: no expression tree for 'Expr' node");
+void CodeGen::assertExprTreeMap(const Expr *E) const {
+  if (ExprTrees.find((E)) == ExprTrees.end())
+    ph_unreachable(INTERNAL_ERROR "no expression tree for 'Expr' node");
 }
 
-void CodeGen::visitDecl(const Decl *d) {
-  if (d->getNodeType() == ASTNode::NODETYPE_TypeDecl)
+void CodeGen::visitDecl(const Decl *Decl) {
+  if (Decl->getASTNodeKind() == ASTNode::AST_NODE_KIND_TypeDecl) {
     return;
+  }
 
-  addDeclaredId(d);
+  addDeclaredId(Decl);
 }
 
-void CodeGen::visitStmt(const Stmt *s) { addAssignment(s); }
+void CodeGen::visitStmt(const Stmt *Stmt) { addAssignment(Stmt); }
 
-void CodeGen::addDeclaredId(const Decl *d) {
-  const Sema *sema = getSema();
-  const std::string &name = d->getIdentifier()->getName();
-  const TensorType &type = sema->getSymbol(name)->getType();
-  ExprNode *id = ENBuilder->createIdentifierExpr(name, type.getDims());
+void CodeGen::addDeclaredId(const Decl *Decl) {
+  const Sema *S = getSema();
+  const std::string &Name = Decl->getIdentifier()->getName();
+  const TensorType &Type = S->getSymbol(Name)->getType();
+  ExprNode *Id = ENBuilder->createIdentifierExpr(Name, Type.getDims());
 
-  DeclaredIds.push_back(id);
+  DeclaredIds.push_back(Id);
 }
 
-void CodeGen::addAssignment(const Stmt *s) {
-  const Sema *sema = getSema();
-  const std::string &name = s->getIdentifier()->getName();
-  const TensorType &type = sema->getSymbol(name)->getType();
-  ExprNode *lhs = ENBuilder->createIdentifierExpr(name, type.getDims());
+void CodeGen::addAssignment(const Stmt *Stmt) {
+  const Sema *Sema = getSema();
+  const std::string &Name = Stmt->getIdentifier()->getName();
+  const TensorType &T = Sema->getSymbol(Name)->getType();
+  ExprNode *LHS = ENBuilder->createIdentifierExpr(Name, T.getDims());
 
-  const Expr *e = s->getExpr();
-  EXPR_TREE_MAP_ASSERT(e);
-  ExprNode *rhs = ExprTrees[e];
+  const Expr *E = Stmt->getExpr();
+  assertExprTreeMap(E);
+  ExprNode *RHS = ExprTrees[E];
 
-  Assignments.push_back({lhs, rhs});
+  Assignments.push_back({LHS, RHS});
 }
 
-const CodeGen::FunctionArgument &
-CodeGen::getFunctionArgument(unsigned i) const {
-  assert(i < getNumFunctionArguments() &&
-         "internal error: index out of bounds for function arguments");
-  return FunctionArguments.at(i);
+const CodeGen::FuncArg &CodeGen::getFuncArg(unsigned Index) const {
+  assert(Index < getNumFuncArgs() &&
+         INTERNAL_ERROR "index out of bounds for auto-gen function args");
+  return FuncArgs.at(Index);
 };
 
-bool CodeGen::allCompare(const List &list, Comparison cmp, int pivot) {
-  std::function<bool(int)> compare = [cmp, pivot](int i) -> bool {
-    switch (cmp) {
+bool CodeGen::allCompare(const List &L, ComparisonKind CmpKey, int Pivot) {
+  std::function<bool(int)> cmpFunc = [CmpKey, Pivot](int I) -> bool {
+    switch (CmpKey) {
     case CMP_Less:
-      return i < pivot;
+      return I < Pivot;
     case CMP_LessEqual:
-      return i <= pivot;
+      return I <= Pivot;
     case CMP_Equal:
-      return i == pivot;
+      return I == Pivot;
     case CMP_GreaterEqual:
-      return i >= pivot;
+      return I >= Pivot;
     case CMP_Greater:
-      return i > pivot;
+      return I > Pivot;
     default:
-      assert(0 && "internal error: invalid comparison");
+      ph_unreachable(INTERNAL_ERROR "invalid comparison");
     }
   };
 
-  for (const auto &i : list) {
-    if (!compare(i))
+  for (const auto &I : L) {
+    if (!cmpFunc(I)) {
       return false;
+    }
   }
   return true;
 }
 
-bool CodeGen::isPairList(const TupleList &list) {
-  for (const auto &l : list) {
-    if (l.size() != 2)
+bool CodeGen::isPairList(const TupleList &TList) {
+  for (const auto &L : TList) {
+    if (L.size() != 2) {
       return false;
+    }
   }
   return true;
 }
 
-bool CodeGen::partitionPairList(int pivot, const TupleList &list,
-                                TupleList &left, TupleList &right,
-                                TupleList &mixed) {
-  if (!isPairList(list))
+bool CodeGen::partitionPairList(int Pivot, const TupleList &TList,
+                                TupleList &Left, TupleList &Right,
+                                TupleList &Mixed) {
+  if (!isPairList(TList)) {
     return false;
+  }
 
-  left.clear();
-  right.clear();
-  mixed.clear();
+  Left.clear();
+  Right.clear();
+  Mixed.clear();
 
-  for (const auto &l : list) {
-    if (allCompare(l, CMP_Less, pivot)) {
-      left.push_back(l);
-    } else if (allCompare(l, CMP_GreaterEqual, pivot)) {
-      right.push_back(l);
+  for (const auto &L : TList) {
+    if (allCompare(L, CMP_Less, Pivot)) {
+      Left.push_back(L);
+    } else if (allCompare(L, CMP_GreaterEqual, Pivot)) {
+      Right.push_back(L);
     } else {
-      mixed.push_back(l);
+      Mixed.push_back(L);
+    }
+  }
+  return true;
+}
+
+void CodeGen::shiftList(int ShiftAmount, List &L) {
+  for (int I = 0; I < L.size(); ++I) {
+    L[I] += ShiftAmount;
+  }
+}
+
+void CodeGen::shiftTupleList(int ShiftAmount, TupleList &TList) {
+  // for each tuple 'L' in 'TList'
+  for (auto &L : TList)
+    shiftList(ShiftAmount, L);
+}
+
+void CodeGen::flattenTupleList(const TupleList &TList, std::list<int> &Res) {
+  Res.clear();
+  for (const auto &T : TList) {
+    for (int Elem : T)
+      Res.push_back(Elem);
+  }
+  // Note that here we sort the result.
+  Res.sort();
+}
+
+void CodeGen::unpackPairList(const TupleList &TList, List &Left, List &Right) {
+  assert(isPairList(TList));
+
+  Left.clear();
+  Right.clear();
+  for (const auto &T : TList) {
+    int L = (T[0] < T[1]) ? T[0] : T[1];
+    int R = (T[0] < T[1]) ? T[1] : T[0];
+    Left.push_back(L);
+    Right.push_back(R);
+  }
+}
+
+void CodeGen::adjustForContractions(List &Index,
+                                    const TupleList &Contractions) {
+  assert(isPairList(Contractions));
+
+  // FIXME: The following nested loop has a runtime(time complexity) that is
+  // roughly quadratic in the size of 'Contractions', here we assume that
+  // 'Index.size()' ~ 'Contractions.size()'.
+  for (int I = 0; I < Index.size(); ++I) {
+    int CurIndex = Index[I];
+    // determine the number of contracted indices
+    // that are smaller than 'CurIndex'
+    int Adj = 0;
+    for (const Tuple &T : Contractions) {
+      Adj += (T[0] < CurIndex) + (T[1] < CurIndex);
+    }
+
+    Index[I] -= Adj;
+  }
+}
+
+const std::string CodeGen::getListString(const List &L) {
+  std::string Res = "[";
+  for (int I = 0; I < L.size(); ++I) {
+    Res += std::to_string((long long)L[I]);
+    if (I != (L.size() - 1)) {
+      Res += ", ";
+    }
+  }
+  Res += "]";
+  return Res;
+}
+
+const std::string CodeGen::getTupleListString(const TupleList &TList) {
+  std::string Res = "[";
+  for (int L = 0; L < TList.size(); ++L) {
+    Res += getListString(TList[L]);
+    if (L != (TList.size() - 1)) {
+      Res += ", ";
+    }
+  }
+  Res += "]";
+  return Res;
+}
+
+const BinaryExpr *CodeGen::extractTensorExprOrNull(const Expr *E) {
+  const BinaryExpr *TensorExpr = dynamic_cast<const BinaryExpr *>(E);
+  if (!TensorExpr) {
+    const ParenExpr *PE = dynamic_cast<const ParenExpr *>(E);
+    if (PE) {
+      return extractTensorExprOrNull(PE->getExpr());
+    } else {
+      return nullptr;
     }
   }
 
-  return true;
-}
+  // Note that if we get here, 'TensorExpr' should NOT be 'nullptr'.
+  assert(TensorExpr);
 
-void CodeGen::shiftList(int shiftAmount, List &list) {
-  for (int i = 0; i < list.size(); i++)
-    list[i] += shiftAmount;
-}
-
-void CodeGen::shiftTupleList(int shiftAmount, TupleList &tuples) {
-  for (auto &t : tuples)
-    shiftList(shiftAmount, t);
-}
-
-void CodeGen::flattenTupleList(const TupleList &list, std::list<int> &result) {
-  result.clear();
-  for (const auto &tuple : list) {
-    for (int elem : tuple)
-      result.push_back(elem);
-  }
-  result.sort();
-}
-
-void CodeGen::unpackPairList(const TupleList &list, List &left, List &right) {
-  assert(isPairList(list));
-
-  left.clear();
-  right.clear();
-  for (const auto &tuple : list) {
-    int l = (tuple[0] < tuple[1]) ? tuple[0] : tuple[1];
-    int r = (tuple[0] < tuple[1]) ? tuple[1] : tuple[0];
-
-    left.push_back(l);
-    right.push_back(r);
-  }
-}
-
-void CodeGen::adjustForContractions(List &indices,
-                                    const TupleList &contractions) {
-  assert(isPairList(contractions));
-
-  // FIXME: The following nested loop has a runtime that is roughly quadratic
-  // in the size of 'contractions', here we assume that 'indices.size()' ~
-  // 'contractions.size()'.
-  for (int i = 0; i < indices.size(); i++) {
-    int index = indices[i];
-    // determine the number of contracted indices
-    // that are smaller than 'index'
-    int adj = 0;
-    for (const Tuple &t : contractions)
-      adj += (t[0] < index) + (t[1] < index);
-
-    indices[i] -= adj;
-  }
-}
-
-const std::string CodeGen::getListString(const List &list) {
-  std::string result = "[";
-  for (int l = 0; l < list.size(); l++) {
-    result += std::to_string((long long)list[l]);
-    if (l != (list.size() - 1))
-      result += ", ";
-  }
-  result += "]";
-  return result;
-}
-
-const std::string CodeGen::getTupleListString(const TupleList &list) {
-  std::string result = "[";
-  for (int l = 0; l < list.size(); l++) {
-    result += getListString(list[l]);
-    if (l != (list.size() - 1))
-      result += ", ";
-  }
-  result += "]";
-  return result;
-}
-
-const BinaryExpr *CodeGen::extractTensorExprOrNull(const Expr *e) {
-  const BinaryExpr *tensor = dynamic_cast<const BinaryExpr *>(e);
-  if (!tensor) {
-    const ParenExpr *paren = dynamic_cast<const ParenExpr *>(e);
-    if (paren)
-      return extractTensorExprOrNull(paren->getExpr());
-    else
-      return nullptr;
-  }
-  // if we get here, tensor should NOT be 'nullptr'.
-  assert(tensor);
-
-  if (tensor->getNodeType() != ASTNode::NODETYPE_ProductExpr)
+  if (TensorExpr->getASTNodeKind() != ASTNode::AST_NODE_KIND_ProductExpr) {
     return nullptr;
+  }
 
-  return tensor;
+  return TensorExpr;
 }

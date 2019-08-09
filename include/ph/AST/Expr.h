@@ -19,34 +19,34 @@ namespace phaeton {
 
 class Expr : public ASTNode {
 protected:
-  Expr(NodeType nt) : ASTNode(nt) {}
+  Expr(ASTNodeKind NK) : ASTNode(NK) {}
 
 public:
   virtual ~Expr() {}
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 
   virtual bool isIdentifier() const { return false; }
 };
 
 class Factor : public Expr {
 protected:
-  Factor(NodeType nt) : Expr(nt) {}
+  Factor(ASTNodeKind NK) : Expr(NK) {}
 
 public:
   virtual ~Factor() {}
 
-  virtual void visit(ASTVisitor *v) const override = 0;
+  virtual void visit(ASTVisitor *Visitor) const override = 0;
 };
 
 class BinaryExpr : public Expr {
 public:
-  BinaryExpr(NodeType nt, const Expr *left, const Expr *right)
-      : Expr(nt), LeftExpr(left), RightExpr(right) {
-    assert(nt == NODETYPE_TranspositionExpr || nt == NODETYPE_ContractionExpr ||
-           nt == NODETYPE_AddExpr || nt == NODETYPE_SubExpr ||
-           nt == NODETYPE_MulExpr || nt == NODETYPE_DivExpr ||
-           nt == NODETYPE_ProductExpr);
+  BinaryExpr(ASTNodeKind NK, const Expr *Left, const Expr *Right)
+      : Expr(NK), LeftExpr(Left), RightExpr(Right) {
+    assert(NK == AST_NODE_KIND_TranspositionExpr ||
+           NK == AST_NODE_KIND_ContractionExpr || NK == AST_NODE_KIND_AddExpr ||
+           NK == AST_NODE_KIND_SubExpr || NK == AST_NODE_KIND_MulExpr ||
+           NK == AST_NODE_KIND_DivExpr || NK == AST_NODE_KIND_ProductExpr);
   }
 
   const Expr *getLeft() const { return LeftExpr; }
@@ -54,13 +54,14 @@ public:
 
   virtual void _delete() const final;
 
-  virtual void dump(unsigned indent = 0) const final;
+  virtual void dump(unsigned Indent = 0) const final;
 
-  static BinaryExpr *create(NodeType nt, const Expr *left, const Expr *right) {
-    return new BinaryExpr(nt, left, right);
+  static BinaryExpr *create(ASTNodeKind NK, const Expr *Left,
+                            const Expr *Right) {
+    return new BinaryExpr(NK, Left, Right);
   }
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 
 private:
   const Expr *LeftExpr;
@@ -69,20 +70,20 @@ private:
 
 class Identifier : public Factor {
 public:
-  Identifier(const std::string name)
-      : Factor(NODETYPE_Identifier), Name(name) {}
+  Identifier(const std::string Name)
+      : Factor(AST_NODE_KIND_Identifier), Name(Name) {}
 
   const std::string &getName() const { return Name; }
 
   virtual void _delete() const final {}
 
-  virtual void dump(unsigned indent = 0) const final;
+  virtual void dump(unsigned Indent = 0) const final;
 
-  static const Identifier *create(const std::string &name) {
-    return new Identifier(name);
+  static const Identifier *create(const std::string &Name) {
+    return new Identifier(Name);
   }
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 
   virtual bool isIdentifier() const override { return true; }
 
@@ -92,7 +93,7 @@ private:
 
 class Integer : public Factor {
 public:
-  Integer(int value) : Factor(NODETYPE_Integer), Value(value) {}
+  Integer(int value) : Factor(AST_NODE_KIND_Integer), Value(value) {}
 
   int getValue() const { return Value; }
 
@@ -110,7 +111,8 @@ private:
 
 class BrackExpr : public Factor {
 public:
-  BrackExpr(const ExprList *exprs) : Factor(NODETYPE_BrackExpr), Exprs(exprs) {}
+  BrackExpr(const ExprList *exprs)
+      : Factor(AST_NODE_KIND_BrackExpr), Exprs(exprs) {}
 
   const ExprList *getExprs() const { return Exprs; }
 
@@ -130,7 +132,8 @@ private:
 
 class ParenExpr : public Factor {
 public:
-  ParenExpr(const Expr *expr) : Factor(NODETYPE_ParenExpr), NestedExpr(expr) {}
+  ParenExpr(const Expr *expr)
+      : Factor(AST_NODE_KIND_ParenExpr), NestedExpr(expr) {}
 
   const Expr *getExpr() const { return NestedExpr; }
 

@@ -12,44 +12,44 @@
 
 using namespace phaeton;
 
+void IdentifierCopier::transformChildren(ExprNode *Node) {
+  ExprNode *SavedParent = Parent;
+  unsigned SavedChildIndex = ChildIndex;
+
+  Parent = Node;
+  for (int I = 0; I < Node->getNumChildren(); ++I) {
+    ChildIndex = I;
+    Node->getChild(I)->transform(this);
+  }
+
+  ChildIndex = SavedChildIndex;
+  Parent = SavedParent;
+}
+
 void IdentifierCopier::transformAssignments() {
-  for (curPos = Assignments.begin(); curPos != Assignments.end(); curPos++) {
-    curLhs = static_cast<const IdentifierExpr *>(curPos->lhs);
-
-    // The index structures on the 'lhs' and 'rhs' are definitely
-    // incompatible if indices on the 'lhs' are permuted
-    if (curLhs->permute())
+  for (CurrentPos = Assignments.begin(); CurrentPos != Assignments.end();
+       ++CurrentPos) {
+    CurrentLHS = static_cast<const IdentifierExpr *>(CurrentPos->LHS);
+    // Note that index structures on 'LHS' and 'RHS' are definitely
+    // incompatible if indices on the 'LHS' are permuted, so we need to make
+    // some transformation.
+    if (CurrentLHS->getPermute()) {
       Incompatible = true;
-    else
+    } else {
       Incompatible = false;
-
+    }
     Parent = nullptr;
     ChildIndex = -1;
-
-    replacementName = "";
-    curPos->rhs->transform(this);
+    ReplaceName = "";
+    CurrentPos->RHS->transform(this);
   }
 }
 
-void IdentifierCopier::transformChildren(ExprNode *en) {
-  ExprNode *savedParent = Parent;
-  unsigned savedChildIndex = ChildIndex;
-
-  Parent = en;
-  for (int i = 0; i < en->getNumChildren(); i++) {
-    ChildIndex = i;
-    en->getChild(i)->transform(this);
-  }
-
-  ChildIndex = savedChildIndex;
-  Parent = savedParent;
-}
-
-/// These methods handle operations that leave the index structure intact, such
-/// as elementwise and scalar operations.
-#define GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(Kind)                          \
-  void IdentifierCopier::transform##Kind##Expr(Kind##Expr *en) {               \
-    transformChildren(en);                                                     \
+/// These methods handle operations that leave index structures intact,
+/// including element-wise and those scalar operations.
+#define GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(ExprName)                      \
+  void IdentifierCopier::transform##ExprName##Expr(ExprName##Expr *E) {        \
+    transformChildren(E);                                                      \
   }
 
 GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(Add)
@@ -61,12 +61,13 @@ GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(ScalarDiv)
 
 #undef GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL
 
-// These methods handle operations that change the index structure.
-#define GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(Kind)                        \
-  void IdentifierCopier::transform##Kind##Expr(Kind##Expr *en) {               \
+/// These methods handle operations that change index structure, including
+/// contraction, product, stack and transposition operation.
+#define GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(ExprName)                    \
+  void IdentifierCopier::transform##ExprName##Expr(ExprName##Expr *E) {        \
     bool savedIncompatible = Incompatible;                                     \
     Incompatible = true;                                                       \
-    transformChildren(en);                                                     \
+    transformChildren(E);                                                      \
     Incompatible = savedIncompatible;                                          \
   }
 GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(Contraction)
@@ -76,37 +77,42 @@ GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(Transposition)
 
 #undef GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL
 
-void IdentifierCopier::transformIdentifierExpr(IdentifierExpr *en) {
-  // the current identifier is different from 'lhs'
-  if (en->getName() != curLhs->getName())
+void IdentifierCopier::transformIdentifierExpr(IdentifierExpr *Node) {
+  // Note that current identifier should be different from 'LHS'.
+  if (Node->getName() != CurrentLHS->getName()) {
     return;
+  }
 
-  // identifiers with the same name must have the same type
-  assert(en->getDims() == curLhs->getDims());
+  // Note that identifiers with the same name must have the same type, here we
+  // only check the dimension.
+  assert(Node->getDims() == CurrentLHS->getDims());
 
-  // index structures of 'lhs' and the current identifier are compatible
-  if (!Incompatible)
+  // If index structures of 'LHS' and the current identifier are compatible
+  if (!Incompatible) {
     return;
+  }
 
-  // if we get here, the current identifier must be replaced
+  // If we get here, that means current identifier must be replaced.
+  // If there isn't a replacement for the identifier yet, we need to create a
+  // name for it.
+  const std::string Tmp = (ReplaceName != "") ? ReplaceName : getTemp();
 
-  // if there isn't a replacement identifier yet, create a name for it
-  const std::string temp =
-      (replacementName != "") ? replacementName : getTemp();
+  ExprNode *NewIdNode =
+      getENBuilder()->createIdentifierExpr(Tmp, Node->getDims());
+  Parent->setChild(ChildIndex, NewIdNode);
 
-  ExprNode *newIdNode =
-      getENBuilder()->createIdentifierExpr(temp, en->getDims());
-  Parent->setChild(ChildIndex, newIdNode);
-
-  // if there wasn't a replacement identifier, assign the 'lhs' to it
-  if (replacementName == "") {
-    replacementName = temp;
-    ExprNode *copyLhsId = getENBuilder()->createIdentifierExpr(
-        curLhs->getName(), curLhs->getDims());
-    ExprNode *newRhsId =
-        getENBuilder()->createIdentifierExpr(replacementName, en->getDims());
-    // the replacement identifier for the 'rhs' must be assigned the
-    // value of the 'lhs' BEFORE the current assignment
-    Assignments.insert(curPos, {newRhsId, copyLhsId});
+  // Note that if there wasn't a replacement identifier, we can simply assign
+  // 'LHS' to it.
+  if (ReplaceName == "") {
+    ReplaceName = Tmp;
+    ExprNode *CopyLHSId = getENBuilder()->createIdentifierExpr(
+        CurrentLHS->getName(), CurrentLHS->getDims());
+    ExprNode *NewRHSId =
+        getENBuilder()->createIdentifierExpr(ReplaceName, Node->getDims());
+    // Note: Replacement identifier for 'RHS' must be assigned the
+    // value of 'LHS' before current assignment.
+    // TODO: To make the insertion clear, we need to add a wrapper for
+    // insertBefore and insertAfter.
+    Assignments.insert(CurrentPos, {NewRHSId, CopyLHSId});
   }
 }

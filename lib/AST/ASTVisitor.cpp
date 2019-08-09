@@ -13,37 +13,38 @@
 
 using namespace phaeton;
 
-template <typename T, ASTNode::NodeType nt, typename Derived>
-void ASTVisitor::visitASTNodeList(const ASTNodeList<T, nt, Derived> *list) {
-  for (const auto &i : *list)
-    i->visit(this);
+template <typename T, ASTNode::ASTNodeKind NK, typename Derived>
+void ASTVisitor::visitASTNodeList(const ASTNodeList<T, NK, Derived> *List) {
+  for (const auto &I : *List)
+    I->visit(this);
 }
 
 #define DEF_VISIT_LIST(Derived)                                                \
-  void ASTVisitor::visit##Derived(const Derived *list) {                       \
-    visitASTNodeList(list);                                                    \
+  void ASTVisitor::visit##Derived(const Derived *List) {                       \
+    visitASTNodeList(List);                                                    \
   }
 
 DEF_VISIT_LIST(DeclList)
 DEF_VISIT_LIST(StmtList)
 DEF_VISIT_LIST(ExprList)
 
-void ASTVisitor::visitProgram(const Program *p) {
-  p->getDecls()->visit(this);
+void ASTVisitor::visitProgram(const Program *Prog) {
+  Prog->getDecls()->visit(this);
 
   // Note: the element directive may not be present in a program,
   // so 'ed == nullptr' is possible. we need to process this corner case.
-  const ElemDirect *ed = p->getElem();
-  if (ed)
-    ed->visit(this);
+  const ElementDirective *ED = Prog->getElem();
+  if (ED) {
+    ED->visit(this);
+  }
 
-  p->getStmts()->visit(this);
+  Prog->getStmts()->visit(this);
 }
 
-void ASTVisitor::visitExpr(const Expr *e) { e->visit(this); }
+void ASTVisitor::visitExpr(const Expr *E) { E->visit(this); }
 
-void ASTVisitor::visitFactor(const Factor *f) { f->visit(this); }
+void ASTVisitor::visitFactor(const Factor *F) { F->visit(this); }
 
-void ASTVisitor::visitParenExpr(const ParenExpr *pe) {
-  pe->getExpr()->visit(this);
+void ASTVisitor::visitParenExpr(const ParenExpr *PE) {
+  PE->getExpr()->visit(this);
 }

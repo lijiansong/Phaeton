@@ -13,86 +13,88 @@
 using namespace phaeton;
 
 void ExprTreeLifter::transformAssignments() {
-  for (curPos = Assignments.begin(); curPos != Assignments.end(); curPos++) {
-    ExprNode *rhs = curPos->rhs;
+  for (CurrentPos = Assignments.begin(); CurrentPos != Assignments.end();
+       ++CurrentPos) {
+    ExprNode *RHS = CurrentPos->RHS;
 
-    setRoot(rhs);
+    setRoot(RHS);
     setParent(nullptr);
     setChildIndex(-1);
-    rhs->transform(this);
+    RHS->transform(this);
   }
 }
 
-void ExprTreeLifter::transformNode(ExprNode *en) {
-  if (isNodeToBeLifted(en, getRoot()))
-    liftNode(en);
-  else
-    transformChildren(en);
-}
+void ExprTreeLifter::liftNode(ExprNode *Node) {
+  ExprNode *Root = getRoot();
+  ExprNode *Parent = getParent();
+  unsigned ChildIndex = getChildIndex();
 
-void ExprTreeLifter::liftNode(ExprNode *en) {
-  ExprNode *root = getRoot();
-  ExprNode *parent = getParent();
-  unsigned childIndex = getChildIndex();
-
-  if (parent == nullptr) {
-    // ExprNode 'en' is at the top of the tree,
+  if (Parent == nullptr) {
+    // Note that since ExprNode 'Node' is at the top of the tree,
     // nothing to do here but visit children
-    setParent(en);
-    transformChildren(en);
+    setParent(Node);
+    transformChildren(Node);
     setParent(nullptr);
   } else {
-    const std::string temp = getTempWithDims(en->getDims());
-    ExprNode *newNode =
-        getENBuilder()->createIdentifierExpr(temp, en->getDims());
-    // Replace sub-expression 'en' which is to be lifted with the identifier
-    // 'temp'
-    parent->setChild(childIndex, newNode);
-    // Recursively lift expressions out of the sub-expression ExprNode 'en'.
-    setRoot(en);
+    const std::string Tmp = getTempWithDims(Node->getDims());
+    ExprNode *NewNode =
+        getENBuilder()->createIdentifierExpr(Tmp, Node->getDims());
+    // Replace sub-expression ExprNode 'Node' which is to be lifted with the
+    // identifier 'Tmp'
+    Parent->setChild(ChildIndex, NewNode);
+    // Recursively lift expressions out of the sub-expression ExprNode 'Node'.
+    setRoot(Node);
     setParent(nullptr);
     setChildIndex(-1);
-    transformChildren(en);
+    transformChildren(Node);
 
-    // Add a new assignment that assigns the lifted sub-expression node 'en'
-    // to the new identifier 'temp'.
-    ExprNode *newLHS =
-        getENBuilder()->createIdentifierExpr(temp, en->getDims());
-    // The new assignment is inserted before 'curPos' on purpose.
-    Assignments.insert(curPos, {newLHS, en});
+    // Add a new assignment that assigns the lifted sub-expression node 'Node'
+    // to the new identifier 'Tmp'.
+    ExprNode *NewLHS =
+        getENBuilder()->createIdentifierExpr(Tmp, Node->getDims());
+    // The new assignment is inserted before 'CurrentPos' on purpose.
+    Assignments.insert(CurrentPos, {NewLHS, Node});
 
-    // Since the ExprNode 'en' has been lifted, the expression tree
-    // rooted at 'root' must be re-visited.
-    setRoot(root);
+    // Since the ExprNode 'Node' has been lifted, the expression tree
+    // rooted at 'Root' must be re-visited.
+    setRoot(Root);
     setParent(nullptr);
     setChildIndex(-1);
-    transformChildren(root);
+    transformChildren(Root);
 
-    freeTempWithDims(temp, en->getDims());
+    freeTempWithDims(Tmp, Node->getDims());
   }
 
-  setChildIndex(childIndex);
-  setParent(parent);
-  setRoot(root);
+  setChildIndex(ChildIndex);
+  setParent(Parent);
+  setRoot(Root);
 }
 
-void ExprTreeLifter::transformChildren(ExprNode *en) {
-  ExprNode *parent = getParent();
-  unsigned childIndex = getChildIndex();
+void ExprTreeLifter::transformNode(ExprNode *Node) {
+  if (IsNodeToBeLifted(Node, getRoot())) {
+    liftNode(Node);
+  } else {
+    transformChildren(Node);
+  }
+}
 
-  setParent(en);
-  for (int i = 0; i < en->getNumChildren(); i++) {
-    setChildIndex(i);
-    en->getChild(i)->transform(this);
+void ExprTreeLifter::transformChildren(ExprNode *Node) {
+  ExprNode *Parent = getParent();
+  unsigned ChildIndex = getChildIndex();
+
+  setParent(Node);
+  for (int I = 0; I < Node->getNumChildren(); ++I) {
+    setChildIndex(I);
+    Node->getChild(I)->transform(this);
   }
 
-  setChildIndex(childIndex);
-  setParent(parent);
+  setChildIndex(ChildIndex);
+  setParent(Parent);
 }
 
 #define GEN_TRANSFORM_EXPR_NODE_IMPL(ExprName)                                 \
-  void ExprTreeLifter::transform##ExprName##Expr(ExprName##Expr *en) {         \
-    transformNode(en);                                                         \
+  void ExprTreeLifter::transform##ExprName##Expr(ExprName##Expr *E) {          \
+    transformNode(E);                                                          \
   }
 
 GEN_TRANSFORM_EXPR_NODE_IMPL(Add)
@@ -108,4 +110,4 @@ GEN_TRANSFORM_EXPR_NODE_IMPL(Transposition)
 
 #undef GEN_TRANSFORM_EXPR_NODE_IMPL
 
-void ExprTreeLifter::transformIdentifierExpr(IdentifierExpr *en) { return; }
+void ExprTreeLifter::transformIdentifierExpr(IdentifierExpr *E) { return; }

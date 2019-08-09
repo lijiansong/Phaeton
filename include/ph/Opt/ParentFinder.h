@@ -12,7 +12,7 @@
 #define PHAETON_OPT_PARENT_FINDER_H
 
 #include "ph/CodeGen/CodeGen.h"
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
 
 namespace phaeton {
 
@@ -27,30 +27,31 @@ namespace phaeton {
 /// may not work in general, i.e. if more than two assignments are fused.
 class ParentFinder : public ExprTreeVisitor {
 public:
-  ParentFinder(const ExprNode *root) : Root(root) {}
+  ParentFinder(const ExprNode *Node) : Root(Node) {}
 
-  void visitChildren(const ExprNode *en) {
-    for (int i = 0; i < en->getNumChildren(); i++) {
-      Parent = en;
-      en->getChild(i)->visit(this);
-      if (Found)
+  void visitChildren(const ExprNode *Node) {
+    for (int I = 0; I < Node->getNumChildren(); ++I) {
+      Parent = Node;
+      Node->getChild(I)->visit(this);
+      if (Found) {
         return;
+      }
     }
   }
 
-  virtual void visitIdentifierExpr(const IdentifierExpr *en) override {
-    if (en == NodeToFind) {
+  virtual void visitIdentifierExpr(const IdentifierExpr *Id) override {
+    if (Id == NodeToFind) {
       Found = true;
     }
   }
 
 #define GEN_VISIT_EXPR_NODE_IMPL(ExprName)                                     \
-  virtual void visit##ExprName##Expr(const ExprName##Expr *en) override {      \
-    if (en == NodeToFind) {                                                    \
+  virtual void visit##ExprName##Expr(const ExprName##Expr *Expr) override {    \
+    if (Expr == NodeToFind) {                                                  \
       Found = true;                                                            \
       return;                                                                  \
     }                                                                          \
-    visitChildren(en);                                                         \
+    visitChildren(Expr);                                                       \
   }
 
   GEN_VISIT_EXPR_NODE_IMPL(Add)
@@ -66,8 +67,8 @@ public:
 
 #undef GEN_VISIT_EXPR_NODE_IMPL
 
-  virtual const ExprNode *find(const ExprNode *nodeToFind) {
-    NodeToFind = nodeToFind;
+  virtual const ExprNode *find(const ExprNode *Node) {
+    NodeToFind = Node;
     Parent = nullptr;
     Found = false;
     Root->visit(this);

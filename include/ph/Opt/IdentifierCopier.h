@@ -13,8 +13,8 @@
 
 #include "ph/CodeGen/CodeGen.h"
 #include "ph/Opt/ENBuilder.h"
-#include "ph/Opt/ExprTree.h"
 #include "ph/Opt/ExprTreeTransformer.h"
+#include "ph/Opt/TensorExprTree.h"
 
 #include <functional>
 #include <list>
@@ -32,10 +32,10 @@ namespace phaeton {
 /// TODO: Make this pass more general.
 class IdentifierCopier : public ExprTreeTransformer {
 public:
-  IdentifierCopier(CodeGen *cg) : CG(cg), Assignments(CG->getAssignments()) {}
+  IdentifierCopier(CodeGen *Gen) : CG(Gen), Assignments(CG->getAssignments()) {}
 
 #define GEN_TRANSFORM_EXPR_NODE_DECL(ExprName)                                 \
-  virtual void transform##ExprName##Expr(ExprName##Expr *en) override;
+  virtual void transform##ExprName##Expr(ExprName##Expr *E) override;
 
   GEN_TRANSFORM_EXPR_NODE_DECL(Add)
   GEN_TRANSFORM_EXPR_NODE_DECL(Sub)
@@ -51,9 +51,9 @@ public:
 
 #undef GEN_TRANSFORM_EXPR_NODE_DECL
 
-  void transformNode(ExprNode *en);
-  void transformChildren(ExprNode *en);
-  void liftNode(ExprNode *en);
+  void transformNode(ExprNode *Node);
+  void transformChildren(ExprNode *Node);
+  void liftNode(ExprNode *Node);
 
   void transformAssignments();
 
@@ -61,13 +61,13 @@ private:
   CodeGen *CG;
   CodeGen::AssignmentsListTy &Assignments;
 
-  const IdentifierExpr *curLhs;
+  const IdentifierExpr *CurrentLHS;
   ExprNode *Parent;
   int ChildIndex;
   bool Incompatible;
-  std::string replacementName;
+  std::string ReplaceName;
 
-  CodeGen::AssignmentsListTy::iterator curPos;
+  CodeGen::AssignmentsListTy::iterator CurrentPos;
 
   // Helper methods that helps to implement functionality from the code
   // generator 'CG', and provide some information.

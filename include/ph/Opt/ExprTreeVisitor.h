@@ -10,14 +10,16 @@
 #ifndef PHAETON_OPT_EXPR_TREE_VISITOR_H
 #define PHAETON_OPT_EXPR_TREE_VISITOR_H
 
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
 
 namespace phaeton {
 
+/// ExprTreeVisitor - This class defines the common visitor interface for
+/// expression tree over each expression node.
 class ExprTreeVisitor {
 public:
 #define GEN_VISIT_EXPR_NODE_DECL(ExprName)                                     \
-  virtual void visit##ExprName##Expr(const ExprName##Expr *e) = 0;
+  virtual void visit##ExprName##Expr(const ExprName##Expr *E) = 0;
 
   GEN_VISIT_EXPR_NODE_DECL(Add)
   GEN_VISIT_EXPR_NODE_DECL(Sub)

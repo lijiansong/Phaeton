@@ -1,15 +1,15 @@
-//==--- ContractionExprCounter.h - Representation of contraction expr ------==//
+//==--- ContrExprCounter.h ------- Representation of contraction expr ------==//
 //
 //                     The Phaeton Compiler Infrastructure
 //
 //===----------------------------------------------------------------------===//
 //
-// This file defines the class for ContractionExprCounter.
+// This file defines the class for ContrExprCounter.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef PHAETON_OPT_CONTRACTION_EXPR_COUNTER_H
-#define PHAETON_OPT_CONTRACTION_EXPR_COUNTER_H
+#ifndef PHAETON_OPT_CONTR_EXPR_COUNTER_H
+#define PHAETON_OPT_CONTR_EXPR_COUNTER_H
 
 #include "ph/CodeGen/CodeGen.h"
 #include "ph/Opt/ExprTreeVisitor.h"
@@ -19,31 +19,32 @@
 
 namespace phaeton {
 
-/// ContractionExprCounter - This pass helps to lift contraction expressions out
+/// ContrExprCounter - This pass helps to lift contraction expressions out
 /// of expression trees only if:
 /// 1. there are more than one contraction in the tree, and
 /// 2. the contraction to be lifted is the most deeply nested of all
 /// contractions in the expression tree.
 ///
 /// Note that this pass should be associate with Transposition operation.
-class ContractionExprCounter : public ExprTreeVisitor {
+class ContrExprCounter : public ExprTreeVisitor {
 public:
-  ContractionExprCounter(const ExprNode *root) : Root(root) {}
+  ContrExprCounter(const ExprNode *EN) : Root(EN) {}
 
-  void visitChildren(const ExprNode *en) {
-    for (int i = 0; i < en->getNumChildren(); i++)
-      en->getChild(i)->visit(this);
+  virtual void visitContractionExpr(const ContractionExpr *Expr) override {
+    ++Counter;
+    Deepest = Expr;
+    visitChildren(Expr);
   }
 
-  virtual void visitContractionExpr(const ContractionExpr *en) override {
-    ++Counter;
-    Deepest = en;
-    visitChildren(en);
+  void visitChildren(const ExprNode *EN) {
+    for (int I = 0; I < EN->getNumChildren(); ++I) {
+      EN->getChild(I)->visit(this);
+    }
   }
 
 #define GEN_VISIT_EXPR_NODE_IMPL(ExprName)                                     \
-  virtual void visit##ExprName##Expr(const ExprName##Expr *en) override {      \
-    visitChildren(en);                                                         \
+  virtual void visit##ExprName##Expr(const ExprName##Expr *E) override {       \
+    visitChildren(E);                                                          \
   }
 
   GEN_VISIT_EXPR_NODE_IMPL(Add)
@@ -71,11 +72,11 @@ public:
 
 private:
   const ExprNode *Root;
-
+  /// Helper variable to keep track of ExprNode states.
   unsigned Counter;
   const ExprNode *Deepest;
 };
 
 } // end namespace phaeton
 
-#endif // PHAETON_OPT_CONTRACTION_EXPR_COUNTER_H
+#endif // PHAETON_OPT_CONTR_EXPR_COUNTER_H

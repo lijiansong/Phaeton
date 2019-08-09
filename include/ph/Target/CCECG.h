@@ -12,13 +12,13 @@
 #ifndef PHAETON_TARGET_CCE_CG_H
 #define PHAETON_TARGET_CCE_CG_H
 
-#include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
+#include "ph/CodeGen/NaiveCG.h"
 
 namespace phaeton {
 
 /// CCECG - This class defines entrance for the CG of Huawei CCE.
-class CCECG : public DirectCodeGen {};
+class CCECG : public NaiveCodeGen {};
 
 } // end namespace phaeton
 

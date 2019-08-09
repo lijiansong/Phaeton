@@ -28,57 +28,65 @@ namespace phaeton {
 /// TODO: We need to abstract a pass manager for different target languages.
 class OMPCG : public ExprTreeVisitor {
 public:
-  OMPCG(CodeGen *cg, bool rowMajor = true, bool emitWrapper = false,
-        bool restrictPointer = false, bool iccPragmas = false,
-        bool ompPragmas = false, const std::string fpTypeName = "float")
-      : CG(cg), FPTypeName(fpTypeName), IndexCounter(0), RowMajor(rowMajor),
-        EmitWrapper(emitWrapper), RestrictPointer(restrictPointer),
-        IccPragmas(iccPragmas), OMPPragmas(ompPragmas) {}
+  OMPCG(CodeGen *Gen, bool IsRowMajor = true, bool IsEmitWrapper = false,
+        bool IsRestrictPointer = false, bool IsIccPragmas = false,
+        bool IsOpenMpPragmas = false, const std::string FpTypeName = "float")
+      : CG(Gen), FloatPointTypeName(FpTypeName), IndexCounter(0),
+        RowMajor(IsRowMajor), EmitWrapper(IsEmitWrapper),
+        RestrictPointer(IsRestrictPointer), IccPragmas(IsIccPragmas),
+        OMPPragmas(IsOpenMpPragmas) {}
 
-  void genCode(const Program *p);
-  const std::string &getCode() const { return CG->getCode(); }
+  const std::string &getCode() const { return CG->getTgtLangCode(); }
+  void genCode(const Program *Prog);
 
 protected:
-  const std::string &getFPTypeName() const { return FPTypeName; }
+  const std::string &getFloatPointTypeName() const {
+    return FloatPointTypeName;
+  }
 
-  const ExprNode *getResultTemp() const { return resultTemp; }
-  void setResultTemp(const ExprNode *temp) { resultTemp = temp; }
+  const ExprNode *getResultTmp() const { return ResultTmp; }
+  void setResultTmp(const ExprNode *Tmp) { ResultTmp = Tmp; }
 
   unsigned getIndent() const { return Indent; }
-  void setIndent(unsigned indent) { Indent = indent; }
+  void setIndent(unsigned Indent) { Indent = Indent; }
 
   std::string getIndex();
 
-  void emitSignature(std::vector<std::vector<int>> &argumentsDims);
+  /// emitSignature - Emit kernel function signature, we need to keep track of
+  /// these variables marked with 'in' and 'out' specifiers which will be the
+  /// kernel function arguments.
+  void emitSignature(std::vector<std::vector<int>> &ArgumentsDims);
 
-  void emitForLoopHeader(unsigned indent, const std::string &indexVar,
-                         const std::string &bound);
-  void emitForLoopHeader(unsigned indent, const std::string &indexVar,
-                         int intBound, bool unroll = false, bool simd = false);
-  void emitForLoopFooter(unsigned indent);
+  void emitForLoopHeader(unsigned Indent, const std::string &IndexVar,
+                         const std::string &Bound);
+  void emitForLoopHeader(unsigned Indent, const std::string &IndexVar,
+                         int IntBound, bool Unroll = false, bool Simd = false);
+  void emitForLoopFooter(unsigned Indent);
 
-  void emitTempDefinition(unsigned indent, const std::string &temp);
+  void emitTempDefinition(unsigned Indent, const std::string &Tmp);
 
-  std::string subscriptString(const std::vector<std::string> &indices,
-                              const std::vector<int> &dims) const;
-  std::string dimsString(const std::vector<int> &dims,
-                         bool emitRestrict = false) const;
+  std::string subscriptString(const std::vector<std::string> &Indices,
+                              const std::vector<int> &Dims) const;
+  std::string dimsString(const std::vector<int> &Dims,
+                         bool EmitRestrict = false) const;
 
-  void updateWithElemInfo(std::vector<std::string> &indices,
-                          std::vector<int> &dims,
-                          const std::string &name) const;
+  void updateWithElemInfo(std::vector<std::string> &Indices,
+                          std::vector<int> &Dims,
+                          const std::string &Name) const;
   std::string
-  subscriptedIdentifier(const ExprNode *en,
-                        const std::vector<std::string> &indices = {}) const;
+  subscriptedIdentifier(const ExprNode *Node,
+                        const std::vector<std::string> &Indices = {}) const;
 
-  void emitLoopHeaderNest(const std::vector<int> &exprDims, bool unroll = false,
-                          bool simd = false);
+  void emitLoopHeaderNest(const std::vector<int> &ExprDims, bool Unroll = false,
+                          bool Simd = false);
   void emitLoopFooterNest();
 
-  std::string visitChildExpr(const ExprNode *en);
+  std::string visitChildExpr(const ExprNode *Node);
+
+  void visitBinOpExpr(const ExprNode *Node, const std::string &Operation);
 
 #define GEN_VISIT_EXPR_NODE_DECL(ExprName)                                     \
-  virtual void visit##ExprName##Expr(const ExprName##Expr *e) override;
+  virtual void visit##ExprName##Expr(const ExprName##Expr *E) override;
 
   GEN_VISIT_EXPR_NODE_DECL(Add)
   GEN_VISIT_EXPR_NODE_DECL(Sub)
@@ -94,13 +102,12 @@ protected:
 
 #undef GEN_VISIT_EXPR_NODE_DECL
 
-  void visitBinOpExpr(const ExprNode *en, const std::string &op);
-  void visitTopLevelIdentifier(const ExprNode *en);
+  void visitTopLevelIdentifier(const ExprNode *Node);
 
 private:
   CodeGen *CG;
-  const std::string FPTypeName;
-  const ExprNode *resultTemp;
+  const ExprNode *ResultTmp;
+  const std::string FloatPointTypeName;
   unsigned Indent;
   unsigned IndexCounter;
   const bool RowMajor;
@@ -110,40 +117,37 @@ private:
   const bool OMPPragmas;
 
   // We need to keep track of context for the emission of expression trees.
-  std::set<std::string> loopedOverIndices;
-  unsigned nestingLevel, initialNestingLevel;
-  std::vector<std::string> exprIndices, resultIndices;
+  std::set<std::string> LoopedOverIndices;
+  unsigned InitialNestLevel;
+  unsigned NestLevel;
+  std::vector<std::string> ResultIndices;
+  std::vector<std::string> ExprIndices;
 
   std::string ElementIndex;
   // Helper methods for CodeGen.
   std::string getTemp() { return CG->getTemp(); }
-  std::string getTempWithDims(const std::vector<int> &dims) {
-    return CG->getTempWithDims(dims);
+  std::string getTempWithDims(const std::vector<int> &Dim) {
+    return CG->getTempWithDims(Dim);
   }
-  void freeTempWithDims(const std::string &name, const std::vector<int> &dims) {
-    CG->freeTempWithDims(name, dims);
+  void freeTempWithDims(const std::string &Name, const std::vector<int> &Dim) {
+    CG->freeTempWithDims(Name, Dim);
   }
-  void append(const std::string &code) { CG->append(code); }
+  void appendCode(const std::string &Code) { CG->appendCode(Code); }
   const Sema *getSema() const { return CG->getSema(); }
-  const std::vector<int> &getDims(const ExprNode *en) const {
-    return en->getDims();
+  const std::vector<int> &getDims(const ExprNode *Node) const {
+    return Node->getDims();
   }
-  void addFunctionArgument(const std::string &name) {
-    CG->addFunctionArgument(name);
-  }
-  int getNumFunctionArguments() const {
-    return CG->getFunctionArguments().size();
-  }
-
   // FIXME: remove later
-  const std::string &getFunctionName() const { return CG->getFunctionName(); }
-  std::string getFunctionNameWrapped() const {
-    std::string name = CG->getFunctionName();
-    if (EmitWrapper)
-      name += "_wrapped";
-
-    return name;
+  const std::string &getCGFuncName() const { return CG->getCGFuncName(); }
+  std::string getCGFuncNameWrapped() const {
+    std::string FnName = CG->getCGFuncName();
+    if (EmitWrapper) {
+      FnName += "_wrapper_autogen";
+    }
+    return FnName;
   }
+  void addFuncArg(const std::string &Name) { CG->addFuncArg(Name); }
+  int getNumFuncArgs() const { return CG->getFuncArgs().size(); }
 };
 
 } // end namespace phaeton

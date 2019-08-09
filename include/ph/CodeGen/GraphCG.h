@@ -8,14 +8,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef PHAETON_CODEGEN_GRAPH_CODEGEN_H
-#define PHAETON_CODEGEN_GRAPH_CODEGEN_H
+#ifndef PHAETON_CODEGEN_GRAPHCG_H
+#define PHAETON_CODEGEN_GRAPHCG_H
 
 #include "ph/AST/AST.h"
 #include "ph/CodeGen/CGUtils.h"
-#include "ph/CodeGen/GraphCGUtils.h"
 #include "ph/CodeGen/CodeGen.h"
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
 
 #include <list>
 #include <set>
@@ -29,53 +28,55 @@ public:
   // Helper alias for type traits.
   using NodeID = AddressID<ExprNode>;
   using EdgeID = StringID;
-  using GCG_Node = GraphNode<NodeID, EdgeID>;
-  using GCG_Edge = GraphEdge<NodeID, EdgeID>;
-  using GCG_Graph = TensorGraph<NodeID, EdgeID>;
-  using GCG_Legs = std::vector<GCG_Edge::NodeIndexPair>;
-  using EdgeSet = std::set<const GCG_Edge *>;
+  using GraphCGNode = GraphNode<NodeID, EdgeID>;
+  using GraphCGEdge = GraphEdge<NodeID, EdgeID>;
+  using GraphCGGraph = TensorGraph<NodeID, EdgeID>;
+  using GraphCGLegs = std::vector<GraphCGEdge::NodeIndexPair>;
+  using EdgeSet = std::set<const GraphCGEdge *>;
 
-  GraphCodeGen(const Sema *sema, const std::string &functionName);
+  GraphCodeGen(const Sema *S, const std::string &FuncName);
 
-  virtual void visitStmt(const Stmt *) override;
+#define GEN_GCG_VISIT_EXPR_DECL(ExprName)                                      \
+  virtual void visit##ExprName(const ExprName *) override;
 
-  virtual void visitElemDirect(const ElemDirect *ed) override {}
+  GEN_GCG_VISIT_EXPR_DECL(Stmt)
+  GEN_GCG_VISIT_EXPR_DECL(BinaryExpr)
+  GEN_GCG_VISIT_EXPR_DECL(Identifier)
+  GEN_GCG_VISIT_EXPR_DECL(Integer)
+  GEN_GCG_VISIT_EXPR_DECL(BrackExpr)
+  GEN_GCG_VISIT_EXPR_DECL(ParenExpr)
 
-  virtual void visitBinaryExpr(const BinaryExpr *) override;
-  virtual void visitIdentifier(const Identifier *) override;
-  virtual void visitInteger(const Integer *) override;
-  virtual void visitBrackExpr(const BrackExpr *) override;
-  virtual void visitParenExpr(const ParenExpr *) override;
+#undef GEN_GCG_VISIT_EXPR_DECL
 
-  static void dump(const GCG_Graph &gcg);
+  virtual void visitElementDirective(const ElementDirective *ED) override {}
+
+  static void dump(const GraphCGGraph &Graph);
 
 private:
-  void visitContraction(const Expr *e, const TupleList &indices);
+  void visitContraction(const Expr *E, const TupleList &Index);
 
   void buildExprTreeForExpr(const Expr *);
-  ExprNode *buildExprTreeForGraph(GCG_Graph *);
+  ExprNode *buildExprTreeForGraph(GraphCGGraph *);
 
-  void selectEdgesToContract(EdgeSet &result, const GCG_Graph &g) const;
-  void getRemainingEdgesAtNode(EdgeSet &result, const GCG_Node &n,
-                               const EdgeSet &toContract) const;
-  void replaceEdgesAtNode(GCG_Graph &graph, const GCG_Node &oldNode,
-                          const EdgeSet &edgesAtOldNode,
-                          const GCG_Node &newNode, int shift,
-                          const EdgeSet &toContract);
+  void selectEdgesToContract(EdgeSet &Res, const GraphCGGraph &Graph) const;
+  void getRemainingEdgesAtNode(EdgeSet &Res, const GraphCGNode &Node,
+                               const EdgeSet &ToContract) const;
+  void replaceEdgesAtNode(GraphCGGraph &Graph, const GraphCGNode &Old,
+                          const EdgeSet &EdgesAtOldNode, const GraphCGNode &New,
+                          int Shift, const EdgeSet &ToContract);
   // Helpers for graph construction and building.
-  GCG_Graph *curGraph;
-  GCG_Legs curLegs;
-  GCG_Node *curEnd;
+  GraphCGGraph *CurrentGraph;
+  GraphCGLegs CurrentLegs;
+  GraphCGNode *CurrentEnd;
 
-  void updateCurEnd(GCG_Node *n);
-
-  // map for 'Exprs' in the AST to graphs representing the 'Expr'.
-  std::map<const Expr *, const GCG_Graph *> ExprGraphs;
+  void updateCurrentEnd(GraphCGNode *Node);
 
   // set for keeping track of allocated graphs.
-  std::set<const GCG_Graph *> Graphs;
+  std::set<const GraphCGGraph *> Graphs;
+  // map for 'Exprs' in the AST to graphs representing the 'Expr'.
+  std::map<const Expr *, const GraphCGGraph *> ExprGraphs;
 };
 
 } // end namespace phaeton
 
-#endif // PHAETON_CODEGEN_GRAPH_CODEGEN_H
+#endif // PHAETON_CODEGEN_GRAPHCG_H

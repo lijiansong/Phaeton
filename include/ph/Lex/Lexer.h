@@ -27,7 +27,7 @@ private:
   YYSTYPE Val;
 
 public:
-  Lexer(const char *input);
+  Lexer(const char *Input);
   ~Lexer();
 
   int lex();
@@ -35,11 +35,11 @@ public:
   yyscan_t getScanner() const { return Scanner; }
   YYSTYPE getVal() const { return Val; }
 
-  static std::map<int, const std::string> TokenStrings;
-
-  static const std::string &getTokenString(int token) {
-    return TokenStrings[token];
+  static const std::string &getTokenString(int Token) {
+    return TokenStrings[Token];
   }
+
+  static std::map<int, const std::string> TokenStrings;
 };
 
 } // end namespace phaeton

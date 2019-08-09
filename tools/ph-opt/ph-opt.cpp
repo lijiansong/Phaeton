@@ -60,9 +60,9 @@ const std::set<std::string> VALID_TARGET_LANG = {
     "OPENMP", "OPENCL", "CUDA", "BANG", "CCE", "TPU", "NUMPY"};
 
 // TODO: refer to ClangCheck to add a factory wrapper.
-void createOptions(Options &options) {
-  options.positional_help("[optional args]").show_positional_help();
-  options.allow_unrecognised_options().add_options()("h, help", "Print help")(
+void createOptions(Options &Opts) {
+  Opts.positional_help("[optional args]").show_positional_help();
+  Opts.allow_unrecognised_options().add_options()("h, help", "Print help")(
       "i, input", "Input phaeton source file", cxxopts::value<std::string>())(
       "l, lang",
       "Emit target language, currently supports: Numpy, OpenMP, OpenCL, Cuda, "
@@ -73,114 +73,115 @@ void createOptions(Options &options) {
       "positional", "These are the arguments that are entered "
                     "without an option",
       cxxopts::value<std::vector<std::string>>());
-  options.parse_positional({"input", "positional"});
+  Opts.parse_positional({"input", "positional"});
 }
 
-ParseResult parseArgs(Options &options, int &argc, char **argv) {
+ParseResult parseArgs(Options &Opts, int &argc, char **argv) {
   if (argc < 2) {
     std::cerr << PH_OPTIMIZER_EXE << ":" << FRED(" error: ")
               << "no input files! Usage see option '--help'.\n";
     exit(-1);
   }
   try {
-    auto result = options.parse(argc, argv);
-    return result;
-  } catch (const cxxopts::OptionException &e) {
+    auto Result = Opts.parse(argc, argv);
+    return Result;
+  } catch (const cxxopts::OptionException &E) {
+    // FIXME: wrong cli options CANNOT be detected now.
     std::cerr << PH_OPTIMIZER_EXE << ":" << FRED(" error: ")
-              << "parsing options: " << e.what() << std::endl;
+              << "parsing options: " << E.what() << std::endl;
     exit(-1);
   }
 }
 
-std::string getDefaultOutputFileName(std::string &tgt_lang) {
-  if (!std::strcmp(tgt_lang.c_str(), "OPENMP")) {
+std::string getDefaultOutputFileName(std::string &TgtLang) {
+  if (!std::strcmp(TgtLang.c_str(), "OPENMP")) {
     return "a.cpp";
-  } else if (!std::strcmp(tgt_lang.c_str(), "NUMPY")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "NUMPY")) {
     return "a.py";
-  } else if (!std::strcmp(tgt_lang.c_str(), "OPENCL")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "OPENCL")) {
     return "a.cl";
-  } else if (!std::strcmp(tgt_lang.c_str(), "CUDA")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "CUDA")) {
     return "a.cu";
-  } else if (!std::strcmp(tgt_lang.c_str(), "BANG")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "BANG")) {
     return "a.mlu";
-  } else if (!std::strcmp(tgt_lang.c_str(), "CCE")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "CCE")) {
     return "a.cce";
-  } else if (!std::strcmp(tgt_lang.c_str(), "TPU")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "TPU")) {
     return "a.jl";
   }
   return "a.cpp";
 }
 
-std::string getTargetLanguageCode(const Parser &parser,
-                                  const std::string &tgt_lang) {
-  Sema sema;
-  sema.visitProgram(parser.getAST());
-  std::string tgt_code = "";
-  if (!std::strcmp(tgt_lang.c_str(), "OPENMP")) {
-    GraphCodeGen gcg(&sema, "omp_func");
+std::string getTargetLanguageCode(const Parser &PhParser,
+                                  const std::string &TgtLang) {
+  Sema S;
+  S.visitProgram(PhParser.getAST());
+  std::string TgtCode = "";
+  if (!std::strcmp(TgtLang.c_str(), "OPENMP")) {
+    GraphCodeGen Gen(&S, "omp_func");
     // FIXME: CodeGen mode must be sync with a specific codegen, i.e.
     // if we omit the function name, the wrapper caller will be wrong.
-    OMPCG omp(&gcg, true);
-    omp.genCode(parser.getAST());
-    tgt_code = omp.getCode();
-  } else if (!std::strcmp(tgt_lang.c_str(), "NUMPY")) {
+    OMPCG OMP(&Gen, true);
+    OMP.genCode(PhParser.getAST());
+    TgtCode = OMP.getCode();
+  } else if (!std::strcmp(TgtLang.c_str(), "NUMPY")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
     exit(EXIT_SUCCESS);
-  } else if (!std::strcmp(tgt_lang.c_str(), "OPENCL")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "OPENCL")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
     exit(EXIT_SUCCESS);
-  } else if (!std::strcmp(tgt_lang.c_str(), "CUDA")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "CUDA")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
     exit(EXIT_SUCCESS);
-  } else if (!std::strcmp(tgt_lang.c_str(), "BANG")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "BANG")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
     exit(EXIT_SUCCESS);
-  } else if (!std::strcmp(tgt_lang.c_str(), "CCE")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "CCE")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
     exit(EXIT_SUCCESS);
-  } else if (!std::strcmp(tgt_lang.c_str(), "TPU")) {
+  } else if (!std::strcmp(TgtLang.c_str(), "TPU")) {
     std::cout << PH_OPTIMIZER_EXE << ":" << FRED(" wip: ")
               << "Target language not support yet\n";
     exit(EXIT_SUCCESS);
   }
-  return tgt_code;
+  return TgtCode;
 }
 
-void buildJobs(const Options &options, const ParseResult &result) {
+void buildJobs(const Options &Opts, const ParseResult &Result) {
   // Dump the help text message
-  if (result.count("help")) {
-    std::cout << options.help({"", "Group"}) << std::endl;
+  if (Result.count("help")) {
+    std::cout << Opts.help({"", "Group"}) << std::endl;
     exit(EXIT_SUCCESS);
   }
 
-  std::ifstream in_ph_file_stream;
-  char *in_ph_tokens = NULL;
+  std::ifstream InPhFileStream;
+  char *InPhTokens = NULL;
 
   // If we get here, that means, we don't pass the 'help' option,
   // so the user must have at least one input.
-  if (result.count("input")) {
-    std::string ph_src_file = result["input"].as<std::string>();
-    in_ph_file_stream.open(ph_src_file);
+  if (Result.count("input")) {
+    std::string PhSrcFile = Result["input"].as<std::string>();
+    InPhFileStream.open(PhSrcFile);
     // Fail to open input source file.
-    if (!in_ph_file_stream.is_open()) {
+    if (!InPhFileStream.is_open()) {
       std::cerr << PH_OPTIMIZER_EXE << ":" << FRED(" error: ")
-                << "Fail to open " << ph_src_file << '\n';
+                << "Fail to open " << PhSrcFile << '\n';
       exit(-1);
     }
-    std::filebuf *file_buf = in_ph_file_stream.rdbuf();
-    std::size_t size =
-        file_buf->pubseekoff(0, in_ph_file_stream.end, in_ph_file_stream.in);
-    file_buf->pubseekpos(0, in_ph_file_stream.in);
+    std::filebuf *FileBuf = InPhFileStream.rdbuf();
+    std::size_t Size =
+        FileBuf->pubseekoff(0, InPhFileStream.end, InPhFileStream.in);
+    FileBuf->pubseekpos(0, InPhFileStream.in);
 
-    in_ph_tokens = new char[size + 1];
-    file_buf->sgetn(in_ph_tokens, size);
-    in_ph_tokens[size] = 0;
-    in_ph_file_stream.close();
+    InPhTokens = new char[Size + 1];
+    FileBuf->sgetn(InPhTokens, Size);
+    InPhTokens[Size] = 0;
+    InPhFileStream.close();
   } else {
     std::cerr << PH_OPTIMIZER_EXE << ":" << FRED(" error: ")
               << "No input files! Usage see option '--help'.\n";
@@ -189,14 +190,14 @@ void buildJobs(const Options &options, const ParseResult &result) {
 
   // Then we need to determine the final phase.
 
-  std::string tgt_lang = "";
+  std::string TgtLang = "";
   // If we get here, that means we need to translate Phaeton into target
   // language.
-  if (result.count("lang")) {
-    tgt_lang = result["lang"].as<std::string>();
+  if (Result.count("lang")) {
+    TgtLang = Result["lang"].as<std::string>();
     // Uniform use of upper case
-    toUpperCase(tgt_lang);
-    if (!VALID_TARGET_LANG.count(tgt_lang)) {
+    toUpperCase(TgtLang);
+    if (!VALID_TARGET_LANG.count(TgtLang)) {
       std::cerr << PH_OPTIMIZER_EXE << ":" << FRED(" error: ")
                 << "Unknown target language! Now only support 'Numpy, OpenMP, "
                    "OpenCL, Cuda, Bang, CCE, TPU'.\n";
@@ -204,25 +205,25 @@ void buildJobs(const Options &options, const ParseResult &result) {
     }
   } else {
     // Default target language is OpenMP
-    tgt_lang = "OpenMP";
+    TgtLang = "OpenMP";
   }
   // Uniform use of upper case
-  toUpperCase(tgt_lang);
+  toUpperCase(TgtLang);
 
-  std::string out_tgt_src = "";
+  std::string OutTgtSrc = "";
   // If we get here, that means we have already get the target language.
-  if (result.count("output")) {
-    out_tgt_src = result["output"].as<std::string>();
+  if (Result.count("output")) {
+    OutTgtSrc = Result["output"].as<std::string>();
   } else {
     // Default output name.
-    out_tgt_src = getDefaultOutputFileName(tgt_lang);
+    OutTgtSrc = getDefaultOutputFileName(TgtLang);
   }
 
-  if (result.count("positional")) {
+  if (Result.count("positional")) {
     std::cout << "Positional = {";
-    auto &v = result["positional"].as<std::vector<std::string>>();
-    for (const auto &s : v) {
-      std::cout << s << ", ";
+    auto &V = Result["positional"].as<std::vector<std::string>>();
+    for (const auto &S : V) {
+      std::cout << S << ", ";
     }
     std::cout << "}" << std::endl;
   }
@@ -230,35 +231,35 @@ void buildJobs(const Options &options, const ParseResult &result) {
   // If we get here, that means we have to perform translation to
   // translate Phaeton input source file into the target language
   // output.
-  Parser parser(in_ph_tokens);
+  Parser parser(InPhTokens);
   if (parser.parse()) {
     std::cerr << PH_OPTIMIZER_EXE << ":" << FRED(" error: ")
               << "Fail to parse input Phaeton tokens\n";
     exit(-1);
   }
   // parser.getAST()->dump();
-  delete[] in_ph_tokens;
+  delete[] InPhTokens;
 
-  std::ofstream out_tgt_file_stream(out_tgt_src);
-  if (out_tgt_file_stream.is_open()) {
-    out_tgt_file_stream << getTargetLanguageCode(parser, tgt_lang);
-    out_tgt_file_stream.close();
+  std::ofstream OutTgtFileStream(OutTgtSrc);
+  if (OutTgtFileStream.is_open()) {
+    OutTgtFileStream << getTargetLanguageCode(parser, TgtLang);
+    OutTgtFileStream.close();
   } else {
     std::cerr << PH_OPTIMIZER_EXE << ":" << FRED(" error: ")
-              << "Fail to open file " << out_tgt_src << '\n';
+              << "Fail to open file " << OutTgtSrc << '\n';
     exit(-1);
   }
   Program::destroy(parser.getAST());
 }
 
 int main(int argc, char *argv[]) {
-  Options options(/*argv[0]*/ PH_OPTIMIZER_EXE,
+  Options Opts(/*argv[0]*/ PH_OPTIMIZER_EXE,
                   "Phaeton optimizer command line options");
-  createOptions(options);
+  createOptions(Opts);
   // Parse input command line arguments.
-  auto result = parseArgs(options, argc, argv);
-  auto arguments = result.arguments();
+  auto Result = parseArgs(Opts, argc, argv);
+  auto Arguments = Result.arguments();
 
-  buildJobs(options, result);
+  buildJobs(Opts, Result);
   return 0;
 }

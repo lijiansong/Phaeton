@@ -17,6 +17,7 @@ namespace phaeton {
 
 class TensorType {
 public:
+  /// AddrSpaceType - Memory hierarchy specifier.
   enum AddrSpaceType {
     ADDR_SPACE_Global,
     ADDR_SPACE_Shared,
@@ -30,19 +31,19 @@ public:
 
 public:
   TensorType() {}
-  TensorType(const std::vector<int> &dims) : Dims(dims) {}
+  TensorType(const std::vector<int> &Dims) : Dims(Dims) {}
 
-  void addDim(int dim) { Dims.push_back(dim); }
+  void addDim(int Dim) { Dims.push_back(Dim); }
 
   int getRank() const { return Dims.size(); }
 
-  int getDim(unsigned i) const { return Dims.at(i); }
+  int getDim(unsigned I) const { return Dims.at(I); }
 
-  bool operator==(const TensorType &rhs) const;
-  bool operator!=(const TensorType &rhs) const { return !(*this == rhs); }
+  bool operator==(const TensorType &RHS) const;
+  bool operator!=(const TensorType &RHS) const { return !(*this == RHS); }
 
-  bool equals(const std::vector<int> &dims) const {
-    return (*this == TensorType(dims));
+  bool equals(const std::vector<int> &Dims) const {
+    return (*this == TensorType(Dims));
   }
 
   const std::string getDimString() const;

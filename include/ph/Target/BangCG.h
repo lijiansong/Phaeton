@@ -11,8 +11,8 @@
 #ifndef PHAETON_TARGET_BANG_CG_H
 #define PHAETON_TARGET_BANG_CG_H
 
-#include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
+#include "ph/CodeGen/NaiveCG.h"
 
 #include <string>
 
@@ -20,7 +20,7 @@ namespace phaeton {
 
 /// BangCG - this class is the entrance of code generation for Cambricon Bang
 /// with SIMD intrinsics.
-class BangCG : public DirectCodeGen {};
+class BangCG : public NaiveCodeGen {};
 
 } // end namespace phaeton
 

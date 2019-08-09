@@ -14,7 +14,7 @@
 #ifndef PHAETON_TOOLING_COMMON_OPTIONS_PARSER_H
 #define PHAETON_TOOLING_COMMON_OPTIONS_PARSER_H
 
-#include "ph/Tooling/Colors.h"
+#include "ph/Support/Colors.h"
 #include "ph/Tooling/ToolingUtils.h"
 #include "ph/Tooling/third-party/cxxopts/cxxopts.hpp"
 

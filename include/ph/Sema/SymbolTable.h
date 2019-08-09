@@ -19,6 +19,7 @@
 
 namespace phaeton {
 
+/// Symbol - This class keep track of each symbol in phaeton.
 class Symbol {
 public:
   enum SymbolKind {
@@ -29,26 +30,26 @@ public:
   };
 
 public:
-  Symbol(SymbolKind k, const std::string &name, const TensorType &type,
-         const Decl *decl = nullptr)
-      : K(k), Name(name), Type(type), DeclNode(decl) {}
+  Symbol(SymbolKind SK, const std::string &Name, const TensorType &Type,
+         const Decl *Decl = nullptr)
+      : SK(SK), Name(Name), Type(Type), DeclNode(Decl) {}
 
-  SymbolKind getKind() const { return K; }
+  SymbolKind getSymbolKind() const { return SK; }
   const std::string &getName() const { return Name; }
   const TensorType &getType() const { return Type; }
   const Decl *getDecl() const { return DeclNode; }
 
-  void setDecl(const Decl *decl) { DeclNode = decl; }
+  void setDecl(const Decl *Decl) { DeclNode = Decl; }
 
 private:
-  const SymbolKind K;
-
+  const SymbolKind SK;
   const std::string Name;
   const TensorType &Type;
-
   const Decl *DeclNode;
 };
 
+/// SymbolTable - This class along with Symbol to implement semantic analysis
+/// for type checking.
 class SymbolTable {
 public:
   using SymbolMap = std::map<const std::string, Symbol *>;
@@ -56,9 +57,9 @@ public:
 public:
   SymbolTable() {}
 
-  bool addSymbol(Symbol *sym);
+  bool addSymbol(Symbol *Sym);
 
-  bool getSymbol(const std::string &name, Symbol *&sym) const;
+  bool getSymbol(const std::string &Name, Symbol *&Sym) const;
 
   SymbolMap::iterator begin() { return Symbols.begin(); }
   SymbolMap::iterator end() { return Symbols.end(); }

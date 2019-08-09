@@ -19,9 +19,9 @@
 
 namespace phaeton {
 
-void toUpperCase(std::string &str) {
+void toUpperCase(std::string &Str) {
   std::transform(
-      str.begin(), str.end(), str.begin(),
+      Str.begin(), Str.end(), Str.begin(),
       [](unsigned char c) -> unsigned char { return std::toupper(c); });
 }
 

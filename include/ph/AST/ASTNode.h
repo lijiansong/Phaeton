@@ -22,121 +22,121 @@ class ASTVisitor;
 
 class ASTNode {
 public:
-  enum NodeType {
-    NODETYPE_Program,
+  enum ASTNodeKind {
+    AST_NODE_KIND_Program,
 
-    NODETYPE_DeclList,
-    NODETYPE_StmtList,
-    NODETYPE_ExprList,
+    AST_NODE_KIND_DeclList,
+    AST_NODE_KIND_StmtList,
+    AST_NODE_KIND_ExprList,
 
-    NODETYPE_VarDecl,
-    NODETYPE_TypeDecl,
+    AST_NODE_KIND_VarDecl,
+    AST_NODE_KIND_TypeDecl,
 
-    NODETYPE_ElemDirect,
+    AST_NODE_KIND_ElementDirective,
 
-    NODETYPE_Stmt,
+    AST_NODE_KIND_Stmt,
 
-    NODETYPE_TranspositionExpr,
-    NODETYPE_ContractionExpr,
-    NODETYPE_AddExpr,
-    NODETYPE_SubExpr,
-    NODETYPE_MulExpr,
-    NODETYPE_DivExpr,
-    NODETYPE_ProductExpr,
-    NODETYPE_Identifier,
-    NODETYPE_Integer,
-    NODETYPE_BrackExpr,
-    NODETYPE_ParenExpr,
+    AST_NODE_KIND_TranspositionExpr,
+    AST_NODE_KIND_ContractionExpr,
+    AST_NODE_KIND_AddExpr,
+    AST_NODE_KIND_SubExpr,
+    AST_NODE_KIND_MulExpr,
+    AST_NODE_KIND_DivExpr,
+    AST_NODE_KIND_ProductExpr,
+    AST_NODE_KIND_Identifier,
+    AST_NODE_KIND_Integer,
+    AST_NODE_KIND_BrackExpr,
+    AST_NODE_KIND_ParenExpr,
 
-    NODETYPE_NodeType_Count
+    AST_NODE_KIND_ASTNodeKind_Count
   };
 
 public:
-  NodeType getNodeType() const { return NdType; };
+  ASTNodeKind getASTNodeKind() const { return NodeKind; };
 
   virtual void _delete() const = 0;
 
-  virtual void dump(unsigned indent = 0) const = 0;
+  virtual void dump(unsigned Indent = 0) const = 0;
 
-  virtual void visit(ASTVisitor *v) const = 0;
+  virtual void visit(ASTVisitor *Visitor) const = 0;
 
 protected:
-  ASTNode(NodeType nt) : NdType(nt) {}
+  ASTNode(ASTNodeKind NK) : NodeKind(NK) {}
   virtual ~ASTNode() {}
-  static std::map<NodeType, std::string> NodeLabel;
+  static std::map<ASTNodeKind, std::string> NodeLabel;
 
 private:
-  NodeType NdType;
+  ASTNodeKind NodeKind;
 };
 
-template <typename T, ASTNode::NodeType nt, typename Derived>
+template <typename T, ASTNode::ASTNodeKind NK, typename Derived>
 class ASTNodeList : public ASTNode {
 public:
   using Container = std::vector<T *>;
 
-  ASTNodeList() : ASTNode(nt) {}
+  ASTNodeList() : ASTNode(NK) {}
   ASTNodeList(T *);
   virtual ~ASTNodeList() {}
 
-  void append(T *t) { elements.push_back(t); }
+  void append(T *Tpl) { Elements.push_back(Tpl); }
 
-  int size() const { return elements.size(); }
+  int size() const { return Elements.size(); }
 
-  T *operator[](int i) const { return elements.at(i); }
+  T *operator[](int Index) const { return Elements.at(Index); }
 
   virtual void _delete() const final;
 
-  virtual void dump(unsigned int indent = 0) const final;
+  virtual void dump(unsigned int Indent = 0) const final;
 
   static Derived *create() { return new Derived(); }
 
-  static Derived *create(T *t) { return new Derived(t); }
+  static Derived *create(T *Type) { return new Derived(Type); }
 
-  static Derived *append(Derived *l, T *t) {
-    l->append(t);
-    return l;
+  static Derived *append(Derived *List, T *Tpl) {
+    List->append(Tpl);
+    return List;
   }
 
-  typename Container::const_iterator begin() const { return elements.begin(); }
-  typename Container::const_iterator end() const { return elements.end(); }
+  typename Container::const_iterator begin() const { return Elements.begin(); }
+  typename Container::const_iterator end() const { return Elements.end(); }
 
-  virtual void visit(ASTVisitor *v) const override {}
+  virtual void visit(ASTVisitor *Visitor) const override {}
 
 private:
-  Container elements;
+  Container Elements;
 };
 
 class Expr;
-class ExprList
-    : public ASTNodeList<const Expr, ASTNode::NODETYPE_ExprList, ExprList> {
+class ExprList : public ASTNodeList<const Expr, ASTNode::AST_NODE_KIND_ExprList,
+                                    ExprList> {
 public:
   ExprList()
-      : ASTNodeList<const Expr, ASTNode::NODETYPE_ExprList, ExprList>() {}
-  ExprList(const Expr *e) : ASTNodeList(e) {}
+      : ASTNodeList<const Expr, ASTNode::AST_NODE_KIND_ExprList, ExprList>() {}
+  ExprList(const Expr *E) : ASTNodeList(E) {}
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 };
 
 class Stmt;
-class StmtList
-    : public ASTNodeList<const Stmt, ASTNode::NODETYPE_StmtList, StmtList> {
+class StmtList : public ASTNodeList<const Stmt, ASTNode::AST_NODE_KIND_StmtList,
+                                    StmtList> {
 public:
   StmtList()
-      : ASTNodeList<const Stmt, ASTNode::NODETYPE_StmtList, StmtList>() {}
-  StmtList(const Stmt *s) : ASTNodeList(s) {}
+      : ASTNodeList<const Stmt, ASTNode::AST_NODE_KIND_StmtList, StmtList>() {}
+  StmtList(const Stmt *S) : ASTNodeList(S) {}
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 };
 
 class Decl;
-class DeclList
-    : public ASTNodeList<const Decl, ASTNode::NODETYPE_DeclList, DeclList> {
+class DeclList : public ASTNodeList<const Decl, ASTNode::AST_NODE_KIND_DeclList,
+                                    DeclList> {
 public:
   DeclList()
-      : ASTNodeList<const Decl, ASTNode::NODETYPE_DeclList, DeclList>() {}
-  DeclList(const Decl *d) : ASTNodeList(d) {}
+      : ASTNodeList<const Decl, ASTNode::AST_NODE_KIND_DeclList, DeclList>() {}
+  DeclList(const Decl *D) : ASTNodeList(D) {}
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 };
 
 } // end namespace phaeton

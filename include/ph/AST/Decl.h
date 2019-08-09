@@ -21,16 +21,17 @@ class Expr;
 class Decl : public ASTNode {
 public:
   enum InOutSpecifier {
-    IO_Empty = 0,
-    IO_Input = 1 << 0,
-    IO_Output = 1 << 1,
+    IO_SPEC_Empty = 0,
+    IO_SPEC_Input = 1 << 0,
+    IO_SPEC_Output = 1 << 1,
   };
 
 public:
-  Decl(NodeType nt, const Identifier *id, const Expr *expr,
-       InOutSpecifier iospec = IO_Empty)
-      : ASTNode(nt), Id(id), TypeExpr(expr), InOutSpec(iospec) {
-    assert(nt == NODETYPE_VarDecl || nt == NODETYPE_TypeDecl);
+  Decl(ASTNodeKind NodeKind, const Identifier *Id, const Expr *Expr,
+       InOutSpecifier IOSpec = IO_SPEC_Empty)
+      : ASTNode(NodeKind), Id(Id), TypeExpr(Expr), InOutSpec(IOSpec) {
+    assert(NodeKind == AST_NODE_KIND_VarDecl ||
+           NodeKind == AST_NODE_KIND_TypeDecl);
   }
 
   const Identifier *getIdentifier() const { return Id; }
@@ -39,14 +40,15 @@ public:
 
   virtual void _delete() const final;
 
-  virtual void dump(unsigned int indent = 0) const final;
+  virtual void dump(unsigned int Indent = 0) const final;
 
-  static const Decl *create(NodeType nt, const Identifier *id, const Expr *expr,
-                            InOutSpecifier iospec = IO_Empty) {
-    return new Decl(nt, id, expr, iospec);
+  static const Decl *create(ASTNodeKind NodeKind, const Identifier *Id,
+                            const Expr *Expr,
+                            InOutSpecifier IOSpec = IO_SPEC_Empty) {
+    return new Decl(NodeKind, Id, Expr, IOSpec);
   }
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 
 private:
   const Identifier *Id;

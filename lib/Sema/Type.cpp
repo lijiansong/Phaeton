@@ -12,24 +12,26 @@
 
 using namespace phaeton;
 
-bool TensorType::operator==(const TensorType &rhs) const {
-  if (getRank() != rhs.getRank())
+bool TensorType::operator==(const TensorType &RHS) const {
+  if (getRank() != RHS.getRank()) {
     return false;
+  }
 
-  for (unsigned i = 0; i < getRank(); i++) {
-    if (getDim(i) != rhs.getDim(i))
+  for (unsigned i = 0; i < getRank(); ++i) {
+    if (getDim(i) != RHS.getDim(i)) {
       return false;
+    }
   }
 
   return true;
 }
 
 const std::string TensorType::getDimString() const {
-  std::string result = "";
+  std::string Res = "";
   for (unsigned i = 0; i < getRank(); i++) {
-    result += std::to_string((long long)getDim(i));
+    Res += std::to_string((long long)getDim(i));
     if (i != (getRank() - 1))
-      result += ", ";
+      Res += ", ";
   }
-  return result;
+  return Res;
 }

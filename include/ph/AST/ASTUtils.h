@@ -20,9 +20,9 @@
 
 // TODO: add log wrapper.
 // Current AST style refer to Swift AST, using a list pattern.
-#define FORMAT_AST_INDENT(indent)                                              \
+#define FORMAT_AST_INDENT(INDENT)                                              \
   {                                                                            \
-    std::cout.width((indent));                                                 \
+    std::cout.width((INDENT));                                                 \
     std::cout << std::left << "";                                              \
     std::cout.unsetf(std::ios::adjustfield);                                   \
   }

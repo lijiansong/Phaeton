@@ -1,4 +1,4 @@
 add_library(CodeGen STATIC
             CodeGen.cpp
-            DirectCG.cpp
+            NaiveCG.cpp
             GraphCG.cpp)

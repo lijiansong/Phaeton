@@ -43,7 +43,7 @@
 
   const phaeton::Expr *expr;
 
-  const phaeton::ElemDirect *elem;
+  const phaeton::ElementDirective *elem;
 
   const phaeton::Identifier *identifier;
   const phaeton::Integer *integer;
@@ -110,17 +110,17 @@ decl : var_decl
      | type_decl
 
 var_decl : KW_VAR in_out_spec identifier COLON type_expr {
-             $$ = phaeton::Decl::create(phaeton::ASTNode::NODETYPE_VarDecl,
+             $$ = phaeton::Decl::create(phaeton::ASTNode::AST_NODE_KIND_VarDecl,
                                $3, $5,
                                (phaeton::Decl::InOutSpecifier)$2);
            }
 
-in_out_spec : /* empty */ { $$ = phaeton::Decl::IO_Empty; }
-       | KW_INPUT in_out_spec { $$ = phaeton::Decl::IO_Input | $2; }
-       | KW_OUTPUT in_out_spec { $$ = phaeton::Decl::IO_Output | $2; }
+in_out_spec : /* empty */ { $$ = phaeton::Decl::IO_SPEC_Empty; }
+       | KW_INPUT in_out_spec { $$ = phaeton::Decl::IO_SPEC_Input | $2; }
+       | KW_OUTPUT in_out_spec { $$ = phaeton::Decl::IO_SPEC_Output | $2; }
 
 type_decl : KW_TYPE identifier COLON type_expr {
-              $$ = phaeton::Decl::create(phaeton::ASTNode::NODETYPE_TypeDecl, $2, $4);
+              $$ = phaeton::Decl::create(phaeton::ASTNode::AST_NODE_KIND_TypeDecl, $2, $4);
             }
 
 stmt_list : stmt_list stmt { $$ = phaeton::StmtList::append($1, $2); }
@@ -132,26 +132,26 @@ type_expr : identifier { $$ = (const phaeton::Expr *)$1; }
           | brack_expr { $$ = (const phaeton::Expr *)$1; }
 
 expr : term
-     | term ADD expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_AddExpr, $1, $3); }
-     | term SUB expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_SubExpr, $1, $3); }
+     | term ADD expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_AddExpr, $1, $3); }
+     | term SUB expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_SubExpr, $1, $3); }
 
 term : factor
      | factor MUL term {
-         $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_MulExpr, $1, $3);
+         $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_MulExpr, $1, $3);
        }
      | factor DIV term {
-         $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_DivExpr, $1, $3);
+         $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_DivExpr, $1, $3);
        }
      | factor DOT term {
-         $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_ContractionExpr, $1, $3);
+         $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_ContractionExpr, $1, $3);
        }
 
 factor : atom
        | atom PRODUCT factor {
-           $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_ProductExpr, $1, $3);
+           $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_ProductExpr, $1, $3);
          }
        | atom CARET factor {
-           $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_TranspositionExpr, $1, $3);
+           $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_TranspositionExpr, $1, $3);
          }
 
 atom : identifier { $$ = (const phaeton::Expr *)$1; }
@@ -172,19 +172,19 @@ expr_list : /* empty */ { $$ = phaeton::ExprList::create(); }
               $$ = phaeton::ExprList::append($1, $2);
             }
 
-pos_spec : KW_FIRST { $$ = phaeton::ElemDirect::POS_First; }
-        | KW_LAST { $$ = phaeton::ElemDirect::POS_Last; }
+pos_spec : KW_FIRST { $$ = phaeton::ElementDirective::POS_First; }
+        | KW_LAST { $$ = phaeton::ElementDirective::POS_Last; }
 
 elem_direct : /* empty */ { $$ = nullptr; }
             | KW_ELEM brack_expr integer pos_spec {
-                $$ = phaeton::ElemDirect::create(phaeton::ASTNode::NODETYPE_ElemDirect,
-                                        (phaeton::ElemDirect::POSSpecifier)$4, $3, $2);
+                $$ = phaeton::ElementDirective::create(phaeton::ASTNode::AST_NODE_KIND_ElementDirective,
+                                        (phaeton::ElementDirective::POSSpecifier)$4, $3, $2);
               }
 
 /* TODO: refine contraction op */
 /*contract_expr : expr
               | expr DOT contract_expr {
-                  $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::NODETYPE_ContractionExpr, $1, $3);
+                  $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_ContractionExpr, $1, $3);
                 }*/
 
 

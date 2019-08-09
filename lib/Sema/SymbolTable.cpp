@@ -13,19 +13,21 @@
 
 using namespace phaeton;
 
-bool SymbolTable::addSymbol(Symbol *sym) {
-  if (Symbols.count(sym->getName()))
+bool SymbolTable::addSymbol(Symbol *S) {
+  if (Symbols.count(S->getName())) {
     return false;
+  }
 
-  Symbols[sym->getName()] = sym;
+  Symbols[S->getName()] = S;
   return true;
 }
 
-bool SymbolTable::getSymbol(const std::string &name, Symbol *&sym) const {
-  auto it = Symbols.find(name);
-  if (it == Symbols.end())
+bool SymbolTable::getSymbol(const std::string &Name, Symbol *&Sym) const {
+  auto It = Symbols.find(Name);
+  if (It == Symbols.end()) {
     return false;
+  }
 
-  sym = it->second;
+  Sym = It->second;
   return true;
 }

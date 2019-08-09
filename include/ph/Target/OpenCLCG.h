@@ -8,16 +8,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef PHAETON_CODEGEN_OPENCL_CG_H
-#define PHAETON_CODEGEN_OPENCL_CG_H
+#ifndef PHAETON_TARGET_OPENCL_CG_H
+#define PHAETON_TARGET_OPENCL_CG_H
 
-#include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
+#include "ph/CodeGen/NaiveCG.h"
 
 namespace phaeton {
 
-class OpenCLCG : public DirectCodeGen {};
+class OpenCLCG : public NaiveCodeGen {};
 
 } // end namespace phaeton
 
-#endif // PHAETON_CODEGEN_OPENCL_CG_H
+#endif // PHAETON_TARGET_OPENCL_CG_H

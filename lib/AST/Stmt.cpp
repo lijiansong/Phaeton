@@ -14,17 +14,17 @@
 
 using namespace phaeton;
 
-void Stmt::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
+void Stmt::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
 
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
 
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str() << "\n";
-  Id->dump(indent + str.length() + 1);
-  RightExpr->dump(indent + str.length() + 1);
-  FORMAT_AST_INDENT(indent + 1)
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str() << "\n";
+  Id->dump(Indent + Str.length() + 1);
+  RightExpr->dump(Indent + Str.length() + 1);
+  FORMAT_AST_INDENT(Indent + 1)
   std::cout << ")\n";
 }
 
@@ -36,4 +36,4 @@ void Stmt::_delete() const {
   delete RightExpr;
 }
 
-void Stmt::visit(ASTVisitor *v) const { v->visitStmt(this); }
+void Stmt::visit(ASTVisitor *Visitor) const { Visitor->visitStmt(this); }

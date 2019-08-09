@@ -14,7 +14,7 @@
 #ifndef PHAETON_OPT_EXPR_NODE_BUILDER_H
 #define PHAETON_OPT_EXPR_NODE_BUILDER_H
 
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
 
 #include <set>
 
@@ -24,10 +24,14 @@ namespace phaeton {
 /// allocated for nodes of expression trees.
 class ExprNodeBuilder {
 public:
-  ~ExprNodeBuilder();
+  ~ExprNodeBuilder() {
+    for (auto *EN : AllocatedNodes) {
+      delete EN;
+    }
+  }
 
 #define GEN_BUILDER_CREATE_EXPR_NODE_DECL(ExprName)                            \
-  ExprName##Expr *create##ExprName##Expr(ExprNode *lhs, ExprNode *rhs);
+  ExprName##Expr *create##ExprName##Expr(ExprNode *LHS, ExprNode *RHS);
 
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(Add)
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(Sub)
@@ -39,18 +43,18 @@ public:
 
 #undef GEN_BUILDER_CREATE_EXPR_NODE_DECL
 
-  ContractionExpr *createContractionExpr(ExprNode *lhs,
-                                         const CodeGen::List &leftIndices,
-                                         ExprNode *rhs,
-                                         const CodeGen::List &rightIndices);
+  ContractionExpr *createContractionExpr(ExprNode *LHS,
+                                         const CodeGen::List &LeftIndex,
+                                         ExprNode *RHS,
+                                         const CodeGen::List &RightIndex);
 
-  StackExpr *createStackExpr(const std::vector<ExprNode *> &members);
+  StackExpr *createStackExpr(const std::vector<ExprNode *> &);
 
   TranspositionExpr *
-  createTranspositionExpr(ExprNode *en, const CodeGen::TupleList &indexPairs);
+  createTranspositionExpr(ExprNode *Node, const CodeGen::TupleList &IndexPairs);
 
-  IdentifierExpr *createIdentifierExpr(const std::string &name,
-                                       const ExprNode::ExprDimensions &dims);
+  IdentifierExpr *createIdentifierExpr(const std::string &Name,
+                                       const ExprNode::ExprDims &Dims);
 
 private:
   /// set to keep track of memory that has been allocated for nodes of

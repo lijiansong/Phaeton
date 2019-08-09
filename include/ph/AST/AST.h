@@ -14,7 +14,7 @@
 #include "ph/AST/ASTNode.h"
 #include "ph/AST/ASTVisitor.h"
 #include "ph/AST/Decl.h"
-#include "ph/AST/ElemDirect.h"
+#include "ph/AST/ElementDirective.h"
 #include "ph/AST/Expr.h"
 #include "ph/AST/Program.h"
 #include "ph/AST/Stmt.h"

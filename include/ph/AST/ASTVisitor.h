@@ -13,7 +13,7 @@
 
 #include "ph/AST/ASTNode.h"
 #include "ph/AST/Decl.h"
-#include "ph/AST/ElemDirect.h"
+#include "ph/AST/ElementDirective.h"
 #include "ph/AST/Expr.h"
 #include "ph/AST/Program.h"
 #include "ph/AST/Stmt.h"
@@ -24,11 +24,11 @@ class ASTVisitor {
 public:
   virtual void visitProgram(const Program *);
 
-  template <typename T, ASTNode::NodeType nt, typename Derived>
-  void visitASTNodeList(const ASTNodeList<T, nt, Derived> *list);
+  template <typename T, ASTNode::ASTNodeKind NK, typename Derived>
+  void visitASTNodeList(const ASTNodeList<T, NK, Derived> *List);
 
 #define GEN_VISIT_LIST_DECL(Derived)                                           \
-  virtual void visit##Derived(const Derived *list);
+  virtual void visit##Derived(const Derived *List);
 
   GEN_VISIT_LIST_DECL(DeclList)
   GEN_VISIT_LIST_DECL(StmtList)
@@ -45,7 +45,7 @@ public:
   GEN_PURE_VISIT_ASTNODE_DECL(Identifier)
   GEN_PURE_VISIT_ASTNODE_DECL(Integer)
   GEN_PURE_VISIT_ASTNODE_DECL(BrackExpr)
-  GEN_PURE_VISIT_ASTNODE_DECL(ElemDirect)
+  GEN_PURE_VISIT_ASTNODE_DECL(ElementDirective)
 
 #undef GEN_PURE_VISIT_ASTNODE_DECL
 

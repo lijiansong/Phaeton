@@ -22,21 +22,21 @@ class Expr;
 
 class Stmt : public ASTNode {
 public:
-  Stmt(const Identifier *id, const Expr *expr)
-      : ASTNode(NODETYPE_Stmt), Id(id), RightExpr(expr) {}
+  Stmt(const Identifier *Id, const Expr *E)
+      : ASTNode(AST_NODE_KIND_Stmt), Id(Id), RightExpr(E) {}
 
   const Identifier *getIdentifier() const { return Id; }
   const Expr *getExpr() const { return RightExpr; }
 
   virtual void _delete() const final;
 
-  virtual void dump(unsigned int indent = 0) const final;
+  virtual void dump(unsigned int Indent = 0) const final;
 
-  static Stmt *create(const Identifier *id, const Expr *expr) {
-    return new Stmt(id, expr);
+  static Stmt *create(const Identifier *Id, const Expr *E) {
+    return new Stmt(Id, E);
   }
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *Visitor) const override;
 
 private:
   const Identifier *Id;

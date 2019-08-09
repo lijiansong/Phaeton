@@ -13,13 +13,13 @@
 #ifndef PHAETON_TARGET_TPU_CG_H
 #define PHAETON_TARGET_TPU_CG_H
 
-#include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
+#include "ph/CodeGen/NaiveCG.h"
 
 namespace phaeton {
 
 /// TPUCG - This class defines the entrance for CG of Google TPU.
-class TPUCG : public DirectCodeGen {};
+class TPUCG : public NaiveCodeGen {};
 
 } // end namespace phaeton
 

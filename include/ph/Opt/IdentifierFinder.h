@@ -12,7 +12,7 @@
 #define PHAETON_OPT_ID_FINDER_H
 
 #include "ph/CodeGen/CodeGen.h"
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
 
 #include <string>
 
@@ -34,8 +34,8 @@ public:
   virtual void visitIdentifierExpr(const IdentifierExpr *en) override {
     if (en->getName() == NameToFind) {
       Found = true;
-      // Note that if the identifiers expression seen so far are still compatible,
-      // set to 'Incompatible', i.e. we have to make sure that
+      // Note that if the identifiers expression seen so far are still
+      // compatible, set to 'Incompatible', i.e. we have to make sure that
       // 'IdIncompatible' is never unset once it has been set to 'true'.
       if (IdIncompatible == false)
         IdIncompatible = Incompatible;

@@ -14,26 +14,26 @@
 
 using namespace phaeton;
 
-void Decl::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
+void Decl::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
 
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
 
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str();
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str();
 
-  if (getNodeType() == NODETYPE_VarDecl) {
-    if (getInOutSpecifier() & IO_Input)
+  if (getASTNodeKind() == AST_NODE_KIND_VarDecl) {
+    if (getInOutSpecifier() & IO_SPEC_Input)
       std::cout << " input";
-    if (getInOutSpecifier() & IO_Output)
+    if (getInOutSpecifier() & IO_SPEC_Output)
       std::cout << " output";
   }
   std::cout << "\n";
 
-  Id->dump(indent + str.length() + 1);
-  TypeExpr->dump(indent + str.length() + 1);
-  FORMAT_AST_INDENT(indent + 1)
+  Id->dump(Indent + Str.length() + 1);
+  TypeExpr->dump(Indent + Str.length() + 1);
+  FORMAT_AST_INDENT(Indent + 1)
   std::cout << ")\n";
 }
 
@@ -45,4 +45,4 @@ void Decl::_delete() const {
   delete TypeExpr;
 }
 
-void Decl::visit(ASTVisitor *v) const { v->visitDecl(this); }
+void Decl::visit(ASTVisitor *Visitor) const { Visitor->visitDecl(this); }

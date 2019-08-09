@@ -17,7 +17,7 @@
 
 using namespace phaeton;
 
-Lexer::Lexer(const char *input) : Input(input) {
+Lexer::Lexer(const char *In) : Input(In) {
   yylex_init(&Scanner);
   yy_scan_string(Input, Scanner);
 }

@@ -10,7 +10,8 @@
 
 #include "ph/CodeGen/GraphCG.h"
 #include "ph/Opt/ENBuilder.h"
-#include "ph/Opt/ExprTree.h"
+#include "ph/Opt/TensorExprTree.h"
+#include "ph/Support/ErrorHandling.h"
 
 #include <cassert>
 #include <fstream>
@@ -20,475 +21,492 @@
 
 using namespace phaeton;
 
-void GraphCodeGen::updateCurEnd(GCG_Node *n) {
-  if (curEnd != nullptr) {
-    curEnd->setSucc(n);
-    n->setPred(curEnd);
+void GraphCodeGen::updateCurrentEnd(GraphCGNode *Node) {
+  if (CurrentEnd != nullptr) {
+    CurrentEnd->setSucc(Node);
+    Node->setPred(CurrentEnd);
   }
-
-  curEnd = n;
+  CurrentEnd = Node;
   return;
 }
 
-GraphCodeGen::GraphCodeGen(const Sema *sema, const std::string &functionName)
-    : CodeGen(sema, functionName), curGraph(nullptr), curEnd(nullptr) {
-  curLegs.clear();
+GraphCodeGen::GraphCodeGen(const Sema *S, const std::string &FuncName)
+    : CodeGen(S, FuncName), CurrentGraph(nullptr), CurrentEnd(nullptr) {
+  CurrentLegs.clear();
 }
 
-void GraphCodeGen::visitStmt(const Stmt *s) {
-  buildExprTreeForExpr(s->getExpr());
-
-  CodeGen::visitStmt(s);
+void GraphCodeGen::visitStmt(const Stmt *S) {
+  buildExprTreeForExpr(S->getExpr());
+  CodeGen::visitStmt(S);
 }
 
-void GraphCodeGen::buildExprTreeForExpr(const Expr *expr) {
-  GCG_Graph *savedGraph = curGraph;
-  GCG_Legs savedLegs = curLegs;
-  GCG_Node *savedEnd = curEnd;
-
+void GraphCodeGen::buildExprTreeForExpr(const Expr *E) {
+  GraphCGGraph *SavedGraph = CurrentGraph;
+  GraphCGLegs SavedLegs = CurrentLegs;
+  GraphCGNode *SavedEnd = CurrentEnd;
   {
-    GCG_Graph temporaryGraph;
-    curGraph = &temporaryGraph;
-    curLegs.clear();
-    curEnd = nullptr;
+    GraphCGGraph TempGraph;
+    CurrentGraph = &TempGraph;
+    CurrentLegs.clear();
+    CurrentEnd = nullptr;
+    // Here we builds the graph for Expr 'E' into 'CurrentGraph'.
+    E->visit(this);
+    addExprNode(E, buildExprTreeForGraph(CurrentGraph));
+  }
+  CurrentGraph = SavedGraph;
+  CurrentLegs = SavedLegs;
+  CurrentEnd = SavedEnd;
+}
 
-    // Here we builds the graph for 'expr' into 'curGraph'.
-    expr->visit(this);
+void GraphCodeGen::visitIdentifier(const Identifier *Id) {
+  const Sema &S = *getSema();
 
-    addExprNode(expr, buildExprTreeForGraph(curGraph));
+  const std::string &Name = Id->getName();
+  const TensorType *Type = S.getType(Id);
+  const int Rank = Type->getRank();
+
+  ExprNode *ResNode = ENBuilder->createIdentifierExpr(Name, Type->getDims());
+  GraphCGNode *Node = CurrentGraph->getNode(NodeID(ResNode, Name, Id), Rank);
+
+  for (int I = 0; I < Rank; ++I) {
+    CurrentLegs.push_back(GraphCGEdge::NodeIndexPair(Node, I));
+  }
+  updateCurrentEnd(Node);
+}
+
+void GraphCodeGen::visitInteger(const Integer *I) {
+  ph_unreachable(INTERNAL_ERROR
+         "integer should not be visited for graph code generation");
+}
+
+void GraphCodeGen::visitParenExpr(const ParenExpr *PE) {
+  const Expr *E = PE->getExpr();
+  PE->visit(this);
+}
+
+void GraphCodeGen::visitBrackExpr(const BrackExpr *BE) {
+  std::vector<ExprNode *> Members;
+
+  const ExprList &Exprs = *BE->getExprs();
+  for (unsigned I = 0; I < Exprs.size(); ++I) {
+    buildExprTreeForExpr(Exprs[I]);
+    assertExprTreeMap(Exprs[I]);
+
+    ExprNode *Node = getExprNode(Exprs[I]);
+    Members.push_back(Node);
   }
 
-  curGraph = savedGraph;
-  curLegs = savedLegs;
-  curEnd = savedEnd;
+  ExprNode *ResNode = ENBuilder->createStackExpr(Members);
+  addExprNode(BE, ResNode);
+
+  const TensorType *Type = getSema()->getType(BE);
+  const int Rank = Type->getRank();
+  GraphCGNode *Node =
+      CurrentGraph->getNode(NodeID(ResNode, /*Label =*/"stack", BE), Rank);
+
+  for (int I = 0; I < Rank; ++I)
+    CurrentLegs.push_back(GraphCGEdge::NodeIndexPair(Node, I));
+
+  updateCurrentEnd(Node);
 }
 
-void GraphCodeGen::visitIdentifier(const Identifier *id) {
-  const Sema &sema = *getSema();
+void GraphCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
+  const Sema &S = *getSema();
+  const ASTNode::ASTNodeKind NK = BE->getASTNodeKind();
 
-  const std::string &name = id->getName();
-  const TensorType *type = sema.getType(id);
-  const int rank = type->getRank();
+  // Handle contraction expression.
+  if (NK == ASTNode::AST_NODE_KIND_ContractionExpr) {
+    TupleList ContrList;
+    if (S.isListOfLists(BE->getRight(), ContrList)) {
+      const BinaryExpr *TensorExpr = extractTensorExprOrNull(BE->getLeft());
+      if (!TensorExpr)
+        ph_unreachable(INTERNAL_ERROR "cannot handle general contractions yet");
 
-  ExprNode *resNode = ENBuilder->createIdentifierExpr(name, type->getDims());
-  GCG_Node *n = curGraph->getNode(NodeID(resNode, name, id), rank);
+      if (ContrList.empty())
+        ph_unreachable(INTERNAL_ERROR "cannot have an empty list here");
 
-  for (int i = 0; i < rank; i++)
-    curLegs.push_back(GCG_Edge::NodeIndexPair(n, i));
-
-  updateCurEnd(n);
-}
-
-void GraphCodeGen::visitInteger(const Integer *i) {
-  assert(0 &&
-         "internal error: integer should not be visited for graph generation");
-}
-
-void GraphCodeGen::visitParenExpr(const ParenExpr *pe) {
-  const Expr *e = pe->getExpr();
-  e->visit(this);
-}
-
-void GraphCodeGen::visitBrackExpr(const BrackExpr *be) {
-  std::vector<ExprNode *> members;
-
-  const ExprList &exprs = *be->getExprs();
-  for (unsigned i = 0; i < exprs.size(); i++) {
-    buildExprTreeForExpr(exprs[i]);
-    EXPR_TREE_MAP_ASSERT(exprs[i]);
-
-    ExprNode *en = getExprNode(exprs[i]);
-    members.push_back(en);
-  }
-
-  ExprNode *resNode = ENBuilder->createStackExpr(members);
-  addExprNode(be, resNode);
-
-  const TensorType *type = getSema()->getType(be);
-  const int rank = type->getRank();
-  GCG_Node *n = curGraph->getNode(NodeID(resNode, "stack", be), rank);
-
-  for (int i = 0; i < rank; i++)
-    curLegs.push_back(GCG_Edge::NodeIndexPair(n, i));
-
-  updateCurEnd(n);
-}
-
-void GraphCodeGen::visitBinaryExpr(const BinaryExpr *be) {
-  const Sema &sema = *getSema();
-  const ASTNode::NodeType nt = be->getNodeType();
-
-  if (nt == ASTNode::NODETYPE_ContractionExpr) {
-    TupleList contractionsList;
-    if (sema.isListOfLists(be->getRight(), contractionsList)) {
-      const BinaryExpr *tensor = extractTensorExprOrNull(be->getLeft());
-      if (!tensor)
-        assert(0 && "internal error: cannot handle general contractions yet");
-
-      if (contractionsList.empty())
-        assert(0 && "internal error: cannot have an empty list here");
-
-      visitContraction(tensor, contractionsList);
+      visitContraction(TensorExpr, ContrList);
     } else {
-      const Expr *left = be->getLeft();
-      buildExprTreeForExpr(left);
-      EXPR_TREE_MAP_ASSERT(left);
+      const Expr *Left = BE->getLeft();
+      buildExprTreeForExpr(Left);
+      assertExprTreeMap(Left);
 
-      const Expr *right = be->getRight();
-      buildExprTreeForExpr(right);
-      EXPR_TREE_MAP_ASSERT(right);
+      const Expr *Right = BE->getRight();
+      buildExprTreeForExpr(Right);
+      assertExprTreeMap(Right);
 
-      ExprNode *lhs = getExprNode(left);
-      ExprNode *rhs = getExprNode(right);
+      ExprNode *LHS = getExprNode(Left);
+      ExprNode *RHS = getExprNode(Right);
 
-      const TensorType *leftType = sema.getType(be->getLeft());
-      const int leftRank = leftType->getRank();
-      ExprNode *resNode =
-          ENBuilder->createContractionExpr(lhs, {leftRank - 1}, rhs, {0});
-      addExprNode(be, resNode);
+      const TensorType *LeftType = S.getType(BE->getLeft());
+      const int LeftRank = LeftType->getRank();
+      ExprNode *ResNode =
+          ENBuilder->createContractionExpr(LHS, {LeftRank - 1}, RHS, {0});
+      addExprNode(BE, ResNode);
 
-      const TensorType *type = sema.getType(be);
-      const int rank = type->getRank();
-      GCG_Node *n = curGraph->getNode(NodeID(resNode, ".", be), rank);
+      const TensorType *Type = S.getType(BE);
+      const int Rank = Type->getRank();
+      GraphCGNode *Node =
+          CurrentGraph->getNode(NodeID(ResNode, /*Lable=*/".", BE), Rank);
 
-      for (int i = 0; i < rank; i++)
-        curLegs.push_back(GCG_Edge::NodeIndexPair(n, i));
+      for (int I = 0; I < Rank; ++I)
+        CurrentLegs.push_back(GraphCGEdge::NodeIndexPair(Node, I));
 
-      updateCurEnd(n);
+      updateCurrentEnd(Node);
     }
     return;
-  } else if (nt == ASTNode::NODETYPE_ProductExpr) {
-    // simply add nodes to 'curGraph'
-    be->getLeft()->visit(this);
-    be->getRight()->visit(this);
+  } else if (NK == ASTNode::AST_NODE_KIND_ProductExpr) {
+    // Handle product expression.
+    // Note that here we simply add nodes to 'CurrentGraph'
+    BE->getLeft()->visit(this);
+    BE->getRight()->visit(this);
     return;
-  } else if (nt == ASTNode::NODETYPE_TranspositionExpr) {
-    const Expr *left = be->getLeft();
-    // need a single expression node at which the
-    // expression tree for 'left' is rooted
-    buildExprTreeForExpr(left);
+  } else if (NK == ASTNode::AST_NODE_KIND_TranspositionExpr) {
+    // Hanle transposition expression.
+    const Expr *Left = BE->getLeft();
+    // Note that here we need a single expression node at which the
+    // expression tree for Expr 'Left' is rooted
+    buildExprTreeForExpr(Left);
 
-    TupleList indexPairs;
-    if (!Sema::isListOfLists(be->getRight(), indexPairs))
-      assert(0 && "internal error: right member of transposition not a list");
+    TupleList IndexPairs;
+    if (!Sema::isListOfLists(BE->getRight(), IndexPairs))
+      ph_unreachable(INTERNAL_ERROR "right of transposition is not a list");
 
-    if (indexPairs.empty())
-      assert(0 && "internal error: cannot have an empty list here");
+    if (IndexPairs.empty())
+      ph_unreachable(INTERNAL_ERROR "cannot have an empty list here");
 
-    ExprNode *resNode =
-        ENBuilder->createTranspositionExpr(getExprNode(left), indexPairs);
-    addExprNode(be, resNode);
+    ExprNode *ResNode =
+        ENBuilder->createTranspositionExpr(getExprNode(Left), IndexPairs);
+    addExprNode(BE, ResNode);
 
-    const TensorType *type = sema.getType(be);
-    const int rank = type->getRank();
-    GCG_Node *n = curGraph->getNode(NodeID(resNode, "transpose", be), rank);
+    const TensorType *Type = S.getType(BE);
+    const int Rank = Type->getRank();
+    GraphCGNode *Node =
+        CurrentGraph->getNode(NodeID(ResNode, /*Label=*/"transpose", BE), Rank);
 
-    for (int i = 0; i < rank; i++)
-      curLegs.push_back(GCG_Edge::NodeIndexPair(n, i));
-
-    updateCurEnd(n);
+    for (int I = 0; I < Rank; ++I) {
+      CurrentLegs.push_back(GraphCGEdge::NodeIndexPair(Node, I));
+    }
+    updateCurrentEnd(Node);
     return;
   }
 
-  assert(nt != ASTNode::NODETYPE_ContractionExpr &&
-         nt != ASTNode::NODETYPE_ProductExpr &&
-         nt != ASTNode::NODETYPE_TranspositionExpr &&
-         "internal error: should not be here");
+  // If we get here that means contraction, product and transposition NOT handle
+  // properly, an internal error occurs.
+  assert(NK != ASTNode::AST_NODE_KIND_ContractionExpr &&
+         NK != ASTNode::AST_NODE_KIND_ProductExpr &&
+         NK != ASTNode::AST_NODE_KIND_TranspositionExpr &&
+         INTERNAL_ERROR "should not be here");
 
-  const Expr *left = be->getLeft();
-  buildExprTreeForExpr(left);
-  EXPR_TREE_MAP_ASSERT(left);
+  // Handle element-wise expression.
+  const Expr *Left = BE->getLeft();
+  buildExprTreeForExpr(Left);
+  assertExprTreeMap(Left);
 
-  const Expr *right = be->getRight();
-  buildExprTreeForExpr(right);
-  EXPR_TREE_MAP_ASSERT(right);
+  const Expr *Right = BE->getRight();
+  buildExprTreeForExpr(Right);
+  assertExprTreeMap(Right);
 
-  ExprNode *resNode, *lhs = getExprNode(left), *rhs = getExprNode(right);
+  ExprNode *ResNode;
+  ExprNode *LHS = getExprNode(Left);
+  ExprNode *RHS = getExprNode(Right);
   std::string OperatorLabel;
-  switch (nt) {
-  case ASTNode::NODETYPE_AddExpr:
-    resNode = ENBuilder->createAddExpr(lhs, rhs);
+  switch (NK) {
+  case ASTNode::AST_NODE_KIND_AddExpr:
+    ResNode = ENBuilder->createAddExpr(LHS, RHS);
     OperatorLabel = "+";
     break;
-  case ASTNode::NODETYPE_SubExpr:
-    resNode = ENBuilder->createSubExpr(lhs, rhs);
+  case ASTNode::AST_NODE_KIND_SubExpr:
+    ResNode = ENBuilder->createSubExpr(LHS, RHS);
     OperatorLabel = "-";
     break;
-  case ASTNode::NODETYPE_MulExpr:
-    if (sema.isScalar(*sema.getType(left)))
-      resNode = ENBuilder->createScalarMulExpr(lhs, rhs);
+  case ASTNode::AST_NODE_KIND_MulExpr:
+    if (S.isScalar(*S.getType(Left)))
+      ResNode = ENBuilder->createScalarMulExpr(LHS, RHS);
     else
-      resNode = ENBuilder->createMulExpr(lhs, rhs);
+      ResNode = ENBuilder->createMulExpr(LHS, RHS);
     OperatorLabel = "*";
     break;
-  case ASTNode::NODETYPE_DivExpr:
-    if (sema.isScalar(*sema.getType(right)))
-      resNode = ENBuilder->createScalarDivExpr(lhs, rhs);
+  case ASTNode::AST_NODE_KIND_DivExpr:
+    if (S.isScalar(*S.getType(Right)))
+      ResNode = ENBuilder->createScalarDivExpr(LHS, RHS);
     else
-      resNode = ENBuilder->createDivExpr(lhs, rhs);
+      ResNode = ENBuilder->createDivExpr(LHS, RHS);
     OperatorLabel = "/";
     break;
   default:
-    assert(0 && "internal error: invalid binary expression");
+    ph_unreachable(INTERNAL_ERROR "invalid binary expression");
   }
 
-  addExprNode(be, resNode);
+  addExprNode(BE, ResNode);
 
-  const TensorType *type = sema.getType(be);
-  const int rank = type->getRank();
-  GCG_Node *n = curGraph->getNode(NodeID(resNode, OperatorLabel, be), rank);
+  const TensorType *Type = S.getType(BE);
+  const int Rank = Type->getRank();
+  GraphCGNode *Node =
+      CurrentGraph->getNode(NodeID(ResNode, OperatorLabel, BE), Rank);
 
-  for (int i = 0; i < rank; i++)
-    curLegs.push_back(GCG_Edge::NodeIndexPair(n, i));
+  for (int I = 0; I < Rank; ++I)
+    CurrentLegs.push_back(GraphCGEdge::NodeIndexPair(Node, I));
 
-  updateCurEnd(n);
+  updateCurrentEnd(Node);
 }
 
-void GraphCodeGen::visitContraction(const Expr *e, const TupleList &indices) {
-  if (indices.empty()) {
-    e->visit(this);
+void GraphCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
+  if (Index.empty()) {
+    E->visit(this);
     return;
   }
 
-  const BinaryExpr *tensor = extractTensorExprOrNull(e);
-  if (!tensor)
-    assert(0 && "internal error: cannot handle general contractions yet");
+  const BinaryExpr *TensorExpr = extractTensorExprOrNull(E);
+  if (!TensorExpr)
+    ph_unreachable(INTERNAL_ERROR "cannot handle general contractions yet");
 
-  if (!isPairList(indices))
-    assert(0 && "internal error: only pairs of indices can be contracted");
+  if (!isPairList(Index))
+    ph_unreachable(INTERNAL_ERROR "only pairs of indices can be contracted");
 
-  const Expr *tensorL = tensor->getLeft();
-  const Expr *tensorR = tensor->getRight();
-  const TensorType *typeL = getSema()->getType(tensorL);
-  int rankL = typeL->getRank();
+  const Expr *TensorLeft = TensorExpr->getLeft();
+  const Expr *TensorRight = TensorExpr->getRight();
+  const TensorType *TypeLeft = getSema()->getType(TensorLeft);
+  int RankLeft = TypeLeft->getRank();
 
-  TupleList contrL, contrR, contrMixed;
-  // Here we classify index pairs into the following three categories:
-  // - 'contrL', contractions of the left sub-expression;
-  // - 'contrR', contractions of the right sub-expression;
-  // - 'contrMixed', having one index from each sub-expression.
-  partitionPairList(rankL, indices, contrL, contrR, contrMixed);
+  TupleList ContrLeft, ContrRight, ContrMixed;
+  // Classify the index pairs into the following three categories:
+  // - 'ContrLeft', contractions of the left sub-expression;
+  // - 'ContrRight', contractions of the right sub-expression;
+  // - 'ContrMixed', means having one index from each sub-expression
+  partitionPairList(RankLeft, Index, ContrLeft, ContrRight, ContrMixed);
 
-  GCG_Legs savedLegs = curLegs;
-  curLegs.clear();
-  visitContraction(tensorL, contrL);
+  GraphCGLegs SavedLegs = CurrentLegs;
+  CurrentLegs.clear();
+  visitContraction(TensorLeft, ContrLeft);
 
-  // Here we determine the rank of the resulting left sub-expression after
-  // contraction has been performed over the set of index pairs 'contrL'.
-  int rankContractedL = rankL - 2 * contrL.size();
+  // Note: here we determine the rank of the result left sub-expression after
+  // contraction has been performed over the set of index pairs 'contrLeft'.
+  int RankContractedLeft = RankLeft - 2 * ContrLeft.size();
 
-  // Note: the index pairs of the right sub-expression must be adjusted by
+  // Note that the index pairs of the right sub-expression must be adjusted by
   // the rank of the left sub-expression.
-  TupleList shiftedR = contrR;
-  shiftTupleList(-rankContractedL, shiftedR);
+  TupleList ShiftedRight = ContrRight;
+  shiftTupleList(-RankContractedLeft, ShiftedRight);
 
-  visitContraction(tensorR, shiftedR);
+  visitContraction(TensorRight, ShiftedRight);
 
-  if (contrMixed.empty())
+  if (ContrMixed.empty())
     return;
 
-  List indL, indR;
-  unpackPairList(contrMixed, indL, indR);
-  // Note: only contractions in 'contrL' affect the adjustments
-  // of the left indices in 'indL'.
-  adjustForContractions(indL, contrL);
-  // Note that adjustments of the right indices in 'indR' are affected by
-  // the contractions in both 'contrL' and 'contrR'.
-  adjustForContractions(indR, contrL);
-  adjustForContractions(indR, contrR);
+  List IndexLeft, IndexRight;
+  unpackPairList(ContrMixed, IndexLeft, IndexRight);
+  // Note that only contractions in 'ContrLeft' affect the adjustments
+  // of the left indices in 'IndexLeft'.
+  adjustForContractions(IndexLeft, ContrLeft);
+  // Note that adjustment of right indices in 'IndexRight' are affected by
+  // the contractions in both 'ContrLeft' and 'ContrRight'.
+  adjustForContractions(IndexRight, ContrLeft);
+  adjustForContractions(IndexRight, ContrRight);
 
-  assert(indL.size() == indR.size() &&
-         "internal error: mis-matched numbers of indices to be contracted");
+  assert(IndexLeft.size() == IndexRight.size() &&
+         INTERNAL_ERROR "mismatched numbers of indices to be contracted");
 
-  for (int k = 0; k < indL.size(); k++) {
-    int iL = indL[k];
-    int iR = indR[k];
+  for (int I = 0; I < IndexLeft.size(); ++I) {
+    int IndLeft = IndexLeft[I];
+    int IndRight = IndexRight[I];
 
-    // For contraction, the 'src' node correcponds to the left tensor in the
+    // For contraction, the 'srcNode' node correcponds to the left tensor in the
     // contraction.
-    const GCG_Node *srcNode = curLegs[iL].first;
-    const int srcIndex = curLegs[iL].second;
-    const GCG_Node *tgtNode = curLegs[iR].first;
-    const int tgtIndex = curLegs[iR].second;
+    const GraphCGNode *SrcNode = CurrentLegs[IndLeft].first;
+    const int SrcIndex = CurrentLegs[IndLeft].second;
+    const GraphCGNode *TargetNode = CurrentLegs[IndRight].first;
+    const int TargetIndex = CurrentLegs[IndRight].second;
 
-    std::stringstream ssLabel;
-    ssLabel << "(" << srcNode->getID().getLabel() << ":" << srcIndex << " -- "
-            << tgtNode->getID().getLabel() << ":" << tgtIndex << ")";
+    std::stringstream StrStreamLabel;
+    StrStreamLabel << "(" << SrcNode->getID().getLabel() << ":" << SrcIndex
+                   << " -- " << TargetNode->getID().getLabel() << ":"
+                   << TargetIndex << ")";
 
-    bool success = curGraph->addEdge(EdgeID(getTemp(), ssLabel.str(), e),
-                                     srcNode, srcIndex, tgtNode, tgtIndex);
-    assert(success && "internal error: should not fail to add edge");
+    bool Success =
+        CurrentGraph->addEdge(EdgeID(getTemp(), StrStreamLabel.str(), E),
+                              SrcNode, SrcIndex, TargetNode, TargetIndex);
+    assert(Success && INTERNAL_ERROR "should not fail to add edge");
   }
 
-  int erased = 0;
-  for (int k = 0; k < indL.size(); k++)
-    curLegs.erase(curLegs.begin() + indL[k] - (erased++));
-  for (int k = 0; k < indR.size(); k++)
-    curLegs.erase(curLegs.begin() + indR[k] - (erased++));
+  int Erased = 0;
+  for (int I = 0; I < IndexLeft.size(); ++I)
+    CurrentLegs.erase(CurrentLegs.begin() + IndexLeft[I] - (Erased++));
+  for (int I = 0; I < IndexRight.size(); ++I)
+    CurrentLegs.erase(CurrentLegs.begin() + IndexRight[I] - (Erased++));
 
-  for (int k = 0; k < curLegs.size(); k++)
-    savedLegs.push_back(curLegs[k]);
-  curLegs = savedLegs;
+  for (int I = 0; I < CurrentLegs.size(); ++I)
+    SavedLegs.push_back(CurrentLegs[I]);
+  CurrentLegs = SavedLegs;
 }
 
-void GraphCodeGen::dump(const GCG_Graph &g) {
-  const std::string tmpFileName = std::tmpnam(nullptr) + std::string(".dot");
-  std::ofstream of(tmpFileName);
-  std::cout << "Writing graph to file \'" << tmpFileName << "\' ... \n";
-  g.plot(of);
-  of.close();
+void GraphCodeGen::dump(const GraphCGGraph &Graph) {
+  // FIXME: 'tmpnam' warning.
+  // https://stackoverflow.com/questions/3299881/tmpnam-warning-saying-it-is-dangerous
+  const std::string TempFileName = std::tmpnam(nullptr) + std::string(".dot");
+  // TODO: add a wrapper for IO stream.
+  std::ofstream OS(TempFileName);
+  std::cout << "Writing graph to file \'" << TempFileName << "\' ... \n";
+  Graph.plot(OS);
+  OS.close();
 }
 
-ExprNode *GraphCodeGen::buildExprTreeForGraph(GCG_Graph *graph) {
-  bool success;
+ExprNode *GraphCodeGen::buildExprTreeForGraph(GraphCGGraph *Graph) {
+  bool Success;
+  while (Graph->getNumEdges()) {
+    EdgeSet EdgesToContract;
+    selectEdgesToContract(EdgesToContract, *Graph);
+    assert(!EdgesToContract.empty() &&
+           INTERNAL_ERROR "graph should still have edges");
 
-  while (graph->getNumEdges()) {
-    EdgeSet toContract;
-    selectEdgesToContract(toContract, *graph);
-    assert(!toContract.empty() &&
-           "internal error: graph should still have edges");
+    const GraphCGEdge *FirstEdge = *EdgesToContract.begin();
+    GraphCGNode &Src = *Graph->getNode(FirstEdge->getSrcID());
+    GraphCGNode &Target = *Graph->getNode(FirstEdge->getTargetID());
 
-    const GCG_Edge *firstEdge = *toContract.begin();
-    GCG_Node &src = *graph->getNode(firstEdge->getSrcID());
-    GCG_Node &tgt = *graph->getNode(firstEdge->getTgtID());
+    List SrcIndices, TargetIndices;
+    for (const auto *E : EdgesToContract) {
+      const GraphCGNode &EdgeSrc = *E->getSrcNode();
+      const GraphCGNode &EdgeTarget = *E->getTargetNode();
 
-    List srcIndices, tgtIndices;
-    for (const auto *e : toContract) {
-      const GCG_Node &edgeSrc = *e->getSrcNode();
-      const GCG_Node &edgeTgt = *e->getTgtNode();
-
-      // Note that the order here matters, 'src' carries lower indices.
-      assert((edgeSrc == src && edgeTgt == tgt));
-      srcIndices.push_back(e->getSrcIndex());
-      tgtIndices.push_back(e->getTgtIndex());
+      // Note that the order here matters, 'Src' node carries lower indices.
+      assert((EdgeSrc == Src && EdgeTarget == Target));
+      SrcIndices.push_back(E->getSrcIndex());
+      TargetIndices.push_back(E->getTargetIndex());
     }
 
-    ExprNode *resNode = ENBuilder->createContractionExpr(
-        src.getID().get(), srcIndices, tgt.getID().get(), tgtIndices);
+    ExprNode *ResNode = ENBuilder->createContractionExpr(
+        Src.getID().get(), SrcIndices, Target.getID().get(), TargetIndices);
 
-    // Here we find edges that remain at 'src' or 'tgt' after the contraction.
-    EdgeSet edgesAtSrc, edgesAtTgt;
-    getRemainingEdgesAtNode(edgesAtSrc, src, toContract);
-    getRemainingEdgesAtNode(edgesAtTgt, tgt, toContract);
+    // Here we find edges that remain at 'Src' node or 'Target' node after the
+    // contraction.
+    EdgeSet EdgesAtSrc, EdgesAtTarget;
+    getRemainingEdgesAtNode(EdgesAtSrc, Src, EdgesToContract);
+    getRemainingEdgesAtNode(EdgesAtTarget, Target, EdgesToContract);
 
-    int rank = src.getRank() + tgt.getRank() - 2 * toContract.size();
-    GCG_Node *n = graph->getNode(NodeID(resNode, "contraction"), rank);
-    n->updateSequence(&src, &tgt);
+    int Rank = Src.getRank() + Target.getRank() - 2 * EdgesToContract.size();
+    GraphCGNode *Node =
+        Graph->getNode(NodeID(ResNode, /*Label=*/"contraction"), Rank);
+    Node->updateSequence(&Src, &Target);
 
-    replaceEdgesAtNode(*graph, src, edgesAtSrc, *n, 0, toContract);
-    replaceEdgesAtNode(*graph, tgt, edgesAtTgt, *n,
-                       src.getRank() - toContract.size(), toContract);
+    replaceEdgesAtNode(*Graph, Src, EdgesAtSrc, *Node, 0, EdgesToContract);
+    replaceEdgesAtNode(*Graph, Target, EdgesAtTarget, *Node,
+                       Src.getRank() - EdgesToContract.size(), EdgesToContract);
 
     // Here we erase all edges that have been contracted over.
-    for (const auto *e : toContract)
-      graph->eraseEdge(e->getID());
+    for (const auto *E : EdgesToContract)
+      Graph->eraseEdge(E->getID());
 
     // Here we erase the nodes that are contracted.
-    success = graph->eraseNode(src.getID());
-    assert(success && "internal error: should not fail to erase source node");
-    success = graph->eraseNode(tgt.getID());
-    assert(success && "internal error: should not fail to erase target node");
+    Success = Graph->eraseNode(Src.getID());
+    assert(Success && INTERNAL_ERROR "should not fail to erase source node");
+    Success = Graph->eraseNode(Target.getID());
+    assert(Success && INTERNAL_ERROR "should not fail to erase target node");
   }
 
   // Here graph has no edges left, hence, form the tensor product
   // of the remaining nodes from left to right.
-  const GCG_Node *n = graph->getStartNode();
-  ExprNode *resNode = n->getID().get();
-  while (n->hasSucc()) {
-    const GCG_Node *succ = n->getSucc();
-    resNode = ENBuilder->createProductExpr(resNode, succ->getID().get());
-    n = succ;
+  const GraphCGNode *Node = Graph->getStartNode();
+  ExprNode *ResNode = Node->getID().get();
+  while (Node->hasSucc()) {
+    const GraphCGNode *Succ = Node->getSucc();
+    ResNode = ENBuilder->createProductExpr(ResNode, Succ->getID().get());
+    Node = Succ;
   }
 
-  return resNode;
+  return ResNode;
 }
 
-void GraphCodeGen::getRemainingEdgesAtNode(EdgeSet &result, const GCG_Node &n,
-                                           const EdgeSet &toContract) const {
-  for (int i = 0; i < n.getRank(); i++) {
-    if (!n.isSet(i))
+void GraphCodeGen::getRemainingEdgesAtNode(
+    EdgeSet &Res, const GraphCGNode &Node,
+    const EdgeSet &EdgesToContract) const {
+  for (int I = 0; I < Node.getRank(); ++I) {
+    if (!Node.isSet(I)) {
       continue;
-
-    const GCG_Edge *e = n.at(i);
-    if (toContract.count(e))
-      continue;
-
-    result.insert(e);
-  }
-}
-
-void GraphCodeGen::replaceEdgesAtNode(GCG_Graph &graph, const GCG_Node &oldNode,
-                                      const EdgeSet &edgesAtOldNode,
-                                      const GCG_Node &newNode, int shift,
-                                      const EdgeSet &toContract) {
-  std::function<int(int)> adjustForContractions =
-      [oldNode, toContract](int index) -> int {
-    int adjustment = 0;
-    for (const auto *e : toContract) {
-      int oldNodeIndex =
-          (oldNode == *e->getSrcNode()) ? e->getSrcIndex() : e->getTgtIndex();
-      adjustment += (oldNodeIndex < index);
     }
-    return index - adjustment;
+    const GraphCGEdge *Edge = Node.at(I);
+    if (EdgesToContract.count(Edge)) {
+      continue;
+    }
+    Res.insert(Edge);
+  }
+}
+
+void GraphCodeGen::replaceEdgesAtNode(GraphCGGraph &Graph,
+                                      const GraphCGNode &Old,
+                                      const EdgeSet &EdgesAtOldNode,
+                                      const GraphCGNode &New, int Shift,
+                                      const EdgeSet &EdgesToContract) {
+  // Helper function for contraction index adjustment.
+  std::function<int(int)> adjustForContractions =
+      [Old, EdgesToContract](int Index) -> int {
+    int Adj = 0;
+    for (const auto *Edge : EdgesToContract) {
+      int OldIndex = (Old == *Edge->getSrcNode()) ? Edge->getSrcIndex()
+                                                  : Edge->getTargetIndex();
+      Adj += (OldIndex < Index);
+    }
+    return Index - Adj;
   };
 
-  for (const auto *e : edgesAtOldNode) {
-    assert(oldNode == *e->getSrcNode() || oldNode == *e->getTgtNode());
+  for (const auto *Edge : EdgesAtOldNode) {
+    assert(Old == *Edge->getSrcNode() || Old == *Edge->getTargetNode());
 
-    const GCG_Node *newSrcNode =
-        (oldNode == *e->getSrcNode()) ? &newNode : e->getSrcNode();
-    const int newSrcIndex =
-        (oldNode == *e->getSrcNode())
-            ? adjustForContractions(e->getSrcIndex()) + shift
-            : e->getSrcIndex();
+    const GraphCGNode *NewSrcNode =
+        (Old == *Edge->getSrcNode()) ? &New : Edge->getSrcNode();
+    const int NewSrcIndex =
+        (Old == *Edge->getSrcNode())
+            ? adjustForContractions(Edge->getSrcIndex()) + Shift
+            : Edge->getSrcIndex();
 
-    const GCG_Node *newTgtNode =
-        (oldNode == *e->getTgtNode()) ? &newNode : e->getTgtNode();
-    const int newTgtIndex =
-        (oldNode == *e->getTgtNode())
-            ? adjustForContractions(e->getTgtIndex()) + shift
-            : e->getTgtIndex();
+    const GraphCGNode *NewTargetNode =
+        (Old == *Edge->getTargetNode()) ? &New : Edge->getTargetNode();
+    const int NewTargetIndex =
+        (Old == *Edge->getTargetNode())
+            ? adjustForContractions(Edge->getTargetIndex()) + Shift
+            : Edge->getTargetIndex();
 
-    std::stringstream ssLabel;
-    ssLabel << "(" << newSrcNode->getID().getLabel() << ":" << newSrcIndex
-            << " -- " << newTgtNode->getID().getLabel() << ":" << newTgtIndex
-            << ")";
+    std::stringstream StrStreamLabel;
+    StrStreamLabel << "(" << NewSrcNode->getID().getLabel() << ":"
+                   << NewSrcIndex << " -- " << NewTargetNode->getID().getLabel()
+                   << ":" << NewTargetIndex << ")";
 
-    GCG_Edge newEdge(EdgeID(getTemp(), ssLabel.str()), newSrcNode, newSrcIndex,
-                     newTgtNode, newTgtIndex);
+    GraphCGEdge NewEdge(EdgeID(getTemp(), StrStreamLabel.str()), NewSrcNode,
+                        NewSrcIndex, NewTargetNode, NewTargetIndex);
 
-    bool success = graph.eraseEdge(e->getID());
-    assert(success && "internal error: should not fail to erase edge");
-    success = graph.addEdge(newEdge);
-    assert(success && "internal error: should not fail to add edge");
+    bool Success = Graph.eraseEdge(Edge->getID());
+    assert(Success && INTERNAL_ERROR "should not fail to erase edge");
+    Success = Graph.addEdge(NewEdge);
+    assert(Success && INTERNAL_ERROR "should not fail to add edge");
   }
 }
 
-void GraphCodeGen::selectEdgesToContract(EdgeSet &result,
-                                         const GCG_Graph &g) const {
-  if (!g.getNumEdges())
+void GraphCodeGen::selectEdgesToContract(EdgeSet &Result,
+                                         const GraphCGGraph &Graph) const {
+  if (!Graph.getNumEdges()) {
     return;
-
-  // Try to find edges that connect predecessor and succesor.
-  const GCG_Node *n = g.getStartNode();
-  GCG_Graph::EdgeMap tmp;
-
-  while (n->hasSucc()) {
-    const GCG_Node *succ = n->getSucc();
-
-    tmp.clear();
-    g.getEdgesBetweenNodes(tmp, n, succ);
-    if (!tmp.empty())
-      break;
-
-    n = succ;
   }
 
-  // Cannot yet handle graphs with no contraction between
-  // predecessor and successor node pairs.
-  assert(!tmp.empty() && "internal error: malformed contraction");
+  // Try to find edges that connect pred and succ node.
+  const GraphCGNode *Node = Graph.getStartNode();
+  GraphCGGraph::EdgeMap Tmp;
 
-  for (const auto &it : tmp) {
-    result.insert(it.second);
+  while (Node->hasSucc()) {
+    const GraphCGNode *Succ = Node->getSucc();
+
+    Tmp.clear();
+    Graph.getEdgesBetweenNodes(Tmp, Node, Succ);
+    if (!Tmp.empty()) {
+      break;
+    }
+    Node = Succ;
+  }
+
+  // FIXME: Now we cannot yet handle graphs with no contractions between
+  // pred and succ node pairs.
+  assert(!Tmp.empty() &&
+         INTERNAL_ERROR "cannot handle malformed contraction yet");
+
+  for (const auto &It : Tmp) {
+    Result.insert(It.second);
   }
 }

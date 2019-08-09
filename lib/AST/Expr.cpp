@@ -11,52 +11,55 @@
 #include "ph/AST/Expr.h"
 #include "ph/AST/ASTUtils.h"
 #include "ph/AST/ASTVisitor.h"
+#include "ph/Support/ErrorHandling.h"
 
 using namespace phaeton;
 
-void Expr::visit(ASTVisitor *v) const {
-  assert(0 && "internal error: base class 'Expr' should not be visited");
+void Expr::visit(ASTVisitor *Visitor) const {
+  ph_unreachable(INTERNAL_ERROR "base class 'Expr' should not be visited");
 }
 
-void Factor::visit(ASTVisitor *v) const {
-  assert(0 && "internal error: base class 'Factor' should not be visited");
+void Factor::visit(ASTVisitor *Visitor) const {
+  ph_unreachable(INTERNAL_ERROR "base class 'Factor' should not be visited");
 }
 
-void Identifier::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
-
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
-
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str() << " \"" << getName() << "\")\n";
+void Identifier::visit(ASTVisitor *Visitor) const {
+  Visitor->visitIdentifier(this);
 }
 
-void Identifier::visit(ASTVisitor *v) const { v->visitIdentifier(this); }
+void Identifier::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
 
-void Integer::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
 
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
-
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str() << " \"" << getValue() << "\")\n";
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str() << " \"" << getName() << "\")\n";
 }
 
-void Integer::visit(ASTVisitor *v) const { v->visitInteger(this); }
+void Integer::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
 
-void BinaryExpr::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
 
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str() << " \"" << getValue() << "\")\n";
+}
 
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str() << "\n";
-  LeftExpr->dump(indent + str.length() + 1);
-  RightExpr->dump(indent + str.length() + 1);
-  FORMAT_AST_INDENT(indent + 1)
+void Integer::visit(ASTVisitor *Visitor) const { Visitor->visitInteger(this); }
+
+void BinaryExpr::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
+
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
+
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str() << "\n";
+  LeftExpr->dump(Indent + Str.length() + 1);
+  RightExpr->dump(Indent + Str.length() + 1);
+  FORMAT_AST_INDENT(Indent + 1)
   std::cout << ")\n";
 }
 
@@ -68,18 +71,20 @@ void BinaryExpr::_delete() const {
   delete RightExpr;
 }
 
-void BinaryExpr::visit(ASTVisitor *v) const { v->visitBinaryExpr(this); }
+void BinaryExpr::visit(ASTVisitor *Visitor) const {
+  Visitor->visitBinaryExpr(this);
+}
 
-void BrackExpr::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
+void BrackExpr::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
 
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
 
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str() << "\n";
-  Exprs->dump(indent + str.length() + 1);
-  FORMAT_AST_INDENT(indent + 1)
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str() << "\n";
+  Exprs->dump(Indent + Str.length() + 1);
+  FORMAT_AST_INDENT(Indent + 1)
   std::cout << ")\n";
 }
 
@@ -88,18 +93,20 @@ void BrackExpr::_delete() const {
   delete Exprs;
 }
 
-void BrackExpr::visit(ASTVisitor *v) const { v->visitBrackExpr(this); }
+void BrackExpr::visit(ASTVisitor *Visitor) const {
+  Visitor->visitBrackExpr(this);
+}
 
-void ParenExpr::dump(unsigned indent) const {
-  std::string str = NodeLabel[getNodeType()];
+void ParenExpr::dump(unsigned Indent) const {
+  std::string Str = NodeLabel[getASTNodeKind()];
 
-  std::stringstream ss;
-  ss << " <" << std::hex << this << ">";
+  std::stringstream StrStream;
+  StrStream << " <" << std::hex << this << ">";
 
-  FORMAT_AST_INDENT(indent)
-  std::cout << "(" << str << ss.str() << "\n";
-  NestedExpr->dump(indent + str.length() + 1);
-  FORMAT_AST_INDENT(indent + 1)
+  FORMAT_AST_INDENT(Indent)
+  std::cout << "(" << Str << StrStream.str() << "\n";
+  NestedExpr->dump(Indent + Str.length() + 1);
+  FORMAT_AST_INDENT(Indent + 1)
   std::cout << ")\n";
 }
 
@@ -108,4 +115,6 @@ void ParenExpr::_delete() const {
   delete NestedExpr;
 }
 
-void ParenExpr::visit(ASTVisitor *v) const { v->visitParenExpr(this); }
+void ParenExpr::visit(ASTVisitor *Visitor) const {
+  Visitor->visitParenExpr(this);
+}

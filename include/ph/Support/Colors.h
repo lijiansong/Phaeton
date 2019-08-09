@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef PHAETON_TOOLING_COLORS_H
-#define PHAETON_TOOLING_COLORS_H
+#ifndef PHAETON_SUPPORT_COLORS_H
+#define PHAETON_SUPPORT_COLORS_H
 
 // More details, checkout this page:
 // https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
@@ -35,4 +35,4 @@
 #define BOLD(x) "\x1B[1m" x RST
 #define UNDL(x) "\x1B[4m" x RST
 
-#endif // PHAETON_TOOLING_COLORS_H
+#endif // PHAETON_SUPPORT_COLORS_H

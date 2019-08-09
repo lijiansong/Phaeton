@@ -11,8 +11,8 @@
 #ifndef PHAETON_TARGET_THEANOCG_H
 #define PHAETON_TARGET_THEANOCG_H
 
-#include "ph/CodeGen/DirectCG.h"
 #include "ph/CodeGen/GraphCG.h"
+#include "ph/CodeGen/NaiveCG.h"
 #include "ph/Opt/ExprTreeVisitor.h"
 
 #include <list>
@@ -24,20 +24,20 @@ namespace phaeton {
 /// is Numpy. This class is a preparation for Google TPU.
 class JuliaCG : public ExprTreeVisitor {
 public:
-  JuliaCG(CodeGen *cg, const std::string &prefix = "T")
-      : CG(cg), ModulePrefix(prefix) {}
+  JuliaCG(CodeGen *Gen, const std::string &Prefix = "jl")
+      : CG(Gen), ModulePrefix(Prefix) {}
 
-  void genCode(const Program *p);
   const std::string &getCode() const { return CG->getCode(); }
+  void genCode(const Program *Prog);
 
 protected:
   const std::string &getModulePrefix() const { return ModulePrefix; }
 
-  std::string getResultTemp() const { return resultTemp; }
-  void setResultTemp(const std::string &temp) { resultTemp = temp; }
+  std::string getResultTmp() const { return ResultTmp; }
+  void setResultTmp(const std::string &Tmp) { ResultTmp = Tmp; }
 
 #define GEN_VISIT_EXPR_NODE_DECL(ExprName)                                     \
-  virtual void visit##ExprName##Expr(const ExprName##Expr *e) override;
+  virtual void visit##ExprName##Expr(const ExprName##Expr *E) override;
 
   GEN_VISIT_EXPR_NODE_DECL(Add)
   GEN_VISIT_EXPR_NODE_DECL(Sub)
@@ -53,23 +53,24 @@ protected:
 
 #undef GEN_VISIT_EXPR_NODE_DECL
 
-  void visitBinOpExpr(const ExprNode *en, const std::string &op);
-  void visitTensordotExpr(const ExprNode *en, const std::string &axes);
+  void visitBinOpExpr(const ExprNode *Node, const std::string &Operation);
+  void visitTensorDotExpr(const ExprNode *Node, const std::string &Axes);
 
 private:
   CodeGen *CG;
+  std::string ResultTmp;
   const std::string ModulePrefix;
-  std::string resultTemp;
 
   // The following methods are the helper methods
-  // that implement functionality from the code generator 'CG'.
+  // that implement functionality from code generator 'CG'. We need to record
+  // some information from these help methods.
   const Sema *getSema() const { return CG->getSema(); }
-  const std::string &getFunctionName() const { return CG->getFunctionName(); }
+  const std::string &getCGFuncName() const { return CG->getCGFuncName(); }
   std::string getTemp() { return CG->getTemp(); }
-  void append(const std::string &code) { CG->append(code); }
-  void addFunctionArgument(const std::string &name) {
-    CG->addFunctionArgument(name);
+  void addFunctionArgument(const std::string &Name) {
+    CG->addFunctionArgument(Name);
   }
+  void appendCode(const std::string &Code) { CG->appendCode(Code); }
 };
 
 } // end namespace phaeton

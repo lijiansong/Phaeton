@@ -16,8 +16,8 @@
 
 #include "ph/CodeGen/CodeGen.h"
 #include "ph/Opt/ENBuilder.h"
-#include "ph/Opt/ExprTree.h"
 #include "ph/Opt/ExprTreeTransformer.h"
+#include "ph/Opt/TensorExprTree.h"
 
 #include <functional>
 #include <list>
@@ -30,11 +30,12 @@ namespace phaeton {
 class ExprTreeLifter : public ExprTreeTransformer {
 public:
   using LiftPredicate = std::function<bool(const ExprNode *, const ExprNode *)>;
-  ExprTreeLifter(CodeGen *cg, const LiftPredicate &lp)
-      : CG(cg), Assignments(CG->getAssignments()), isNodeToBeLifted(lp) {}
+  ExprTreeLifter(CodeGen *Gen, const LiftPredicate &Predicate)
+      : CG(Gen), Assignments(CG->getAssignments()),
+        IsNodeToBeLifted(Predicate) {}
 
 #define GEN_TRANSFORM_EXPR_NODE_DECL(ExprName)                                 \
-  virtual void transform##ExprName##Expr(ExprName##Expr *en) override;
+  virtual void transform##ExprName##Expr(ExprName##Expr *E) override;
 
   GEN_TRANSFORM_EXPR_NODE_DECL(Add)
   GEN_TRANSFORM_EXPR_NODE_DECL(Sub)
@@ -50,29 +51,29 @@ public:
 
 #undef GEN_TRANSFORM_EXPR_NODE_DECL
 
-  void transformNode(ExprNode *en);
-  void transformChildren(ExprNode *en);
-  void liftNode(ExprNode *en);
+  void transformNode(ExprNode *);
+  void transformChildren(ExprNode *);
+  void liftNode(ExprNode *);
 
   void transformAssignments();
 
 protected:
-  void setRoot(ExprNode *r) { Root = r; }
+  void setRoot(ExprNode *Node) { Root = Node; }
   ExprNode *getRoot() const { return Root; }
 
-  void setParent(ExprNode *p) { Parent = p; }
+  void setParent(ExprNode *Node) { Parent = Node; }
   ExprNode *getParent() const { return Parent; }
 
-  void setChildIndex(int index) { ChildIndex = index; }
+  void setChildIndex(int Index) { ChildIndex = Index; }
   int getChildIndex() const { return ChildIndex; }
 
-  // helper methods that implement functionality from the code generator 'cg'
+  /// helper methods that implement functionality from the code generator 'CG'
 private:
-  std::string getTempWithDims(const std::vector<int> &dims) {
-    return CG->getTempWithDims(dims);
+  std::string getTempWithDims(const std::vector<int> &Dims) {
+    return CG->getTempWithDims(Dims);
   }
-  void freeTempWithDims(const std::string &name, const std::vector<int> &dims) {
-    CG->freeTempWithDims(name, dims);
+  void freeTempWithDims(const std::string &Name, const std::vector<int> &Dims) {
+    CG->freeTempWithDims(Name, Dims);
   }
   ExprNodeBuilder *getENBuilder() { return CG->getENBuilder(); }
   CodeGen *CG;
@@ -80,8 +81,8 @@ private:
   ExprNode *Root;
   ExprNode *Parent;
   int ChildIndex;
-  CodeGen::AssignmentsListTy::iterator curPos;
-  const LiftPredicate isNodeToBeLifted;
+  CodeGen::AssignmentsListTy::iterator CurrentPos;
+  const LiftPredicate IsNodeToBeLifted;
 };
 
 } // end namespace phaeton
