@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../libTarget.a  CMakeFiles/Target.dir/TheanoCG.cpp.o CMakeFiles/Target.dir/OMPCG.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../libTarget.a

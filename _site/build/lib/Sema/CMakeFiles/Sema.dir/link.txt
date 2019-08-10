@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../libSema.a  CMakeFiles/Sema.dir/Sema.cpp.o CMakeFiles/Sema.dir/SymbolTable.cpp.o CMakeFiles/Sema.dir/Type.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../libSema.a

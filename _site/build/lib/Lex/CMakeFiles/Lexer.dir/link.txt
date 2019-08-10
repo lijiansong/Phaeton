@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../libLexer.a  CMakeFiles/Lexer.dir/Lexer.cpp.o CMakeFiles/Lexer.dir/__/Lang/lex.yy.c.o CMakeFiles/Lexer.dir/__/Lang/phaeton.tab.cc.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../libLexer.a
