@@ -793,31 +793,31 @@ WARN_LOGFILE           =
 
 # FIXME: 1. Using RegExpr or internal function to match these files.
 #        2. Flex and Bision is not supported by Doxygen.
-INPUT                  = "../include/ph-c"                                      \
-                         "../include/ph/AST"                                    \
-                         "../include/ph/ADT"                                    \
-                         "../include/ph/CodeGen"                                \
-                         "../include/ph/Core"                                   \
-                         "../include/ph/Driver"                                 \
-                         "../include/ph/Lex"                                    \
-                         "../include/ph/Opt"                                    \
-                         "../include/ph/Parse"                                  \
-                         "../include/ph/Runtime"                                \
-                         "../include/ph/Sema"                                   \
-                         "../include/ph/Support"                                \
-                         "../include/ph/Target"                                 \
-                         "../include/ph/Tooling"                                \
-                         "../include/ph/Tooling/third-party/cxxopts"            \
-                         "../lib/AST"                                           \
-                         "../lib/CodeGen"                                       \
-                         "../lib/Driver"                                        \
-                         "../lib/Lang"                                          \
-                         "../lib/Lex"                                           \
-                         "../lib/Opt"                                           \
-                         "../lib/Parse"                                         \
-                         "../lib/Sema"                                          \
-                         "../lib/Target"                                        \
-                         doxygen-mainpage.dox
+INPUT                  = "@DOXYGEN_INPUT_DIR@/../include/ph-c"                                      \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/AST"                                    \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/ADT"                                    \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/CodeGen"                                \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Core"                                   \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Driver"                                 \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Lex"                                    \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Opt"                                    \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Parse"                                  \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Runtime"                                \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Sema"                                   \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Support"                                \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Target"                                 \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Tooling"                                \
+                         "@DOXYGEN_INPUT_DIR@/../include/ph/Tooling/third-party/cxxopts"            \
+                         "@DOXYGEN_INPUT_DIR@/../lib/AST"                                           \
+                         "@DOXYGEN_INPUT_DIR@/../lib/CodeGen"                                       \
+                         "@DOXYGEN_INPUT_DIR@/../lib/Driver"                                        \
+                         "@DOXYGEN_INPUT_DIR@/../lib/Lang"                                          \
+                         "@DOXYGEN_INPUT_DIR@/../lib/Lex"                                           \
+                         "@DOXYGEN_INPUT_DIR@/../lib/Opt"                                           \
+                         "@DOXYGEN_INPUT_DIR@/../lib/Parse"                                         \
+                         "@DOXYGEN_INPUT_DIR@/../lib/Sema"                                          \
+                         "@DOXYGEN_INPUT_DIR@/../lib/Target"                                        \
+                         "@DOXYGEN_INPUT_DIR@/doxygen-mainpage.dox"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
