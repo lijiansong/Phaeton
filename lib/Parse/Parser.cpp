@@ -12,4 +12,4 @@
 
 using namespace phaeton;
 
-int Parser::parse() { return yyparse(Lexer.getScanner(), AST); }
+int Parser::parse() { return yyparse(PhaetonLexer.getScanner(), AST); }
