@@ -21,6 +21,8 @@
 #include <cstring>
 #include <unistd.h> // mkdtemp
 
+#define TMP_STRING_TEMPLATE "/tmp/phaeton-XXXXXXXXX"
+
 using namespace phaeton;
 
 void GraphCodeGen::updateCurrentEnd(GraphCGNode *Node) {
@@ -345,9 +347,9 @@ void GraphCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
 void GraphCodeGen::dump(const GraphCGGraph &Graph) {
   /// Note: warning: the use of `tmpnam' is dangerous, better use `mkstemp'
   /// std::tmpnam is dangerous, here we use 'mkstemp' in <unistd.h>.
-  char TmpName[L_tmpnam];
-  mkdtemp(strcpy(TmpName, "/tmp/phaeton-XXXXXXXXX"));
-  const std::string TempFileName = std::string(TmpName) + std::string(".dot");
+  char TmpDirName[L_tmpnam];
+  mkdtemp(strcpy(TmpDirName, TMP_STRING_TEMPLATE));
+  const std::string TempFileName = std::string(TmpDirName) + std::string("phaeton.dot");
   // TODO: add a wrapper for IO stream.
   std::ofstream OS(TempFileName);
   std::cout << "Writing graph to file \'" << TempFileName << "\' ... \n";

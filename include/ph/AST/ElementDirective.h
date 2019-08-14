@@ -7,8 +7,8 @@
 //  This file defines the elements directive expression.
 //
 //===----------------------------------------------------------------------===//
-#ifndef PHAETON_AST_ELEM_DIRECT_H
-#define PHAETON_AST_ELEM_DIRECT_H
+#ifndef PHAETON_AST_ELEMENT_DIRECTIVE_H
+#define PHAETON_AST_ELEMENT_DIRECTIVE_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ private:
 
 } // end namespace phaeton
 
-#endif // PHAETON_AST_ELEM_DIRECT_H
+#endif // PHAETON_AST_ELEMENT_DIRECTIVE_H
