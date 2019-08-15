@@ -33,30 +33,39 @@
 %union {
   const phaeton::Program *program;
   
-  phaeton::DeclList *decls;
-  phaeton::StmtList *stmts;
-  phaeton::ExprList *exprs;
+  phaeton::DeclList *Decls;
+  phaeton::StmtList *Stmts;
+  phaeton::ExprList *Exprs;
  
-  const phaeton::Decl *decl;
+  const phaeton::Decl *Decl;
 
-  const phaeton::Stmt *stmt;
+  const phaeton::Stmt *Stmt;
 
-  const phaeton::Expr *expr;
+  const phaeton::Expr *Expr;
 
-  const phaeton::ElementDirective *elem;
+  const phaeton::ElementDirective *ElemDirective;
 
-  const phaeton::Identifier *identifier;
-  const phaeton::Integer *integer;
-  const phaeton::BrackExpr *brack;
-  const phaeton::ParenExpr *paren;
+  const phaeton::Identifier *Identifier;
+  const phaeton::Integer *Integer;
+  const phaeton::BrackExpr *Brack;
+  const phaeton::ParenExpr *Paren;
 
   const char *string_literal;
   int integer_literal;
 
-  int in_out_spec;
-  int pos_spec;
+  int InOutSpec;
+  int PosSpec;
 }
 
+%token INT2
+%token INT8
+%token INT16
+%token INT32
+%token INT64
+%token FLOAT8
+%token FLOAT16
+%token FLOAT32
+%token FLOAT64
 %token KW_VAR
 %token KW_INPUT
 %token KW_OUTPUT
@@ -83,19 +92,19 @@
 %start program
 
 %type <program> program
-%type <decls> decl_list
-%type <decl> decl var_decl type_decl
-%type <stmts> stmt_list
-%type <stmt> stmt
-%type <expr> type_expr expr term factor atom
-%type <identifier> identifier
-%type <integer> integer
-%type <brack> brack_expr
-%type <paren> paren_expr
-%type <exprs> expr_list
-%type <elem> elem_direct
-%type <in_out_spec> in_out_spec
-%type <pos_spec> pos_spec
+%type <Decls> decl_list
+%type <Decl> decl var_decl type_decl
+%type <Stmts> stmt_list
+%type <Stmt> stmt
+%type <Expr> type_expr expr term factor atom
+%type <Identifier> identifier
+%type <Integer> integer
+%type <Brack> brack_expr
+%type <Paren> paren_expr
+%type <Exprs> expr_list
+%type <ElemDirective> elem_direct
+%type <InOutSpec> in_out_spec
+%type <PosSpec> pos_spec
 
 %%
 

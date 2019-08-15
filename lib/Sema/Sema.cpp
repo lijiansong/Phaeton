@@ -163,6 +163,7 @@ void Sema::visitDecl(const Decl *D) {
 
   const Symbol *Sym = createSymbol(Kind, Name, *Type, D);
 
+  // FIXME: Handle variable both marked with 'in' and 'out'.
   if (D->getInOutSpecifier() & Decl::IO_SPEC_Input)
     Inputs.push_back(Sym);
   if (D->getInOutSpecifier() & Decl::IO_SPEC_Output)

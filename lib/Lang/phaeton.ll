@@ -51,9 +51,11 @@ KW_LAST   "last"
 CARET     "\^"
 
 /* data types */
+INT2      "i2"
 INT8      "i8"
 INT16     "i16"
 INT32     "i32"
+INT64     "i64"
 FLOAT8    "f8"
 FLOAT16   "f16"
 FLOAT32   "f32"
@@ -62,7 +64,6 @@ FLOAT64   "f64"
 /* TODO: brach control keywords*/
 
 %%
-
 
 {KW_VAR}    { return KW_VAR; }
 {KW_INPUT}  { return KW_INPUT; }
@@ -84,6 +85,16 @@ FLOAT64   "f64"
 {KW_FIRST}  { return KW_FIRST; }
 {KW_LAST}   { return KW_LAST; }
 {CARET}     { return CARET; }
+{INT2}      { return INT2; }
+{INT8}      { return INT8; }
+{INT16}     { return INT16; }
+{INT32}     { return INT32; }
+{INT64}     { return INT64; }
+{FLOAT8}    { return FLOAT8; }
+{FLOAT16}   { return FLOAT16; }
+{FLOAT32}   { return FLOAT32; }
+{FLOAT64}   { return FLOAT64; }
+
 {INT}       { 
               yylval->integer_literal = atoi(yytext);
               return INT;
@@ -95,6 +106,6 @@ FLOAT64   "f64"
 <<EOF>>     { return EOF; }
 [ \t\n]+    /* ignore whitespace */
 
-"//".*             ; /* for double slash comments*/
+"//".*             ; /* for double slash comments */
 
 %%
