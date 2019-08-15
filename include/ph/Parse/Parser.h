@@ -17,19 +17,18 @@
 namespace phaeton {
 
 class Parser {
-private:
-  Lexer Lexer;
-
-  const Program *AST;
-
 public:
-  Parser(const char *Input) : Lexer(Input) {}
+  Parser(const char *Input) : PhaetonLexer(Input) {}
 
   ~Parser() {}
 
   int parse();
 
   const Program *getAST() const { return AST; }
+
+private:
+  Lexer PhaetonLexer;
+  const Program *AST;
 };
 
 } // end namespace phaeton

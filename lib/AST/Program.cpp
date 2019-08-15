@@ -23,7 +23,9 @@ void Program::dump(unsigned Indent) const {
   FORMAT_AST_INDENT(Indent)
   std::cout << "(" << Str << StrStream.str() << "\n";
   Decls->dump(Indent + Str.length() + 1);
-  Elem->dump(Indent + Str.length() + 1);
+  if (Elem) {
+    Elem->dump(Indent + Str.length() + 1);
+  }
   Stmts->dump(Indent + Str.length() + 1);
   FORMAT_AST_INDENT(Indent + 1)
   std::cout << ")\n";
