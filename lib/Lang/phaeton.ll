@@ -50,6 +50,8 @@ KW_FIRST  "first"
 KW_LAST   "last"
 CARET     "\^"
 
+/* TODO: add keyword for dnn ops */
+
 /* data types */
 INT2      "i2"
 INT8      "i8"
@@ -61,7 +63,7 @@ FLOAT16   "f16"
 FLOAT32   "f32"
 FLOAT64   "f64"
 
-/* TODO: brach control keywords*/
+/* TODO: brach control keywords */
 
 %%
 

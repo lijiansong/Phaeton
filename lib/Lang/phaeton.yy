@@ -195,6 +195,7 @@ elem_direct : /* empty */ { $$ = nullptr; }
               | expr DOT contract_expr {
                   $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_ContractionExpr, $1, $3);
                 }*/
+/* TODO: add dnn ops */
 
 
 %%

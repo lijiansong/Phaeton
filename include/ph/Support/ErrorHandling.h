@@ -21,16 +21,16 @@
 #define SYNTAX_ERROR FRED("syntax error: ")
 #define SEMANTIC_ERROR FRED("semantic error: ")
 
-namespace ph {
+namespace phaeton {
 
 /// This function calls abort(), and prints the optional message to stderr.
 /// Use the llvm_unreachable macro (that adds location info), instead of
 /// calling this function directly.
 ///
-/// Note that we must mark 'ph_unreachable_internal' as 'static', otherwise we
-/// will get a duplicate symbols error for this function, since this header file
-/// will be included in mutiple source files, using 'static' we can make this
-/// function local in each file.
+/// Note that we must mark 'ph_unreachable_internal' as 'static' to make the
+/// compiler happy, otherwise we will get a duplicate symbols error for this
+/// function, since this header file will be included in mutiple source files,
+/// using 'static' we can make this function local in each file.
 PH_ATTRIBUTE_NORETURN static void
 ph_unreachable_internal(const char *msg = nullptr, const char *file = nullptr,
                         unsigned line = 0) {
@@ -43,7 +43,7 @@ ph_unreachable_internal(const char *msg = nullptr, const char *file = nullptr,
   abort();
 }
 
-} // end namespace ph
+} // end namespace phaeton
 
 /// Prints the message and location info to stderr in !NDEBUG builds.
 /// This is intended to be used for "impossible" situations that imply
@@ -54,9 +54,9 @@ ph_unreachable_internal(const char *msg = nullptr, const char *file = nullptr,
 /// is not reachable even for NDEBUG builds.
 #ifndef NDEBUG
 #define ph_unreachable(msg)                                                    \
-  ::ph::ph_unreachable_internal(msg, __FILE__, __LINE__)
+  ::phaeton::ph_unreachable_internal(msg, __FILE__, __LINE__)
 #else
-#define ph_unreachable(msg) ::ph::ph_unreachable_internal(msg)
+#define ph_unreachable(msg) ::phaeton::ph_unreachable_internal(msg)
 #endif
 
 #endif // PHAETON_SUPPORT_ERROR_HANDLING_H
