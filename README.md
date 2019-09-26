@@ -5,7 +5,7 @@ A toy domain specific language for deep learning tensor expressions.
 # Building
 
 ```
-$ git clone git@github.com:lijiansong/Phaeton.git
+$ git clone git@github.com:lijiansong/Phaeton.git # or git clone https://github.com/lijiansong/Phaeton.git
 $ cd Phaeton
 $ mkdir build && cd build
 $ cmake -DCMAKE_CXX_COMPILER=$(which g++) -DCMAKE_C_COMPILER=$(which gcc) .. && make -j

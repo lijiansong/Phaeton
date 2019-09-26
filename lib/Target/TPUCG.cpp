@@ -4,8 +4,8 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This provides a class for Cambricon Bang code generation targeting the
-// Google TPUs.
+// This provides a class for HLO(High-Level Optimization) IR code generation
+// targeting the Google TPUs.
 //
 //===----------------------------------------------------------------------===//
 

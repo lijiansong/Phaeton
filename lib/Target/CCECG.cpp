@@ -4,8 +4,8 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This provides a class for Cambricon Bang code generation targeting the
-// Huawei Ascend accelerators.
+// This provides a class for Huawei CCE(cube computation engine) code generation
+// targeting the Huawei Ascend accelerators.
 //
 //===----------------------------------------------------------------------===//
 
