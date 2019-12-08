@@ -1,0 +1,54 @@
+(Program <0x7ffbed6023f0>
+        (DeclList <0x7ffbed601fd0>
+                 (VarDecl <0x7ffbed601fa0> input
+                         (Identifier <0x7ffbed6013d0> "a")
+                         (BrackExpr <0x7ffbed601580>
+                                   (ExprList <0x7ffbed601f70>
+                                            (Integer <0x7ffbed600ad0> "3")
+                                            (Integer <0x7ffbed600c00> "4")
+                                    )
+                          )
+                  )
+                 (VarDecl <0x7ffbed6020b0> input
+                         (Identifier <0x7ffbed602000> "b")
+                         (BrackExpr <0x7ffbed602090>
+                                   (ExprList <0x7ffbed602030>
+                                            (Integer <0x7ffbed6016a0> "4")
+                                            (Integer <0x7ffbed602070> "3")
+                                    )
+                          )
+                  )
+                 (VarDecl <0x7ffbed602190> output
+                         (Identifier <0x7ffbed6020e0> "c")
+                         (BrackExpr <0x7ffbed602170>
+                                   (ExprList <0x7ffbed602110>
+                                            (Integer <0x7ffbed6007b0> "3")
+                                            (Integer <0x7ffbed602150> "3")
+                                    )
+                          )
+                  )
+         )
+        (StmtList <0x7ffbed6023b0>
+                 (Stmt <0x7ffbed602390>
+                      (Identifier <0x7ffbed6021e0> "c")
+                      (ContractionExpr <0x7ffbed602370>
+                                      (ParenExpr <0x7ffbed602290>
+                                                (ProductExpr <0x7ffbed602270>
+                                                            (Identifier <0x7ffbed602210> "a")
+                                                            (Identifier <0x7ffbed602240> "b")
+                                                 )
+                                       )
+                                      (BrackExpr <0x7ffbed602350>
+                                                (ExprList <0x7ffbed6022b0>
+                                                         (BrackExpr <0x7ffbed602330>
+                                                                   (ExprList <0x7ffbed6022e0>
+                                                                            (Integer <0x7ffbed602060> "1")
+                                                                            (Integer <0x7ffbed602310> "2")
+                                                                    )
+                                                          )
+                                                 )
+                                       )
+                       )
+                  )
+         )
+ )
