@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phaeton: /Users/lijiansong/work-space/compile/git/Phaeton/lib/Target/TheanoCG.cpp File Reference</title>
+<title>Phaeton: /Users/lijiansong/work-space/compile/git/phaeton/lib/Target/TheanoCG.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -66,49 +66,10 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">TheanoCG.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="TheanoCG_8h_source.html">ph/Target/TheanoCG.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="AST_8h_source.html">ph/AST/AST.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ExprTreeLifter_8h_source.html">ph/Opt/ExprTreeLifter.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ExprTreeTransformer_8h_source.html">ph/Opt/ExprTreeTransformer.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ExprTreeVisitor_8h_source.html">ph/Opt/ExprTreeVisitor.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="Sema_8h_source.html">ph/Sema/Sema.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="Type_8h_source.html">ph/Sema/Type.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ErrorHandling_8h_source.html">ph/Support/ErrorHandling.h</a>&quot;</code><br />
-<code>#include &lt;vector&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a3ad112026cb2501a60778155a8fdcea0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TheanoCG_8cpp.html#a3ad112026cb2501a60778155a8fdcea0">GEN_TH_IO_SYMBOL_LIST</a>(InOut)</td></tr>
-<tr class="separator:a3ad112026cb2501a60778155a8fdcea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a3ad112026cb2501a60778155a8fdcea0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ad112026cb2501a60778155a8fdcea0">&#9670;&nbsp;</a></span>GEN_TH_IO_SYMBOL_LIST</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEN_TH_IO_SYMBOL_LIST</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">InOut</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">std::string InOut##List;                                                     \</div><div class="line">  {                                                                            \</div><div class="line">    InOut##List = <span class="stringliteral">&quot;[&quot;</span>;                                                         \</div><div class="line">    bool First = <span class="keyword">true</span>;                                                         \</div><div class="line">    for (<span class="keyword">auto</span> It = <a class="code" href="classphaeton_1_1Sema.html">Sema</a>.InOut##_begin(), IE = <a class="code" href="classphaeton_1_1Sema.html">Sema</a>.InOut##_end(); It != IE;    \</div><div class="line">         It++) {                                                               \</div><div class="line">      const <a class="code" href="classphaeton_1_1Symbol.html">Symbol</a> *Sym = *It;                                                 \</div><div class="line">      if (!First)                                                              \</div><div class="line">        InOut##List += <span class="stringliteral">&quot;, &quot;</span>;                                                   \</div><div class="line">      InOut##List += Sym-&gt;<a class="code" href="classphaeton_1_1Symbol.html#ab0f7728be4114bd07fc430f70cd06d82">getName</a>();                                           \</div><div class="line">      First = <span class="keyword">false</span>;                                                           \</div><div class="line">    }                                                                          \</div><div class="line">    InOut##List += <span class="stringliteral">&quot;]&quot;</span>;                                                        \</div><div class="line">  }</div><div class="ttc" id="classphaeton_1_1Symbol_html_ab0f7728be4114bd07fc430f70cd06d82"><div class="ttname"><a href="classphaeton_1_1Symbol.html#ab0f7728be4114bd07fc430f70cd06d82">phaeton::Symbol::getName</a></div><div class="ttdeci">const std::string &amp; getName() const</div><div class="ttdef"><b>Definition:</b> SymbolTable.h:38</div></div>
-<div class="ttc" id="classphaeton_1_1Sema_html"><div class="ttname"><a href="classphaeton_1_1Sema.html">phaeton::Sema</a></div><div class="ttdef"><b>Definition:</b> Sema.h:25</div></div>
-<div class="ttc" id="classphaeton_1_1Symbol_html"><div class="ttname"><a href="classphaeton_1_1Symbol.html">phaeton::Symbol</a></div><div class="ttdoc">Symbol - This class keep track of each symbol in phaeton.</div><div class="ttdef"><b>Definition:</b> SymbolTable.h:23</div></div>
-</div><!-- fragment -->
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -1,7 +1,6 @@
 var searchData=
 [
   ['scalardivexpr',['ScalarDivExpr',['../classphaeton_1_1ScalarDivExpr.html',1,'phaeton']]],
-  ['scalarmulexpr',['ScalarMulExpr',['../classphaeton_1_1ScalarMulExpr.html',1,'phaeton']]],
   ['sema',['Sema',['../classphaeton_1_1Sema.html',1,'phaeton']]],
   ['signedcheck',['SignedCheck',['../structcxxopts_1_1values_1_1detail_1_1SignedCheck.html',1,'cxxopts::values::detail']]],
   ['signedcheck_3c_20t_2c_20false_20_3e',['SignedCheck&lt; T, false &gt;',['../structcxxopts_1_1values_1_1detail_1_1SignedCheck_3_01T_00_01false_01_4.html',1,'cxxopts::values::detail']]],

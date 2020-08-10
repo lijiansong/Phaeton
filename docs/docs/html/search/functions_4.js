@@ -2,6 +2,7 @@ var searchData=
 [
   ['decl',['Decl',['../classphaeton_1_1Decl.html#a16f8011e7ad762d59ddee73686e79d19',1,'phaeton::Decl']]],
   ['decllist',['DeclList',['../classphaeton_1_1DeclList.html#a02d753e79bebc9691f5dd673371c8935',1,'phaeton::DeclList::DeclList()'],['../classphaeton_1_1DeclList.html#a8635ae5b86a61f2172d0a5a07331adbb',1,'phaeton::DeclList::DeclList(const Decl *D)']]],
+  ['def_5fvisit_5flist',['DEF_VISIT_LIST',['../ASTVisitor_8cpp.html#ad30f7a6cc2b0b17b95ec8c492e670ff0',1,'ASTVisitor.cpp']]],
   ['default_5fvalue',['default_value',['../classcxxopts_1_1Value.html#ad30c339238f27e887707a29b10c55382',1,'cxxopts::Value::default_value()'],['../classcxxopts_1_1values_1_1abstract__value.html#a63ad0dbf9f18fc7fc8553030a03cfc88',1,'cxxopts::values::abstract_value::default_value()']]],
   ['description',['description',['../classcxxopts_1_1OptionDetails.html#ac1e3c7be552b0ce94051455a23c2b8d9',1,'cxxopts::OptionDetails']]],
   ['destroy',['destroy',['../classphaeton_1_1Program.html#a9e6be906ff18d4199459e3b43dba618b',1,'phaeton::Program']]],

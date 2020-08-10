@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phaeton: /Users/lijiansong/work-space/compile/git/Phaeton/include/ph/Tooling/third-party/cxxopts/cxxopts.hpp File Reference</title>
+<title>Phaeton: /Users/lijiansong/work-space/compile/git/phaeton/include/ph/Tooling/third-party/cxxopts/cxxopts.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,31 +69,19 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">cxxopts.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;cctype&gt;</code><br />
-<code>#include &lt;cstring&gt;</code><br />
-<code>#include &lt;exception&gt;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
-<code>#include &lt;limits&gt;</code><br />
-<code>#include &lt;map&gt;</code><br />
-<code>#include &lt;memory&gt;</code><br />
-<code>#include &lt;regex&gt;</code><br />
-<code>#include &lt;sstream&gt;</code><br />
-<code>#include &lt;string&gt;</code><br />
-<code>#include &lt;unordered_map&gt;</code><br />
-<code>#include &lt;unordered_set&gt;</code><br />
-<code>#include &lt;vector&gt;</code><br />
-</div>
+
 <p><a href="cxxopts_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcxxopts_1_1UnicodeStringIterator.html">cxxopts::UnicodeStringIterator</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcxxopts_1_1Value.html">cxxopts::Value</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcxxopts_1_1OptionException.html">cxxopts::OptionException</a></td></tr>
@@ -161,41 +149,44 @@ Classes</h2></td></tr>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespacecxxopts"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html">cxxopts</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:namespacestd"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestd.html">std</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacecxxopts_1_1values"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts_1_1values.html">cxxopts::values</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacecxxopts_1_1values_1_1detail"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts_1_1values_1_1detail.html">cxxopts::values::detail</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a564e0c1dcc7d9a5202f36755f4fb07c7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cxxopts_8hpp.html#a564e0c1dcc7d9a5202f36755f4fb07c7">CXXOPTS_VECTOR_DELIMITER</a>&#160;&#160;&#160;','</td></tr>
-<tr class="separator:a564e0c1dcc7d9a5202f36755f4fb07c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00d4ee40bcf31ae271e78a9c52632bc7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cxxopts_8hpp.html#a00d4ee40bcf31ae271e78a9c52632bc7">CXXOPTS__VERSION_MAJOR</a>&#160;&#160;&#160;2</td></tr>
-<tr class="separator:a00d4ee40bcf31ae271e78a9c52632bc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa67ae10831707133de2518234e695084"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cxxopts_8hpp.html#aa67ae10831707133de2518234e695084">CXXOPTS__VERSION_MINOR</a>&#160;&#160;&#160;2</td></tr>
-<tr class="separator:aa67ae10831707133de2518234e695084"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3de1a4b00ea1ddee4799e6382992e79"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cxxopts_8hpp.html#ab3de1a4b00ea1ddee4799e6382992e79">CXXOPTS__VERSION_PATCH</a>&#160;&#160;&#160;0</td></tr>
-<tr class="separator:ab3de1a4b00ea1ddee4799e6382992e79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a095b3fd6a666292bf51b52a16ce4e57e"><td class="memItemLeft" align="right" valign="top">typedef std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a095b3fd6a666292bf51b52a16ce4e57e">cxxopts::String</a></td></tr>
+<tr class="memitem:a095b3fd6a666292bf51b52a16ce4e57e"><td class="memItemLeft" align="right" valign="top">typedef icu::UnicodeString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a095b3fd6a666292bf51b52a16ce4e57e">cxxopts::String</a></td></tr>
 <tr class="separator:a095b3fd6a666292bf51b52a16ce4e57e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ad95d9591c1210b3b3c6cea81e830d5d8"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#ad95d9591c1210b3b3c6cea81e830d5d8">cxxopts::toLocalString</a> (std::string s)</td></tr>
+<tr class="separator:ad95d9591c1210b3b3c6cea81e830d5d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7efc463c39be189df1c25b8e770f8687"><td class="memItemLeft" align="right" valign="top">String &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a7efc463c39be189df1c25b8e770f8687">cxxopts::stringAppend</a> (String &amp;s, String a)</td></tr>
+<tr class="separator:a7efc463c39be189df1c25b8e770f8687"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58d2ac9d8b8d9beb30fe67a7607671b0"><td class="memItemLeft" align="right" valign="top">String &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a58d2ac9d8b8d9beb30fe67a7607671b0">cxxopts::stringAppend</a> (String &amp;s, int n, UChar32 c)</td></tr>
+<tr class="separator:a58d2ac9d8b8d9beb30fe67a7607671b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1a4ae4022414cbbc08d505174914185"><td class="memTemplParams" colspan="2">template&lt;typename Iterator &gt; </td></tr>
+<tr class="memitem:af1a4ae4022414cbbc08d505174914185"><td class="memTemplItemLeft" align="right" valign="top">String &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#af1a4ae4022414cbbc08d505174914185">cxxopts::stringAppend</a> (String &amp;s, Iterator begin, Iterator end)</td></tr>
+<tr class="separator:af1a4ae4022414cbbc08d505174914185"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e40a21a193047cd4575ac90411ca295"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a6e40a21a193047cd4575ac90411ca295">cxxopts::stringLength</a> (const String &amp;s)</td></tr>
+<tr class="separator:a6e40a21a193047cd4575ac90411ca295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa928c1ccea4085cba9744c892f7115b6"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#aa928c1ccea4085cba9744c892f7115b6">cxxopts::toUTF8String</a> (const String &amp;s)</td></tr>
+<tr class="separator:aa928c1ccea4085cba9744c892f7115b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa87b35d24d0a4ec1ec968ff2ae71f771"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#aa87b35d24d0a4ec1ec968ff2ae71f771">cxxopts::empty</a> (const String &amp;s)</td></tr>
+<tr class="separator:aa87b35d24d0a4ec1ec968ff2ae71f771"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac280394d33cff8bb3e61bf0e731edfcc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcxxopts_1_1UnicodeStringIterator.html">cxxopts::UnicodeStringIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestd.html#ac280394d33cff8bb3e61bf0e731edfcc">std::begin</a> (const icu::UnicodeString &amp;s)</td></tr>
+<tr class="separator:ac280394d33cff8bb3e61bf0e731edfcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5989d971dab02b95e781a29872d4f4f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcxxopts_1_1UnicodeStringIterator.html">cxxopts::UnicodeStringIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacestd.html#aa5989d971dab02b95e781a29872d4f4f">std::end</a> (const icu::UnicodeString &amp;s)</td></tr>
+<tr class="separator:aa5989d971dab02b95e781a29872d4f4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8ee50fdeb30245d157343a3bade9ede"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ac8ee50fdeb30245d157343a3bade9ede"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#ac8ee50fdeb30245d157343a3bade9ede">cxxopts::toLocalString</a> (T &amp;&amp;t)</td></tr>
 <tr class="separator:ac8ee50fdeb30245d157343a3bade9ede"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e40a21a193047cd4575ac90411ca295"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a6e40a21a193047cd4575ac90411ca295">cxxopts::stringLength</a> (const String &amp;s)</td></tr>
-<tr class="separator:a6e40a21a193047cd4575ac90411ca295"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4e2118d5f82b0a7aead69d76c888dba"><td class="memItemLeft" align="right" valign="top">String &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#ab4e2118d5f82b0a7aead69d76c888dba">cxxopts::stringAppend</a> (String &amp;s, String a)</td></tr>
-<tr class="separator:ab4e2118d5f82b0a7aead69d76c888dba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acaccf00f3326703699254e4ed65ee8be"><td class="memItemLeft" align="right" valign="top">String &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#acaccf00f3326703699254e4ed65ee8be">cxxopts::stringAppend</a> (String &amp;s, size_t n, char c)</td></tr>
 <tr class="separator:acaccf00f3326703699254e4ed65ee8be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65c3cf8f216044dc090ef06a7480279d"><td class="memTemplParams" colspan="2">template&lt;typename Iterator &gt; </td></tr>
-<tr class="memitem:a65c3cf8f216044dc090ef06a7480279d"><td class="memTemplItemLeft" align="right" valign="top">String &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a65c3cf8f216044dc090ef06a7480279d">cxxopts::stringAppend</a> (String &amp;s, Iterator begin, Iterator end)</td></tr>
-<tr class="separator:a65c3cf8f216044dc090ef06a7480279d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21f7a08caacc41cc3475f4bc7f9a1a67"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a21f7a08caacc41cc3475f4bc7f9a1a67"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#a21f7a08caacc41cc3475f4bc7f9a1a67">cxxopts::toUTF8String</a> (T &amp;&amp;t)</td></tr>
 <tr class="separator:a21f7a08caacc41cc3475f4bc7f9a1a67"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -242,6 +233,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a9cc26abde531fd7df6ff0ff07cc6d413"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a9cc26abde531fd7df6ff0ff07cc6d413"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts_1_1values.html#a9cc26abde531fd7df6ff0ff07cc6d413">cxxopts::values::parse_value</a> (const std::string &amp;text, std::vector&lt; T &gt; &amp;value)</td></tr>
 <tr class="separator:a9cc26abde531fd7df6ff0ff07cc6d413"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6b7d25cb22e93d2119b8e33de73b492"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ac6b7d25cb22e93d2119b8e33de73b492"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts_1_1values.html#ac6b7d25cb22e93d2119b8e33de73b492">cxxopts::values::parse_value</a> (const std::string &amp;text, std::optional&lt; T &gt; &amp;value)</td></tr>
+<tr class="separator:ac6b7d25cb22e93d2119b8e33de73b492"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1f1ae31bec8be1d1d166f5b4cc152cb"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:aa1f1ae31bec8be1d1d166f5b4cc152cb"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; Value &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#aa1f1ae31bec8be1d1d166f5b4cc152cb">cxxopts::value</a> ()</td></tr>
 <tr class="separator:aa1f1ae31bec8be1d1d166f5b4cc152cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,63 +243,6 @@ Functions</h2></td></tr>
 <tr class="memitem:acba2dc6918212bd8935701fd48461b9e"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; Value &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecxxopts.html#acba2dc6918212bd8935701fd48461b9e">cxxopts::value</a> (T &amp;t)</td></tr>
 <tr class="separator:acba2dc6918212bd8935701fd48461b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a00d4ee40bcf31ae271e78a9c52632bc7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00d4ee40bcf31ae271e78a9c52632bc7">&#9670;&nbsp;</a></span>CXXOPTS__VERSION_MAJOR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CXXOPTS__VERSION_MAJOR&#160;&#160;&#160;2</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa67ae10831707133de2518234e695084"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa67ae10831707133de2518234e695084">&#9670;&nbsp;</a></span>CXXOPTS__VERSION_MINOR</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CXXOPTS__VERSION_MINOR&#160;&#160;&#160;2</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ab3de1a4b00ea1ddee4799e6382992e79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3de1a4b00ea1ddee4799e6382992e79">&#9670;&nbsp;</a></span>CXXOPTS__VERSION_PATCH</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CXXOPTS__VERSION_PATCH&#160;&#160;&#160;0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a564e0c1dcc7d9a5202f36755f4fb07c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a564e0c1dcc7d9a5202f36755f4fb07c7">&#9670;&nbsp;</a></span>CXXOPTS_VECTOR_DELIMITER</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CXXOPTS_VECTOR_DELIMITER&#160;&#160;&#160;','</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

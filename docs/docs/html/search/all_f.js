@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['omp_5fcg_5findent',['OMP_CG_INDENT',['../OMPCG_8cpp.html#a825656789b0463368705ad174948b305',1,'OMPCG.cpp']]],
-  ['omp_5findent_5fper_5flevel',['OMP_INDENT_PER_LEVEL',['../OMPCG_8cpp.html#ae9c9bf64b5e1e86d19e6be488f121323',1,'OMPCG.cpp']]],
   ['ompcg',['OMPCG',['../classphaeton_1_1OMPCG.html',1,'phaeton::OMPCG'],['../classphaeton_1_1OMPCG.html#a5c734263c99db0785854c9a1af60e38c',1,'phaeton::OMPCG::OMPCG()']]],
   ['ompcg_2ecpp',['OMPCG.cpp',['../OMPCG_8cpp.html',1,'']]],
   ['ompcg_2eh',['OMPCG.h',['../OMPCG_8h.html',1,'']]],
@@ -9,11 +7,15 @@ var searchData=
   ['openclcg',['OpenCLCG',['../classphaeton_1_1OpenCLCG.html',1,'phaeton']]],
   ['openclcg_2ecpp',['OpenCLCG.cpp',['../OpenCLCG_8cpp.html',1,'']]],
   ['openclcg_2eh',['OpenCLCG.h',['../OpenCLCG_8h.html',1,'']]],
-  ['operator_21_3d',['operator!=',['../classphaeton_1_1Comparison.html#a68876b327e4ca6f21b1826e024e934f2',1,'phaeton::Comparison::operator!=()'],['../classphaeton_1_1TensorType.html#ac7e6d442d894817d2b5f25c9392a5b05',1,'phaeton::TensorType::operator!=()']]],
+  ['operation',['Operation',['../classphaeton_1_1JuliaCG.html#ae5ad8448b4b15afd8f5dff2d28985a03',1,'phaeton::JuliaCG::Operation()'],['../classphaeton_1_1TheanoCG.html#a0491adc5ad8521464b57a010a10dae33',1,'phaeton::TheanoCG::Operation()']]],
+  ['operator_20_2a',['operator *',['../classcxxopts_1_1UnicodeStringIterator.html#a6ba56b977bb6be29eb993a96e88c9343',1,'cxxopts::UnicodeStringIterator']]],
+  ['operator_21_3d',['operator!=',['../classphaeton_1_1Comparison.html#a68876b327e4ca6f21b1826e024e934f2',1,'phaeton::Comparison::operator!=()'],['../classphaeton_1_1TensorType.html#ac7e6d442d894817d2b5f25c9392a5b05',1,'phaeton::TensorType::operator!=()'],['../classcxxopts_1_1UnicodeStringIterator.html#adafd6c85107b2951ee55ced840a0a8fb',1,'cxxopts::UnicodeStringIterator::operator!=()']]],
   ['operator_28_29',['operator()',['../structcxxopts_1_1values_1_1detail_1_1SignedCheck_3_01T_00_01true_01_4.html#a03b02f6c1e500d96c8b8b13cbe858ce4',1,'cxxopts::values::detail::SignedCheck&lt; T, true &gt;::operator()()'],['../structcxxopts_1_1values_1_1detail_1_1SignedCheck_3_01T_00_01false_01_4.html#a616bc4801ac0d3cd851ec3ac4fad9bce',1,'cxxopts::values::detail::SignedCheck&lt; T, false &gt;::operator()()'],['../classcxxopts_1_1OptionAdder.html#a368dc6bff478b4eb39185a8f0e90ef9a',1,'cxxopts::OptionAdder::operator()()']]],
+  ['operator_2b',['operator+',['../classcxxopts_1_1UnicodeStringIterator.html#a07d00059bf7432df9fa9eec560114077',1,'cxxopts::UnicodeStringIterator']]],
+  ['operator_2b_2b',['operator++',['../classcxxopts_1_1UnicodeStringIterator.html#a8c6ec1e55b7f259fc2ae74a758ec4545',1,'cxxopts::UnicodeStringIterator']]],
   ['operator_3c',['operator&lt;',['../classphaeton_1_1Comparison.html#a9f66a1970eeaad7bbc063f09a9217778',1,'phaeton::Comparison::operator&lt;()'],['../classphaeton_1_1StringID.html#a886b5fe3f4b8f8b4c3b094ed7a6a3900',1,'phaeton::StringID::operator&lt;()'],['../classphaeton_1_1AddressID.html#a1252e15649f24177b9974d5c83dce70e',1,'phaeton::AddressID::operator&lt;()'],['../classphaeton_1_1GraphNode.html#afc532fc604ce6d03a2da7ff174f0baf6',1,'phaeton::GraphNode::operator&lt;()'],['../classphaeton_1_1GraphEdge.html#a2415bcaec01fde9809957bdd77ad4f72',1,'phaeton::GraphEdge::operator&lt;()']]],
   ['operator_3c_3d',['operator&lt;=',['../classphaeton_1_1Comparison.html#a5b9b1b3dfed0ad2fadbf249b609516bb',1,'phaeton::Comparison']]],
-  ['operator_3d_3d',['operator==',['../classphaeton_1_1Comparison.html#ad31b6ca9adbb249eb1126d059019a78f',1,'phaeton::Comparison::operator==()'],['../classphaeton_1_1StringID.html#a03e57a9f73b5913a81aeee6038f53226',1,'phaeton::StringID::operator==()'],['../classphaeton_1_1AddressID.html#a7d69e656e963ebefcbcf60b0bb7ff4ae',1,'phaeton::AddressID::operator==()'],['../classphaeton_1_1GraphNode.html#ac5f1d3498b8c0f9c43cfeaa1e8d65b13',1,'phaeton::GraphNode::operator==()'],['../classphaeton_1_1GraphEdge.html#af199bd545725382a26a97438a9c5f3cc',1,'phaeton::GraphEdge::operator==()'],['../classphaeton_1_1TensorType.html#afa056a17315f9170f92c3a9ddda5554e',1,'phaeton::TensorType::operator==()']]],
+  ['operator_3d_3d',['operator==',['../classphaeton_1_1Comparison.html#ad31b6ca9adbb249eb1126d059019a78f',1,'phaeton::Comparison::operator==()'],['../classphaeton_1_1StringID.html#a03e57a9f73b5913a81aeee6038f53226',1,'phaeton::StringID::operator==()'],['../classphaeton_1_1AddressID.html#a7d69e656e963ebefcbcf60b0bb7ff4ae',1,'phaeton::AddressID::operator==()'],['../classphaeton_1_1GraphNode.html#ac5f1d3498b8c0f9c43cfeaa1e8d65b13',1,'phaeton::GraphNode::operator==()'],['../classphaeton_1_1GraphEdge.html#af199bd545725382a26a97438a9c5f3cc',1,'phaeton::GraphEdge::operator==()'],['../classphaeton_1_1TensorType.html#afa056a17315f9170f92c3a9ddda5554e',1,'phaeton::TensorType::operator==()'],['../classcxxopts_1_1UnicodeStringIterator.html#accd612f1c0cf59754d075f9921c5dda4',1,'cxxopts::UnicodeStringIterator::operator==()']]],
   ['operator_3e',['operator&gt;',['../classphaeton_1_1Comparison.html#ab87e90bef1c2ef3d1570535945274864',1,'phaeton::Comparison']]],
   ['operator_3e_3d',['operator&gt;=',['../classphaeton_1_1Comparison.html#af52756d8facec55b0ac72246cece6bcc',1,'phaeton::Comparison']]],
   ['operator_5b_5d',['operator[]',['../classphaeton_1_1ASTNodeList.html#ac43eb842bd6fb0102d6cc9604f012bc0',1,'phaeton::ASTNodeList::operator[]()'],['../classphaeton_1_1GraphNode.html#aa293fb2b796d6c65da8905389c7f68c7',1,'phaeton::GraphNode::operator[]()'],['../classcxxopts_1_1ParseResult.html#a3e63be4a467bc52c1d013f54955e0346',1,'cxxopts::ParseResult::operator[]()']]],
@@ -36,8 +38,5 @@ var searchData=
   ['optionvalue',['OptionValue',['../classcxxopts_1_1OptionValue.html',1,'cxxopts']]],
   ['opts_5f',['opts_',['../structcxxopts_1_1Option.html#af5408ed9c7f5d322a8f4925aa337fa3e',1,'cxxopts::Option']]],
   ['optutils_2eh',['OptUtils.h',['../OptUtils_8h.html',1,'']]],
-  ['outputs',['Outputs',['../classphaeton_1_1Sema.html#a569ea122edfc584610d8ddb3670c34fc',1,'phaeton::Sema']]],
-  ['outputs_5fbegin',['outputs_begin',['../classphaeton_1_1Sema.html#a45b326622d1c6cdbe7546c1a7f58f130',1,'phaeton::Sema']]],
-  ['outputs_5fend',['outputs_end',['../classphaeton_1_1Sema.html#aeb267b4622272f8a1944be85e9daec89',1,'phaeton::Sema']]],
-  ['outputs_5fsize',['outputs_size',['../classphaeton_1_1Sema.html#a925ac6424981c9844ec6333c6a25bca0',1,'phaeton::Sema']]]
+  ['outputs',['Outputs',['../classphaeton_1_1Sema.html#a569ea122edfc584610d8ddb3670c34fc',1,'phaeton::Sema']]]
 ];

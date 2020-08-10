@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phaeton: /Users/lijiansong/work-space/compile/git/Phaeton/lib/Opt/IdentifierCopier.cpp File Reference</title>
+<title>Phaeton: /Users/lijiansong/work-space/compile/git/phaeton/lib/Opt/IdentifierCopier.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,58 +67,34 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">IdentifierCopier.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="IdentifierCopier_8h_source.html">ph/Opt/IdentifierCopier.h</a>&quot;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a71e83becafed64790ae8b1bc3d1d929e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IdentifierCopier_8cpp.html#a71e83becafed64790ae8b1bc3d1d929e">GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL</a>(ExprName)</td></tr>
-<tr class="separator:a71e83becafed64790ae8b1bc3d1d929e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a163192122e0605be9e38738260d34855"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IdentifierCopier_8cpp.html#a163192122e0605be9e38738260d34855">GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL</a>(ExprName)</td></tr>
-<tr class="separator:a163192122e0605be9e38738260d34855"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a3dbf2ea065b5d46e0afa190e57220443"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="IdentifierCopier_8cpp.html#a3dbf2ea065b5d46e0afa190e57220443">GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL</a> (Add) GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(Sub) GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(Mul) GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(ScalarMul) GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(Div) GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL(ScalarDiv) GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(Contraction) GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(Product) GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(Stack) GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL(Transposition) void <a class="el" href="classphaeton_1_1IdentifierCopier.html">IdentifierCopier</a></td></tr>
+<tr class="separator:a3dbf2ea065b5d46e0afa190e57220443"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a71e83becafed64790ae8b1bc3d1d929e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71e83becafed64790ae8b1bc3d1d929e">&#9670;&nbsp;</a></span>GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a3dbf2ea065b5d46e0afa190e57220443"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dbf2ea065b5d46e0afa190e57220443">&#9670;&nbsp;</a></span>GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL</td>
+          <td class="memname">GEN_TRANSFORM_COMPATIBLE_EXPR_NODE_IMPL </td>
           <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">ExprName</td><td>)</td>
+          <td class="paramtype">Add&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordtype">void</span> IdentifierCopier::transform##ExprName##<a class="code" href="classphaeton_1_1Expr.html">Expr</a>(ExprName##<a class="code" href="classphaeton_1_1Expr.html">Expr</a> *E) {        \</div><div class="line">    transformChildren(E);                                                      \</div><div class="line">  }</div><div class="ttc" id="classphaeton_1_1Expr_html"><div class="ttname"><a href="classphaeton_1_1Expr.html">phaeton::Expr</a></div><div class="ttdef"><b>Definition:</b> Expr.h:20</div></div>
-</div><!-- fragment --><p>These methods handle operations that leave index structures intact, including element-wise and those scalar operations. </p>
-
-</div>
-</div>
-<a id="a163192122e0605be9e38738260d34855"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a163192122e0605be9e38738260d34855">&#9670;&nbsp;</a></span>GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEN_TRANSFORM_INCOMPATIBLE_EXPR_NODE_IMPL</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">ExprName</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordtype">void</span> IdentifierCopier::transform##ExprName##<a class="code" href="classphaeton_1_1Expr.html">Expr</a>(ExprName##<a class="code" href="classphaeton_1_1Expr.html">Expr</a> *E) {        \</div><div class="line">    bool savedIncompatible = Incompatible;                                     \</div><div class="line">    Incompatible = <span class="keyword">true</span>;                                                       \</div><div class="line">    transformChildren(E);                                                      \</div><div class="line">    Incompatible = savedIncompatible;                                          \</div><div class="line">  }</div><div class="ttc" id="classphaeton_1_1Expr_html"><div class="ttname"><a href="classphaeton_1_1Expr.html">phaeton::Expr</a></div><div class="ttdef"><b>Definition:</b> Expr.h:20</div></div>
-</div><!-- fragment --><p>These methods handle operations that change index structure, including contraction, product, stack and transposition operation. </p>
+<p>These methods handle operations that change index structure, including contraction, product, stack and transposition operation. </p>
 
 </div>
 </div>

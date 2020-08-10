@@ -16,7 +16,7 @@ $ cmake -DCMAKE_CXX_COMPILER=$(which g++) -DCMAKE_C_COMPILER=$(which gcc) .. && 
 # Related Projects
 
 - taco: <https://github.com/tensor-compiler/taco>
-- lift: <https://github.com/lift-project/lift>
+- lift: <https://github.com/lift-project/lift> and its successor rise: <https://github.com/rise-lang>
 - mlir: <https://github.com/tensorflow/mlir>
 - halide: <https://github.com/halide/Halide>
 - futhark: <https://github.com/diku-dk/futhark>

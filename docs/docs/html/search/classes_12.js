@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['value',['Value',['../classcxxopts_1_1Value.html',1,'cxxopts']]]
+  ['unicodestringiterator',['UnicodeStringIterator',['../classcxxopts_1_1UnicodeStringIterator.html',1,'cxxopts']]]
 ];

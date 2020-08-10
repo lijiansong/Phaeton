@@ -1,22 +1,12 @@
 var searchData=
 [
   ['factor',['Factor',['../classphaeton_1_1Factor.html',1,'phaeton::Factor'],['../classphaeton_1_1Factor.html#a13f5331125f2aacb3af7ef7e317320df',1,'phaeton::Factor::Factor()']]],
-  ['fblu',['FBLU',['../Colors_8h.html#a7efc4f68a50a41c6a93ece87dd6c7dec',1,'Colors.h']]],
-  ['fcyn',['FCYN',['../Colors_8h.html#a707fab975ef99b4f89ff740f55d14602',1,'Colors.h']]],
-  ['fgrn',['FGRN',['../Colors_8h.html#ab3968f7b5009845811dc102a5b53d898',1,'Colors.h']]],
-  ['find',['find',['../classphaeton_1_1IdentifierFinder.html#acad2972867abfa2e764bc856dfe10fa8',1,'phaeton::IdentifierFinder::find()'],['../classphaeton_1_1ParentFinder.html#a0b866dd6db642680ac48b62382548aac',1,'phaeton::ParentFinder::find()']]],
   ['flattentuplelist',['flattenTupleList',['../classphaeton_1_1CodeGen.html#a34e5c41a8555df269eef3d4176cdc329',1,'phaeton::CodeGen']]],
   ['floatpointtypename',['FloatPointTypeName',['../classphaeton_1_1OMPCG.html#a0fc8b6aa44202cf55ac0177d35da0c6e',1,'phaeton::OMPCG']]],
-  ['fmag',['FMAG',['../Colors_8h.html#a957ecba768167bfb215a4bf97e7a0533',1,'Colors.h']]],
-  ['format_5fast_5findent',['FORMAT_AST_INDENT',['../ASTUtils_8h.html#a8e4365b07d137dd2610ae52af66801a8',1,'ASTUtils.h']]],
-  ['format_5fopt_5findent',['FORMAT_OPT_INDENT',['../OptUtils_8h.html#ab03e7a3ba461ded5ea783ce2dd4df6c4',1,'OptUtils.h']]],
   ['found',['Found',['../classphaeton_1_1IdentifierFinder.html#a957ded5dca2b0e6ad3e1328da50c6e22',1,'phaeton::IdentifierFinder::Found()'],['../classphaeton_1_1ParentFinder.html#abd539e53cee24ddee6b67939d44c8d45',1,'phaeton::ParentFinder::Found()']]],
-  ['fred',['FRED',['../Colors_8h.html#ae5b789f4a8f720ec20a544c58f9c204d',1,'Colors.h']]],
   ['freetemps',['FreeTemps',['../classphaeton_1_1CodeGen.html#acea8039a6feddd87c62f836a3074c4fd',1,'phaeton::CodeGen']]],
   ['freetempwithdims',['freeTempWithDims',['../classphaeton_1_1CodeGen.html#a61fabee792b777c4b30d9e94efd6a147',1,'phaeton::CodeGen::freeTempWithDims()'],['../classphaeton_1_1ExprTreeLifter.html#a3db6e4a2765ac0667c878cc93316b572',1,'phaeton::ExprTreeLifter::freeTempWithDims()'],['../classphaeton_1_1OMPCG.html#a336713d949df8715318de6246a72061e',1,'phaeton::OMPCG::freeTempWithDims()']]],
   ['funcarg',['FuncArg',['../structphaeton_1_1CodeGen_1_1FuncArg.html',1,'phaeton::CodeGen']]],
   ['funcargs',['FuncArgs',['../classphaeton_1_1CodeGen.html#a90c0b408f91a12df3ce7c50d4efec54b',1,'phaeton::CodeGen']]],
-  ['funcargslistty',['FuncArgsListTy',['../classphaeton_1_1CodeGen.html#a5a777df3b9b3b7c7967f48fda13d2133',1,'phaeton::CodeGen']]],
-  ['fwht',['FWHT',['../Colors_8h.html#a312c671f34e0d7a772e43cd63bc0f31b',1,'Colors.h']]],
-  ['fyel',['FYEL',['../Colors_8h.html#a4bae6c5147cf3957a90c9c6f5b37faac',1,'Colors.h']]]
+  ['funcargslistty',['FuncArgsListTy',['../classphaeton_1_1CodeGen.html#a5a777df3b9b3b7c7967f48fda13d2133',1,'phaeton::CodeGen']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phaeton: /Users/lijiansong/work-space/compile/git/Phaeton/lib/Opt/ENBuilder.cpp File Reference</title>
+<title>Phaeton: /Users/lijiansong/work-space/compile/git/phaeton/lib/Opt/ENBuilder.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,37 +67,34 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">ENBuilder.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="ENBuilder_8h_source.html">ph/Opt/ENBuilder.h</a>&quot;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a9b25acff6692969e0b11532b05f9dbc6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ENBuilder_8cpp.html#a9b25acff6692969e0b11532b05f9dbc6">GEN_BUILDER_CREATE_EXPR_NODE_IMPL</a>(ExprName)</td></tr>
-<tr class="separator:a9b25acff6692969e0b11532b05f9dbc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a46a4876af5b61e0afe1a422a6481ba2b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ENBuilder_8cpp.html#a46a4876af5b61e0afe1a422a6481ba2b">GEN_BUILDER_CREATE_EXPR_NODE_IMPL</a> (Add) GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Sub) GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Mul) GEN_BUILDER_CREATE_EXPR_NODE_IMPL(ScalarMul) GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Div) GEN_BUILDER_CREATE_EXPR_NODE_IMPL(ScalarDiv) GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Product) <a class="el" href="classphaeton_1_1ContractionExpr.html">ContractionExpr</a> *<a class="el" href="classphaeton_1_1ExprNodeBuilder.html">ExprNodeBuilder</a></td></tr>
+<tr class="separator:a46a4876af5b61e0afe1a422a6481ba2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a9b25acff6692969e0b11532b05f9dbc6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b25acff6692969e0b11532b05f9dbc6">&#9670;&nbsp;</a></span>GEN_BUILDER_CREATE_EXPR_NODE_IMPL</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a46a4876af5b61e0afe1a422a6481ba2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46a4876af5b61e0afe1a422a6481ba2b">&#9670;&nbsp;</a></span>GEN_BUILDER_CREATE_EXPR_NODE_IMPL()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define GEN_BUILDER_CREATE_EXPR_NODE_IMPL</td>
+          <td class="memname">GEN_BUILDER_CREATE_EXPR_NODE_IMPL </td>
           <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">ExprName</td><td>)</td>
+          <td class="paramtype">Add&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">ExprName##<a class="code" href="classphaeton_1_1Expr.html">Expr</a> *ExprNodeBuilder::create##ExprName##<a class="code" href="classphaeton_1_1Expr.html">Expr</a>(<a class="code" href="classphaeton_1_1ExprNode.html">ExprNode</a> *lhs,       \</div><div class="line">                                                          <a class="code" href="classphaeton_1_1ExprNode.html">ExprNode</a> *rhs) {     \</div><div class="line">    ExprName##<a class="code" href="classphaeton_1_1Expr.html">Expr</a> *result = ExprName##Expr::create(lhs, rhs);                 \</div><div class="line">    AllocatedNodes.insert(result);                                             \</div><div class="line">    return result;                                                             \</div><div class="line">  }</div><div class="ttc" id="classphaeton_1_1ExprNode_html"><div class="ttname"><a href="classphaeton_1_1ExprNode.html">phaeton::ExprNode</a></div><div class="ttdoc">ExprNode - This class keeps track of state of each expression node.</div><div class="ttdef"><b>Definition:</b> TensorExprTree.h:29</div></div>
-<div class="ttc" id="classphaeton_1_1Expr_html"><div class="ttname"><a href="classphaeton_1_1Expr.html">phaeton::Expr</a></div><div class="ttdef"><b>Definition:</b> Expr.h:20</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 </div><!-- contents -->

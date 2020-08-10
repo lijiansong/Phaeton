@@ -1,7 +1,6 @@
 var searchData=
 [
   ['scalardivexpr',['ScalarDivExpr',['../classphaeton_1_1ScalarDivExpr.html#a611e099c64b1d9dd2e6bce286e3f3ef7',1,'phaeton::ScalarDivExpr']]],
-  ['scalarmulexpr',['ScalarMulExpr',['../classphaeton_1_1ScalarMulExpr.html#afce38154f8c38e9c9b0c44b81f6b6b68',1,'phaeton::ScalarMulExpr']]],
   ['selectedgestocontract',['selectEdgesToContract',['../classphaeton_1_1GraphCodeGen.html#a6b199bda1fcf7289b288956004ec94f1',1,'phaeton::GraphCodeGen']]],
   ['sema',['Sema',['../classphaeton_1_1Sema.html#af9b8293df5197632979630c5e74fe7bf',1,'phaeton::Sema']]],
   ['set_5fdefault_5fand_5fimplicit',['set_default_and_implicit',['../classcxxopts_1_1values_1_1standard__value_3_01bool_01_4.html#a2f0911fd51e2bec0f6409806ccb0ec47',1,'cxxopts::values::standard_value&lt; bool &gt;']]],
@@ -29,7 +28,7 @@ var searchData=
   ['stmt',['Stmt',['../classphaeton_1_1Stmt.html#a60f60068b89bc45829c1aae45eee23fa',1,'phaeton::Stmt']]],
   ['stmtlist',['StmtList',['../classphaeton_1_1StmtList.html#ad3b792e446b9b342a38fba13898241db',1,'phaeton::StmtList::StmtList()'],['../classphaeton_1_1StmtList.html#ade8f1b7a882c0b3dc4437acfc9086e62',1,'phaeton::StmtList::StmtList(const Stmt *S)']]],
   ['str',['str',['../classphaeton_1_1GraphComponentID.html#aad4f656165793567929d63da1ab9f440',1,'phaeton::GraphComponentID::str()'],['../classphaeton_1_1StringID.html#a9982304bec080634962dac19148459a7',1,'phaeton::StringID::str()'],['../classphaeton_1_1AddressID.html#aa6ad4aed4907a9504ff60aa534234627',1,'phaeton::AddressID::str()']]],
-  ['stringappend',['stringAppend',['../namespacecxxopts.html#ab4e2118d5f82b0a7aead69d76c888dba',1,'cxxopts::stringAppend(String &amp;s, String a)'],['../namespacecxxopts.html#acaccf00f3326703699254e4ed65ee8be',1,'cxxopts::stringAppend(String &amp;s, size_t n, char c)'],['../namespacecxxopts.html#a65c3cf8f216044dc090ef06a7480279d',1,'cxxopts::stringAppend(String &amp;s, Iterator begin, Iterator end)']]],
+  ['stringappend',['stringAppend',['../namespacecxxopts.html#a7efc463c39be189df1c25b8e770f8687',1,'cxxopts::stringAppend(String &amp;s, String a)'],['../namespacecxxopts.html#a58d2ac9d8b8d9beb30fe67a7607671b0',1,'cxxopts::stringAppend(String &amp;s, int n, UChar32 c)'],['../namespacecxxopts.html#af1a4ae4022414cbbc08d505174914185',1,'cxxopts::stringAppend(String &amp;s, Iterator begin, Iterator end)'],['../namespacecxxopts.html#acaccf00f3326703699254e4ed65ee8be',1,'cxxopts::stringAppend(String &amp;s, size_t n, char c)']]],
   ['stringid',['StringID',['../classphaeton_1_1StringID.html#aedc45197c97d63d70ce67b7916a6a2b2',1,'phaeton::StringID::StringID(const std::string &amp;Id, const std::string Label=&quot;&quot;, const ASTNode *Node=nullptr)'],['../classphaeton_1_1StringID.html#a47c7f342bbf21e1c731f5c4e8e4549a9',1,'phaeton::StringID::StringID(const StringID &amp;RHS)']]],
   ['stringlength',['stringLength',['../namespacecxxopts.html#a6e40a21a193047cd4575ac90411ca295',1,'cxxopts']]],
   ['stringstream_5fparser',['stringstream_parser',['../namespacecxxopts_1_1values.html#a56fb16f3a09e011db85757491c52691e',1,'cxxopts::values']]],

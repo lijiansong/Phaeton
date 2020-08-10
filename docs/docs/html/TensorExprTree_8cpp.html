@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phaeton: /Users/lijiansong/work-space/compile/git/Phaeton/lib/Opt/TensorExprTree.cpp File Reference</title>
+<title>Phaeton: /Users/lijiansong/work-space/compile/git/phaeton/lib/Opt/TensorExprTree.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,68 +67,34 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">TensorExprTree.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="TensorExprTree_8h_source.html">ph/Opt/TensorExprTree.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ENBuilder_8h_source.html">ph/Opt/ENBuilder.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ExprTreeTransformer_8h_source.html">ph/Opt/ExprTreeTransformer.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ExprTreeVisitor_8h_source.html">ph/Opt/ExprTreeVisitor.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="OptUtils_8h_source.html">ph/Opt/OptUtils.h</a>&quot;</code><br />
-<code>#include &lt;cassert&gt;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
-<code>#include &lt;list&gt;</code><br />
-<code>#include &lt;sstream&gt;</code><br />
-<code>#include &lt;string&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:ae3d0e12e333856e4fc0abc3702f5a2fd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TensorExprTree_8cpp.html#ae3d0e12e333856e4fc0abc3702f5a2fd">GEN_EXPR_NODE_CLASS_VISIT_IMPL</a>(ExprName)</td></tr>
-<tr class="separator:ae3d0e12e333856e4fc0abc3702f5a2fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82673b442bee320ef3aca137fd863d91"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TensorExprTree_8cpp.html#a82673b442bee320ef3aca137fd863d91">GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL</a>(ExprName)</td></tr>
-<tr class="separator:a82673b442bee320ef3aca137fd863d91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a2e52327bbab7a9c28b82b7f4c7716ee4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TensorExprTree_8cpp.html#a2e52327bbab7a9c28b82b7f4c7716ee4">GEN_EXPR_NODE_CLASS_VISIT_IMPL</a> (Add) GEN_EXPR_NODE_CLASS_VISIT_IMPL(Sub) GEN_EXPR_NODE_CLASS_VISIT_IMPL(Mul) GEN_EXPR_NODE_CLASS_VISIT_IMPL(ScalarMul) GEN_EXPR_NODE_CLASS_VISIT_IMPL(Div) GEN_EXPR_NODE_CLASS_VISIT_IMPL(ScalarDiv) GEN_EXPR_NODE_CLASS_VISIT_IMPL(Product) GEN_EXPR_NODE_CLASS_VISIT_IMPL(Contraction) GEN_EXPR_NODE_CLASS_VISIT_IMPL(Stack) GEN_EXPR_NODE_CLASS_VISIT_IMPL(Transposition) GEN_EXPR_NODE_CLASS_VISIT_IMPL(<a class="el" href="classphaeton_1_1Identifier.html">Identifier</a>) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Add) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Sub) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Mul) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(ScalarMul) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Div) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(ScalarDiv) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Product) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Contraction) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Stack) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Transposition) GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(<a class="el" href="classphaeton_1_1Identifier.html">Identifier</a>) ScalarMulExpr</td></tr>
+<tr class="separator:a2e52327bbab7a9c28b82b7f4c7716ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a82673b442bee320ef3aca137fd863d91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82673b442bee320ef3aca137fd863d91">&#9670;&nbsp;</a></span>GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a2e52327bbab7a9c28b82b7f4c7716ee4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e52327bbab7a9c28b82b7f4c7716ee4">&#9670;&nbsp;</a></span>GEN_EXPR_NODE_CLASS_VISIT_IMPL()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL</td>
+          <td class="memname">GEN_EXPR_NODE_CLASS_VISIT_IMPL </td>
           <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">ExprName</td><td>)</td>
+          <td class="paramtype">Add&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordtype">void</span> ExprName##Expr::transform(<a class="code" href="classphaeton_1_1ExprTreeTransformer.html">ExprTreeTransformer</a> *T) {                     \</div><div class="line">    T-&gt;transform##ExprName##<a class="code" href="classphaeton_1_1Expr.html#a8d2619535b48cc2377c80f370d5a3ec4">Expr</a>(<span class="keyword">this</span>);                                        \</div><div class="line">  }</div><div class="ttc" id="classphaeton_1_1Expr_html_a8d2619535b48cc2377c80f370d5a3ec4"><div class="ttname"><a href="classphaeton_1_1Expr.html#a8d2619535b48cc2377c80f370d5a3ec4">phaeton::Expr::Expr</a></div><div class="ttdeci">Expr(ASTNodeKind NK)</div><div class="ttdef"><b>Definition:</b> Expr.h:22</div></div>
-<div class="ttc" id="classphaeton_1_1ExprTreeTransformer_html"><div class="ttname"><a href="classphaeton_1_1ExprTreeTransformer.html">phaeton::ExprTreeTransformer</a></div><div class="ttdef"><b>Definition:</b> ExprTreeTransformer.h:22</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="ae3d0e12e333856e4fc0abc3702f5a2fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3d0e12e333856e4fc0abc3702f5a2fd">&#9670;&nbsp;</a></span>GEN_EXPR_NODE_CLASS_VISIT_IMPL</h2>
 
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEN_EXPR_NODE_CLASS_VISIT_IMPL</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">ExprName</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordtype">void</span> ExprName##Expr::visit(<a class="code" href="classphaeton_1_1ExprTreeVisitor.html">ExprTreeVisitor</a> *Visitor)<span class="keyword"> const </span>{                 \</div><div class="line">    Visitor-&gt;visit##ExprName##<a class="code" href="classphaeton_1_1Expr.html#a8d2619535b48cc2377c80f370d5a3ec4">Expr</a>(<span class="keyword">this</span>);                                      \</div><div class="line">  }</div><div class="ttc" id="classphaeton_1_1ExprTreeVisitor_html"><div class="ttname"><a href="classphaeton_1_1ExprTreeVisitor.html">phaeton::ExprTreeVisitor</a></div><div class="ttdef"><b>Definition:</b> ExprTreeVisitor.h:19</div></div>
-<div class="ttc" id="classphaeton_1_1Expr_html_a8d2619535b48cc2377c80f370d5a3ec4"><div class="ttname"><a href="classphaeton_1_1Expr.html#a8d2619535b48cc2377c80f370d5a3ec4">phaeton::Expr::Expr</a></div><div class="ttdeci">Expr(ASTNodeKind NK)</div><div class="ttdef"><b>Definition:</b> Expr.h:22</div></div>
-</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

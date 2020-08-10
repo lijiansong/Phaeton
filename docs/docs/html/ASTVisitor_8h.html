@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phaeton: /Users/lijiansong/work-space/compile/git/Phaeton/include/ph/AST/ASTVisitor.h File Reference</title>
+<title>Phaeton: /Users/lijiansong/work-space/compile/git/phaeton/include/ph/AST/ASTVisitor.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -68,19 +68,12 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Macros</a>  </div>
+<a href="#namespaces">Namespaces</a>  </div>
   <div class="headertitle">
 <div class="title">ASTVisitor.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="ASTNode_8h_source.html">ph/AST/ASTNode.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="Decl_8h_source.html">ph/AST/Decl.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="ElementDirective_8h_source.html">ph/AST/ElementDirective.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="Expr_8h_source.html">ph/AST/Expr.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="Program_8h_source.html">ph/AST/Program.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="Stmt_8h_source.html">ph/AST/Stmt.h</a>&quot;</code><br />
-</div>
+
 <p><a href="ASTVisitor_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -92,71 +85,7 @@ Classes</h2></td></tr>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespacephaeton"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacephaeton.html">phaeton</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:adc78bab7cd33566b080ac4cd4135d549"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ASTVisitor_8h.html#adc78bab7cd33566b080ac4cd4135d549">GEN_VISIT_LIST_DECL</a>(Derived)&#160;&#160;&#160;virtual void visit##Derived(const Derived *List);</td></tr>
-<tr class="separator:adc78bab7cd33566b080ac4cd4135d549"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a456fdc270f853e77dbebe465afa82fdc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ASTVisitor_8h.html#a456fdc270f853e77dbebe465afa82fdc">GEN_PURE_VISIT_ASTNODE_DECL</a>(NodeName)&#160;&#160;&#160;virtual void visit##NodeName(const NodeName *) = 0;</td></tr>
-<tr class="separator:a456fdc270f853e77dbebe465afa82fdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea09b3cbbd6bfd0a79113652f729a6ff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ASTVisitor_8h.html#aea09b3cbbd6bfd0a79113652f729a6ff">GEN_VISIT_ASTNODE_DECL</a>(NodeName)&#160;&#160;&#160;virtual void visit##NodeName(const NodeName *);</td></tr>
-<tr class="separator:aea09b3cbbd6bfd0a79113652f729a6ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a456fdc270f853e77dbebe465afa82fdc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a456fdc270f853e77dbebe465afa82fdc">&#9670;&nbsp;</a></span>GEN_PURE_VISIT_ASTNODE_DECL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEN_PURE_VISIT_ASTNODE_DECL</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">NodeName</td><td>)</td>
-          <td>&#160;&#160;&#160;virtual void visit##NodeName(const NodeName *) = 0;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aea09b3cbbd6bfd0a79113652f729a6ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea09b3cbbd6bfd0a79113652f729a6ff">&#9670;&nbsp;</a></span>GEN_VISIT_ASTNODE_DECL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEN_VISIT_ASTNODE_DECL</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">NodeName</td><td>)</td>
-          <td>&#160;&#160;&#160;virtual void visit##NodeName(const NodeName *);</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="adc78bab7cd33566b080ac4cd4135d549"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc78bab7cd33566b080ac4cd4135d549">&#9670;&nbsp;</a></span>GEN_VISIT_LIST_DECL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define GEN_VISIT_LIST_DECL</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">Derived</td><td>)</td>
-          <td>&#160;&#160;&#160;virtual void visit##Derived(const Derived *List);</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

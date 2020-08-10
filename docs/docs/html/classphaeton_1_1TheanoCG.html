@@ -69,6 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classphaeton_1_1TheanoCG-members.html">List of all members</a>  </div>
@@ -105,10 +106,15 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a76b59c880570ebba9d1c0328bb80d4dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14786804b749b3db3efa03bc629c1b5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1TheanoCG.html#a14786804b749b3db3efa03bc629c1b5b">setResultTmp</a> (const std::string &amp;Tmp)</td></tr>
 <tr class="separator:a14786804b749b3db3efa03bc629c1b5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50c0065627e3900e2aa56de11107b6fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1TheanoCG.html#a50c0065627e3900e2aa56de11107b6fa">visitBinOpExpr</a> (const <a class="el" href="classphaeton_1_1ExprNode.html">ExprNode</a> *Node, const std::string &amp;Operation)</td></tr>
-<tr class="separator:a50c0065627e3900e2aa56de11107b6fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf7090ab94b862555eb6c748ce2a59f3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1TheanoCG.html#aaf7090ab94b862555eb6c748ce2a59f3">GEN_VISIT_EXPR_NODE_DECL</a> (Add) GEN_VISIT_EXPR_NODE_DECL(Sub) GEN_VISIT_EXPR_NODE_DECL(Mul) GEN_VISIT_EXPR_NODE_DECL(ScalarMul) GEN_VISIT_EXPR_NODE_DECL(Div) GEN_VISIT_EXPR_NODE_DECL(ScalarDiv) GEN_VISIT_EXPR_NODE_DECL(Contraction) GEN_VISIT_EXPR_NODE_DECL(Product) GEN_VISIT_EXPR_NODE_DECL(Stack) GEN_VISIT_EXPR_NODE_DECL(Transposition) GEN_VISIT_EXPR_NODE_DECL(<a class="el" href="classphaeton_1_1Identifier.html">Identifier</a>) void visitBinOpExpr(const <a class="el" href="classphaeton_1_1ExprNode.html">ExprNode</a> *Node</td></tr>
+<tr class="separator:aaf7090ab94b862555eb6c748ce2a59f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a690a0b772f7277ce5ce4646d7235143d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1TheanoCG.html#a690a0b772f7277ce5ce4646d7235143d">visitTensorDotExpr</a> (const <a class="el" href="classphaeton_1_1ExprNode.html">ExprNode</a> *Node, const std::string &amp;Axes)</td></tr>
 <tr class="separator:a690a0b772f7277ce5ce4646d7235143d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a0491adc5ad8521464b57a010a10dae33"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1TheanoCG.html#a0491adc5ad8521464b57a010a10dae33">Operation</a></td></tr>
+<tr class="separator:a0491adc5ad8521464b57a010a10dae33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -218,6 +224,32 @@ Private Attributes</h2></td></tr>
   </td>
   <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaf7090ab94b862555eb6c748ce2a59f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf7090ab94b862555eb6c748ce2a59f3">&#9670;&nbsp;</a></span>GEN_VISIT_EXPR_NODE_DECL()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">phaeton::TheanoCG::GEN_VISIT_EXPR_NODE_DECL </td>
+          <td>(</td>
+          <td class="paramtype">Add&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -418,42 +450,6 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a50c0065627e3900e2aa56de11107b6fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50c0065627e3900e2aa56de11107b6fa">&#9670;&nbsp;</a></span>visitBinOpExpr()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TheanoCG::visitBinOpExpr </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classphaeton_1_1ExprNode.html">ExprNode</a> *&#160;</td>
-          <td class="paramname"><em>Node</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>Operation</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a690a0b772f7277ce5ce4646d7235143d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a690a0b772f7277ce5ce4646d7235143d">&#9670;&nbsp;</a></span>visitTensorDotExpr()</h2>
 
@@ -535,6 +531,28 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a0491adc5ad8521464b57a010a10dae33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0491adc5ad8521464b57a010a10dae33">&#9670;&nbsp;</a></span>Operation</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string&amp; phaeton::TheanoCG::Operation</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ac42a26ae7ad9b6cb3f8478248963b44d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac42a26ae7ad9b6cb3f8478248963b44d">&#9670;&nbsp;</a></span>ResultTmp</h2>
 
@@ -558,8 +576,8 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/Users/lijiansong/work-space/compile/git/Phaeton/include/ph/Target/<a class="el" href="TheanoCG_8h_source.html">TheanoCG.h</a></li>
-<li>/Users/lijiansong/work-space/compile/git/Phaeton/lib/Target/<a class="el" href="TheanoCG_8cpp.html">TheanoCG.cpp</a></li>
+<li>/Users/lijiansong/work-space/compile/git/phaeton/include/ph/Target/<a class="el" href="TheanoCG_8h_source.html">TheanoCG.h</a></li>
+<li>/Users/lijiansong/work-space/compile/git/phaeton/lib/Target/<a class="el" href="TheanoCG_8cpp.html">TheanoCG.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

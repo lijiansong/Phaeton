@@ -1,16 +1,14 @@
 var searchData=
 [
-  ['s',['s',['../structcxxopts_1_1HelpOptionDetails.html#a83cb4bc76deb1d40c89de4165e4b0cdc',1,'cxxopts::HelpOptionDetails']]],
+  ['s',['s',['../classcxxopts_1_1UnicodeStringIterator.html#a2127f332237113d14da58b1b6a9e3b2b',1,'cxxopts::UnicodeStringIterator::s()'],['../structcxxopts_1_1HelpOptionDetails.html#a83cb4bc76deb1d40c89de4165e4b0cdc',1,'cxxopts::HelpOptionDetails::s()']]],
   ['scalar',['Scalar',['../classphaeton_1_1Sema.html#aa7264ef1e1563a40e6fb007c01a96777',1,'phaeton::Sema']]],
   ['scalardivexpr',['ScalarDivExpr',['../classphaeton_1_1ScalarDivExpr.html',1,'phaeton::ScalarDivExpr'],['../classphaeton_1_1ScalarDivExpr.html#a611e099c64b1d9dd2e6bce286e3f3ef7',1,'phaeton::ScalarDivExpr::ScalarDivExpr()']]],
-  ['scalarmulexpr',['ScalarMulExpr',['../classphaeton_1_1ScalarMulExpr.html',1,'phaeton::ScalarMulExpr'],['../classphaeton_1_1ScalarMulExpr.html#afce38154f8c38e9c9b0c44b81f6b6b68',1,'phaeton::ScalarMulExpr::ScalarMulExpr()']]],
   ['scanner',['Scanner',['../classphaeton_1_1Lexer.html#ae56fa7f01784a715904f42a77539eb3f',1,'phaeton::Lexer']]],
   ['selectedgestocontract',['selectEdgesToContract',['../classphaeton_1_1GraphCodeGen.html#a6b199bda1fcf7289b288956004ec94f1',1,'phaeton::GraphCodeGen']]],
   ['self',['Self',['../classcxxopts_1_1values_1_1abstract__value.html#a6b8c97ae22663547247602545e8a1cf9',1,'cxxopts::values::abstract_value']]],
   ['sema',['Sema',['../classphaeton_1_1Sema.html',1,'phaeton::Sema'],['../classphaeton_1_1Sema.html#af9b8293df5197632979630c5e74fe7bf',1,'phaeton::Sema::Sema()']]],
   ['sema_2ecpp',['Sema.cpp',['../Sema_8cpp.html',1,'']]],
   ['sema_2eh',['Sema.h',['../Sema_8h.html',1,'']]],
-  ['semantic_5ferror',['SEMANTIC_ERROR',['../ErrorHandling_8h.html#aeb10597f992c38458ce260883ace4d72',1,'ErrorHandling.h']]],
   ['seq',['Seq',['../classphaeton_1_1GraphNode.html#a7d3e06b72e764bdbbd1c419f5d3eb334',1,'phaeton::GraphNode']]],
   ['set_5fdefault_5fand_5fimplicit',['set_default_and_implicit',['../classcxxopts_1_1values_1_1standard__value_3_01bool_01_4.html#a2f0911fd51e2bec0f6409806ccb0ec47',1,'cxxopts::values::standard_value&lt; bool &gt;']]],
   ['setchild',['setChild',['../classphaeton_1_1ExprNode.html#aa6d63294e1d70ecd95ab9cced40236c2',1,'phaeton::ExprNode']]],
@@ -41,6 +39,7 @@ var searchData=
   ['stackremover_2eh',['StackRemover.h',['../StackRemover_8h.html',1,'']]],
   ['standard_5fvalue',['standard_value',['../classcxxopts_1_1values_1_1standard__value.html',1,'cxxopts::values::standard_value&lt; T &gt;'],['../classcxxopts_1_1values_1_1standard__value_3_01bool_01_4.html#a47718a070233f5c631b433979fdf808e',1,'cxxopts::values::standard_value&lt; bool &gt;::standard_value()'],['../classcxxopts_1_1values_1_1standard__value_3_01bool_01_4.html#aa5c0c7c48a5f27ef5ce821970a0ced94',1,'cxxopts::values::standard_value&lt; bool &gt;::standard_value(bool *b)']]],
   ['standard_5fvalue_3c_20bool_20_3e',['standard_value&lt; bool &gt;',['../classcxxopts_1_1values_1_1standard__value_3_01bool_01_4.html',1,'cxxopts::values']]],
+  ['std',['std',['../namespacestd.html',1,'']]],
   ['stmt',['Stmt',['../classphaeton_1_1Stmt.html',1,'phaeton::Stmt'],['../classphaeton_1_1Stmt.html#a60f60068b89bc45829c1aae45eee23fa',1,'phaeton::Stmt::Stmt()']]],
   ['stmt_2ecpp',['Stmt.cpp',['../Stmt_8cpp.html',1,'']]],
   ['stmt_2eh',['Stmt.h',['../Stmt_8h.html',1,'']]],
@@ -48,7 +47,7 @@ var searchData=
   ['stmts',['Stmts',['../classphaeton_1_1Program.html#a8fbaeedffcb685adb6b411830649900b',1,'phaeton::Program']]],
   ['str',['str',['../classphaeton_1_1GraphComponentID.html#aad4f656165793567929d63da1ab9f440',1,'phaeton::GraphComponentID::str()'],['../classphaeton_1_1StringID.html#a9982304bec080634962dac19148459a7',1,'phaeton::StringID::str()'],['../classphaeton_1_1AddressID.html#aa6ad4aed4907a9504ff60aa534234627',1,'phaeton::AddressID::str()']]],
   ['string',['String',['../namespacecxxopts.html#a095b3fd6a666292bf51b52a16ce4e57e',1,'cxxopts']]],
-  ['stringappend',['stringAppend',['../namespacecxxopts.html#ab4e2118d5f82b0a7aead69d76c888dba',1,'cxxopts::stringAppend(String &amp;s, String a)'],['../namespacecxxopts.html#acaccf00f3326703699254e4ed65ee8be',1,'cxxopts::stringAppend(String &amp;s, size_t n, char c)'],['../namespacecxxopts.html#a65c3cf8f216044dc090ef06a7480279d',1,'cxxopts::stringAppend(String &amp;s, Iterator begin, Iterator end)']]],
+  ['stringappend',['stringAppend',['../namespacecxxopts.html#a7efc463c39be189df1c25b8e770f8687',1,'cxxopts::stringAppend(String &amp;s, String a)'],['../namespacecxxopts.html#a58d2ac9d8b8d9beb30fe67a7607671b0',1,'cxxopts::stringAppend(String &amp;s, int n, UChar32 c)'],['../namespacecxxopts.html#af1a4ae4022414cbbc08d505174914185',1,'cxxopts::stringAppend(String &amp;s, Iterator begin, Iterator end)'],['../namespacecxxopts.html#acaccf00f3326703699254e4ed65ee8be',1,'cxxopts::stringAppend(String &amp;s, size_t n, char c)']]],
   ['stringid',['StringID',['../classphaeton_1_1StringID.html',1,'phaeton::StringID'],['../classphaeton_1_1StringID.html#aedc45197c97d63d70ce67b7916a6a2b2',1,'phaeton::StringID::StringID(const std::string &amp;Id, const std::string Label=&quot;&quot;, const ASTNode *Node=nullptr)'],['../classphaeton_1_1StringID.html#a47c7f342bbf21e1c731f5c4e8e4549a9',1,'phaeton::StringID::StringID(const StringID &amp;RHS)']]],
   ['stringlength',['stringLength',['../namespacecxxopts.html#a6e40a21a193047cd4575ac90411ca295',1,'cxxopts']]],
   ['stringstream_5fparser',['stringstream_parser',['../namespacecxxopts_1_1values.html#a56fb16f3a09e011db85757491c52691e',1,'cxxopts::values']]],
@@ -65,6 +64,5 @@ var searchData=
   ['symboltable',['SymbolTable',['../classphaeton_1_1SymbolTable.html',1,'phaeton::SymbolTable'],['../classphaeton_1_1SymbolTable.html#abf2ac468ca421d287748cdb0c5cb3c1a',1,'phaeton::SymbolTable::SymbolTable()']]],
   ['symboltable_2ecpp',['SymbolTable.cpp',['../SymbolTable_8cpp.html',1,'']]],
   ['symboltable_2eh',['SymbolTable.h',['../SymbolTable_8h.html',1,'']]],
-  ['syms',['Syms',['../structphaeton_1_1Sema_1_1ElemInfo.html#a06529643dd6666de61abb2a1a9ca3a7b',1,'phaeton::Sema::ElemInfo']]],
-  ['syntax_5ferror',['SYNTAX_ERROR',['../ErrorHandling_8h.html#a54d8a457a66c93c7a392eb065c58d9d8',1,'ErrorHandling.h']]]
+  ['syms',['Syms',['../structphaeton_1_1Sema_1_1ElemInfo.html#a06529643dd6666de61abb2a1a9ca3a7b',1,'phaeton::Sema::ElemInfo']]]
 ];
