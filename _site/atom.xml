@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>Phaeton:  </title>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000/"/>
+ <updated>2020-09-01T18:49:11+08:00</updated>
+ <id>http://localhost:4000</id>
+ <author>
+   <name>Json Lee</name>
+   <email></email>
+ </author>
+
+ 
+ <entry>
+   <title>Phaeton Introduction</title>
+   <link href="http://localhost:4000/2019/07/10/ph-intro/"/>
+   <updated>2019-07-10T00:00:00+08:00</updated>
+   <id>http://localhost:4000/2019/07/10/ph-intro</id>
+   <content type="html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Phaeton is a domain specific language for DNN accelerators.&lt;/p&gt;
+
+&lt;p&gt;Target platforms:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Cambricon MLUs&lt;/li&gt;
+  &lt;li&gt;Huawei DaVinci Ascend Accelerators&lt;/li&gt;
+  &lt;li&gt;Google TPUs&lt;/li&gt;
+  &lt;li&gt;…&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;api-docs&quot;&gt;API Docs&lt;/h2&gt;
+
+&lt;p&gt;The automatically generated documentation from the code comments (using Doxygen) can be found at : &lt;a href=&quot;/Phaeton/API-Docs&quot;&gt;API Docs&lt;/a&gt;.&lt;/p&gt;
+
+</content>
+ </entry>
+ 
+
+</feed>

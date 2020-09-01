@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../libAST.a  CMakeFiles/AST.dir/Expr.cpp.o CMakeFiles/AST.dir/Stmt.cpp.o CMakeFiles/AST.dir/Program.cpp.o CMakeFiles/AST.dir/ElementDirective.cpp.o CMakeFiles/AST.dir/ASTNode.cpp.o CMakeFiles/AST.dir/Decl.cpp.o CMakeFiles/AST.dir/ASTVisitor.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../libAST.a

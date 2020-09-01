@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../libOpt.a  CMakeFiles/Opt.dir/TensorExprTree.cpp.o CMakeFiles/Opt.dir/ENBuilder.cpp.o CMakeFiles/Opt.dir/IdentifierCopier.cpp.o CMakeFiles/Opt.dir/StackRemover.cpp.o CMakeFiles/Opt.dir/ExprTreeLoopLifter.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../libOpt.a
