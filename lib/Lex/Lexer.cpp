@@ -26,21 +26,21 @@ Lexer::~Lexer() { yylex_destroy(Scanner); }
 
 int Lexer::lex() { return yylex(&Val, Scanner); }
 
-std::map<int, const std::string> Lexer::TokenStrings = {
+std::map<int, const std::string> Lexer::TokenStrs = {
     {KW_VAR, "KW_VAR"},
     {KW_INPUT, "KW_INPUT"},
     {KW_OUTPUT, "KW_OUTPUT"},
     {KW_TYPE, "KW_TYPE"},
-    {COLON, "COLON"},
-    {LPAREN, "LPAREN"},
-    {RPAREN, "RPAREN"},
-    {LBRACK, "LBRACK"},
-    {RBRACK, "RBRACK"},
-    {ADD, "ADD"},
-    {SUB, "SUB"},
-    {MUL, "MUL"},
-    {DIV, "DIV"},
-    {DOT, "DOT"},
+    {SYMBOL_COLON, "SYMBOL_COLON"},
+    {SYMBOL_LEFT_PAREN, "SYMBOL_LEFT_PAREN"},
+    {SYMBOL_RIGHT_PAREN, "SYMBOL_RIGHT_PAREN"},
+    {SYMBOL_LEFT_BRACKET, "SYMBOL_LEFT_BRACKET"},
+    {SYMBOL_RIGHT_BRACKET, "SYMBOL_RIGHT_BRACKET"},
+    {ARITHM_ADD, "ARITHM_ADD"},
+    {ARITHM_SUB, "ARITHM_SUB"},
+    {ARITHM_MUL, "ARITHM_MUL"},
+    {ARITHM_DIV, "ARITHM_DIV"},
+    {ARITHM_DOT, "ARITHM_DOT"},
     {EQUAL, "EQUAL"},
     {INT, "INT"},
     {ID, "ID"}};

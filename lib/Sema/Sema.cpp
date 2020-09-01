@@ -21,13 +21,13 @@
 #define ASSERT_TYPE_MAP(Expr)                                                  \
   {                                                                            \
     if (ExprTypes.find((Expr)) == ExprTypes.end())                             \
-      ph_unreachable(INTERNAL_ERROR "type of 'Expr' node not in map");         \
+      ph_unreachable(INTERNAL_ERROR "type of 'Expression' node not in map");   \
   }
 
 using namespace phaeton;
 
 Sema::Sema() {
-  Scalar = new TensorType(std::vector<int>());
+  Scalar = new TensorDataType(std::vector<int>());
   Types.push_back(Scalar);
 
   ElementInfo.Present = false;
@@ -40,13 +40,13 @@ Sema::~Sema() {
     delete It.second;
 }
 
-const TensorType *Sema::createType(const std::vector<int> &Dims) {
-  const TensorType *Type = new TensorType(Dims);
+const TensorDataType *Sema::createType(const std::vector<int> &Dims) {
+  const TensorDataType *Type = new TensorDataType(Dims);
   Types.push_back(Type);
   return Type;
 }
 
-const TensorType *Sema::getType(const std::vector<int> &Dims) {
+const TensorDataType *Sema::getType(const std::vector<int> &Dims) {
   for (auto It : Types) {
     if (It->equals(Dims))
       return It;
@@ -55,7 +55,7 @@ const TensorType *Sema::getType(const std::vector<int> &Dims) {
   return createType(Dims);
 }
 
-const TensorType *Sema::getType(const std::vector<int> &Dims) const {
+const TensorDataType *Sema::getType(const std::vector<int> &Dims) const {
   for (auto It : Types) {
     if (It->equals(Dims))
       return It;
@@ -65,7 +65,7 @@ const TensorType *Sema::getType(const std::vector<int> &Dims) const {
 }
 
 const Symbol *Sema::createSymbol(Symbol::SymbolKind SK, const std::string &Name,
-                                 const TensorType &Type, const Decl *Decl) {
+                                 const TensorDataType &Type, const Decl *Decl) {
   Symbol *Sym = new Symbol(SK, Name, Type, Decl);
   Symbols.addSymbol(Sym);
   return Sym;
@@ -80,7 +80,7 @@ const Symbol *Sema::getSymbol(const std::string &Name) const {
   return Sym;
 }
 
-bool Sema::isTypeName(const Expr *E, const TensorType *&Type) const {
+bool Sema::isTypeName(const Expression *E, const TensorDataType *&Type) const {
   const Identifier *Id = dynamic_cast<const Identifier *>(E);
   if (!Id) {
     return false;
@@ -94,7 +94,7 @@ bool Sema::isTypeName(const Expr *E, const TensorType *&Type) const {
   return true;
 }
 
-bool Sema::isIntegerList(const Expr *E, std::vector<int> &Ints) {
+bool Sema::isIntegerList(const Expression *E, std::vector<int> &Ints) {
   const BrackExpr *BE = dynamic_cast<const BrackExpr *>(E);
   if (!BE) {
     return false;
@@ -113,7 +113,8 @@ bool Sema::isIntegerList(const Expr *E, std::vector<int> &Ints) {
   return true;
 }
 
-bool Sema::isListOfLists(const Expr *E, std::vector<std::vector<int>> &Lists) {
+bool Sema::isListOfLists(const Expression *E,
+                         std::vector<std::vector<int>> &Lists) {
   const BrackExpr *BE = dynamic_cast<const BrackExpr *>(E);
   if (!BE) {
     return false;
@@ -121,7 +122,7 @@ bool Sema::isListOfLists(const Expr *E, std::vector<std::vector<int>> &Lists) {
 
   const ExprList *List = BE->getExprs();
   Lists.clear();
-  for (const Expr *const &Expr : *List) {
+  for (const Expression *const &Expr : *List) {
     std::vector<int> Integers;
     if (!isIntegerList(Expr, Integers)) {
       return false;
@@ -133,8 +134,8 @@ bool Sema::isListOfLists(const Expr *E, std::vector<std::vector<int>> &Lists) {
   return true;
 }
 
-const TensorType *Sema::visitTypeExpr(const Expr *E) {
-  const TensorType *Type;
+const TensorDataType *Sema::visitTypeExpr(const Expression *E) {
+  const TensorDataType *Type;
   if (isTypeName(E, Type)) {
     return Type;
   }
@@ -154,7 +155,7 @@ void Sema::visitDecl(const Decl *D) {
           ? Symbol::SYM_KIND_Variable
           : Symbol::SYM_KIND_Type;
   const std::string &Name = D->getIdentifier()->getName();
-  const TensorType *Type = visitTypeExpr(D->getTypeExpr());
+  const TensorDataType *Type = visitTypeExpr(D->getTypeExpr());
 
   if (getSymbol(Name)) {
     ph_unreachable(("symbol \'" + Name + "\' already declared").c_str());
@@ -175,7 +176,7 @@ void Sema::visitDecl(const Decl *D) {
 
 void Sema::visitStmt(const Stmt *S) {
   const Identifier *Id = S->getIdentifier();
-  const Expr *Expr = S->getExpr();
+  const Expression *Expr = S->getExpr();
 
   const Symbol *Sym = getSymbol(Id->getName());
   if (!Sym) {
@@ -188,7 +189,7 @@ void Sema::visitStmt(const Stmt *S) {
   Expr->visit(this);
   ASSERT_TYPE_MAP(Expr)
 
-  const TensorType *Type = ExprTypes[Expr];
+  const TensorDataType *Type = ExprTypes[Expr];
   if (*Type != Sym->getType()) {
     ph_unreachable("semantic error: assigning non-equal types");
     return;
@@ -200,10 +201,10 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
   const ASTNode::ASTNodeKind NK = BE->getASTNodeKind();
 
   if (NK == ASTNode::AST_NODE_KIND_ContractionExpr) {
-    const Expr *Left = BE->getLeft();
+    const Expression *Left = BE->getLeft();
     Left->visit(this);
     ASSERT_TYPE_MAP(Left);
-    const TensorType *Type0 = ExprTypes[Left];
+    const TensorDataType *Type0 = ExprTypes[Left];
 
     std::vector<std::vector<int>> Lists;
     if (isListOfLists(BE->getRight(), Lists)) {
@@ -257,10 +258,10 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
       ExprTypes[BE] = getType(Res);
       return;
     } else {
-      const Expr *Right = BE->getRight();
+      const Expression *Right = BE->getRight();
       Right->visit(this);
       ASSERT_TYPE_MAP(Right);
-      const TensorType *Type1 = ExprTypes[Right];
+      const TensorDataType *Type1 = ExprTypes[Right];
 
       const int Rank0 = Type0->getRank();
       const int Rank1 = Type1->getRank();
@@ -287,10 +288,10 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
     // If we get here, this must be an internal ERROR!
     ph_unreachable(INTERNAL_ERROR "should have returned");
   } else if (NK == ASTNode::AST_NODE_KIND_TranspositionExpr) {
-    const Expr *Left = BE->getLeft();
+    const Expression *Left = BE->getLeft();
     Left->visit(this);
     ASSERT_TYPE_MAP(Left);
-    const TensorType *Type0 = ExprTypes[Left];
+    const TensorDataType *Type0 = ExprTypes[Left];
     const int Rank = Type0->getRank();
 
     std::vector<std::vector<int>> Lists;
@@ -334,17 +335,17 @@ void Sema::visitBinaryExpr(const BinaryExpr *BE) {
          NK != ASTNode::AST_NODE_KIND_TranspositionExpr &&
          "internal error: should not be here");
 
-  const Expr *Left = BE->getLeft();
+  const Expression *Left = BE->getLeft();
   Left->visit(this);
   ASSERT_TYPE_MAP(Left);
-  const TensorType &LeftType = *ExprTypes[Left];
+  const TensorDataType &LeftType = *ExprTypes[Left];
 
-  const Expr *Right = BE->getRight();
+  const Expression *Right = BE->getRight();
   Right->visit(this);
   ASSERT_TYPE_MAP(Right);
-  const TensorType &RightType = *ExprTypes[Right];
+  const TensorDataType &RightType = *ExprTypes[Right];
 
-  const TensorType *ResultType;
+  const TensorDataType *ResultType;
   switch (NK) {
   case ASTNode::AST_NODE_KIND_AddExpr:
   case ASTNode::AST_NODE_KIND_SubExpr: {
@@ -424,12 +425,12 @@ void Sema::visitBrackExpr(const BrackExpr *BE) {
 
   List[0]->visit(this);
   ASSERT_TYPE_MAP(List[0]);
-  const TensorType *Type = getType(List[0]);
+  const TensorDataType *Type = getType(List[0]);
 
   // Note that here we skip the first expression in the list,
   // since it has already been visited above.
   for (unsigned i = 1; i < List.size(); ++i) {
-    const Expr *E = List[i];
+    const Expression *E = List[i];
     E->visit(this);
     ASSERT_TYPE_MAP(E);
     if (getType(E) != Type)
@@ -445,17 +446,17 @@ void Sema::visitBrackExpr(const BrackExpr *BE) {
 }
 
 void Sema::visitParenExpr(const ParenExpr *PE) {
-  const Expr *E = PE->getExpr();
+  const Expression *E = PE->getExpr();
   E->visit(this);
   ASSERT_TYPE_MAP(E);
   ExprTypes[PE] = getType(E);
 }
 
-bool Sema::isNamedType(const TensorType *Type) const {
+bool Sema::isNamedType(const TensorDataType *Type) const {
   return NamedTypes.count(Type);
 }
 
-const Symbol *Sema::getTypeSymbol(const TensorType *Type) const {
+const Symbol *Sema::getTypeSymbol(const TensorDataType *Type) const {
   if (!isNamedType(Type)) {
     return nullptr;
   }

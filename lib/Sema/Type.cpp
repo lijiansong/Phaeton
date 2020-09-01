@@ -12,7 +12,7 @@
 
 using namespace phaeton;
 
-bool TensorType::operator==(const TensorType &RHS) const {
+bool TensorDataType::operator==(const TensorDataType &RHS) const {
   if (getRank() != RHS.getRank()) {
     return false;
   }
@@ -26,7 +26,7 @@ bool TensorType::operator==(const TensorType &RHS) const {
   return true;
 }
 
-const std::string TensorType::getDimString() const {
+const std::string TensorDataType::getDimString() const {
   std::string Res = "";
   for (unsigned i = 0; i < getRank(); i++) {
     Res += std::to_string((long long)getDim(i));

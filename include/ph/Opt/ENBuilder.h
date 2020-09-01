@@ -20,18 +20,19 @@
 
 namespace phaeton {
 
-/// ExprNodeBuilder - This class is used to keep track of memory that has been
-/// allocated for nodes of expression trees.
-class ExprNodeBuilder {
+/// ExpressionNodeBuilder - This class is used to keep track of memory that has
+/// been allocated for nodes of expression trees.
+class ExpressionNodeBuilder {
 public:
-  ~ExprNodeBuilder() {
+  ~ExpressionNodeBuilder() {
     for (auto *EN : AllocatedNodes) {
       delete EN;
     }
   }
 
 #define GEN_BUILDER_CREATE_EXPR_NODE_DECL(ExprName)                            \
-  ExprName##Expr *create##ExprName##Expr(ExprNode *LHS, ExprNode *RHS);
+  ExprName##Expr *create##ExprName##Expr(ExpressionNode *LHS,                  \
+                                         ExpressionNode *RHS);
 
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(Add)
   GEN_BUILDER_CREATE_EXPR_NODE_DECL(Sub)
@@ -43,23 +44,24 @@ public:
 
 #undef GEN_BUILDER_CREATE_EXPR_NODE_DECL
 
-  ContractionExpr *createContractionExpr(ExprNode *LHS,
+  ContractionExpr *createContractionExpr(ExpressionNode *LHS,
                                          const CodeGen::List &LeftIndex,
-                                         ExprNode *RHS,
+                                         ExpressionNode *RHS,
                                          const CodeGen::List &RightIndex);
 
-  StackExpr *createStackExpr(const std::vector<ExprNode *> &);
+  StackExpr *createStackExpr(const std::vector<ExpressionNode *> &);
 
   TranspositionExpr *
-  createTranspositionExpr(ExprNode *Node, const CodeGen::TupleList &IndexPairs);
+  createTranspositionExpr(ExpressionNode *Node,
+                          const CodeGen::TupleList &IndexPairs);
 
   IdentifierExpr *createIdentifierExpr(const std::string &Name,
-                                       const ExprNode::ExprDims &Dims);
+                                       const ExpressionNode::ExprDims &Dims);
 
 private:
   /// set to keep track of memory that has been allocated for nodes of
   /// expression trees.
-  std::set<const ExprNode *> AllocatedNodes;
+  std::set<const ExpressionNode *> AllocatedNodes;
 };
 
 } // end namespace phaeton

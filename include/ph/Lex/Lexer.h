@@ -35,11 +35,9 @@ public:
   yyscan_t getScanner() const { return Scanner; }
   YYSTYPE getVal() const { return Val; }
 
-  static const std::string &getTokenString(int Token) {
-    return TokenStrings[Token];
-  }
+  static const std::string &getTokenStr(int Token) { return TokenStrs[Token]; }
 
-  static std::map<int, const std::string> TokenStrings;
+  static std::map<int, const std::string> TokenStrs;
 };
 
 } // end namespace phaeton

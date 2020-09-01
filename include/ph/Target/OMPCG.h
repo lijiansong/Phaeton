@@ -44,8 +44,8 @@ protected:
     return FloatPointTypeName;
   }
 
-  const ExprNode *getResultTmp() const { return ResultTmp; }
-  void setResultTmp(const ExprNode *Tmp) { ResultTmp = Tmp; }
+  const ExpressionNode *getResultTmp() const { return ResultTmp; }
+  void setResultTmp(const ExpressionNode *Tmp) { ResultTmp = Tmp; }
 
   unsigned getIndent() const { return Indent; }
   void setIndent(unsigned Indent) { Indent = Indent; }
@@ -63,7 +63,7 @@ protected:
                          int IntBound, bool Unroll = false, bool Simd = false);
   void emitForLoopFooter(unsigned Indent);
 
-  void emitTempDefinition(unsigned Indent, const std::string &Tmp);
+  void emitTmpDefinition(unsigned Indent, const std::string &Tmp);
 
   std::string subscriptString(const std::vector<std::string> &Indices,
                               const std::vector<int> &Dims) const;
@@ -74,16 +74,16 @@ protected:
                           std::vector<int> &Dims,
                           const std::string &Name) const;
   std::string
-  subscriptedIdentifier(const ExprNode *Node,
+  subscriptedIdentifier(const ExpressionNode *Node,
                         const std::vector<std::string> &Indices = {}) const;
 
   void emitLoopHeaderNest(const std::vector<int> &ExprDims, bool Unroll = false,
                           bool Simd = false);
   void emitLoopFooterNest();
 
-  std::string visitChildExpr(const ExprNode *Node);
+  std::string visitChildExpr(const ExpressionNode *Node);
 
-  void visitBinOpExpr(const ExprNode *Node, const std::string &Operation);
+  void visitBinOpExpr(const ExpressionNode *Node, const std::string &Operation);
 
 #define GEN_VISIT_EXPR_NODE_DECL(ExprName)                                     \
   virtual void visit##ExprName##Expr(const ExprName##Expr *E) override;
@@ -102,11 +102,11 @@ protected:
 
 #undef GEN_VISIT_EXPR_NODE_DECL
 
-  void visitTopLevelIdentifier(const ExprNode *Node);
+  void visitTopLevelIdentifier(const ExpressionNode *Node);
 
 private:
   CodeGen *CG;
-  const ExprNode *ResultTmp;
+  const ExpressionNode *ResultTmp;
   const std::string FloatPointTypeName;
   unsigned Indent;
   unsigned IndexCounter;
@@ -125,16 +125,16 @@ private:
 
   std::string ElementIndex;
   // Helper methods for CodeGen.
-  std::string getTemp() { return CG->getTemp(); }
-  std::string getTempWithDims(const std::vector<int> &Dim) {
-    return CG->getTempWithDims(Dim);
+  std::string getTmp() { return CG->getTmp(); }
+  std::string getTmpWithDims(const std::vector<int> &Dim) {
+    return CG->getTmpWithDims(Dim);
   }
-  void freeTempWithDims(const std::string &Name, const std::vector<int> &Dim) {
-    CG->freeTempWithDims(Name, Dim);
+  void freeTmpWithDims(const std::string &Name, const std::vector<int> &Dim) {
+    CG->freeTmpWithDims(Name, Dim);
   }
   void appendCode(const std::string &Code) { CG->appendCode(Code); }
   const Sema *getSema() const { return CG->getSema(); }
-  const std::vector<int> &getDims(const ExprNode *Node) const {
+  const std::vector<int> &getDims(const ExpressionNode *Node) const {
     return Node->getDims();
   }
   // FIXME: remove later

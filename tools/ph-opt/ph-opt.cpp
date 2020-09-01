@@ -20,9 +20,9 @@
 #include <iostream>
 
 #include "ph/CodeGen/GraphCG.h"
-#include "ph/Target/OMPCG.h"
 #include "ph/Parse/Parser.h"
 #include "ph/Sema/Sema.h"
+#include "ph/Target/OMPCG.h"
 #include "ph/Tooling/CommonOptionsParser.h"
 
 #define PH_OPTIMIZER_EXE "ph-opt"
@@ -70,8 +70,9 @@ void createOptions(Options &Opts) {
       cxxopts::value<std::string>()->default_value("OpenMP"))(
       "o, output", "Output file",
       cxxopts::value<std::string>()->default_value("a.cpp"))(
-      "positional", "These are the arguments that are entered "
-                    "without an option",
+      "positional",
+      "These are the arguments that are entered "
+      "without an option",
       cxxopts::value<std::vector<std::string>>());
   Opts.parse_positional({"input", "positional"});
 }
@@ -254,7 +255,7 @@ void buildJobs(const Options &Opts, const ParseResult &Result) {
 
 int main(int argc, char *argv[]) {
   Options Opts(/*argv[0]*/ PH_OPTIMIZER_EXE,
-                  "Phaeton optimizer command line options");
+               "Phaeton optimizer command line options");
   createOptions(Opts);
   // Parse input command line arguments.
   auto Result = parseArgs(Opts, argc, argv);

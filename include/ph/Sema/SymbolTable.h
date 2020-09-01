@@ -30,13 +30,13 @@ public:
   };
 
 public:
-  Symbol(SymbolKind SK, const std::string &Name, const TensorType &Type,
+  Symbol(SymbolKind SK, const std::string &Name, const TensorDataType &Type,
          const Decl *Decl = nullptr)
       : SK(SK), Name(Name), Type(Type), DeclNode(Decl) {}
 
   SymbolKind getSymbolKind() const { return SK; }
   const std::string &getName() const { return Name; }
-  const TensorType &getType() const { return Type; }
+  const TensorDataType &getType() const { return Type; }
   const Decl *getDecl() const { return DeclNode; }
 
   void setDecl(const Decl *Decl) { DeclNode = Decl; }
@@ -44,7 +44,7 @@ public:
 private:
   const SymbolKind SK;
   const std::string Name;
-  const TensorType &Type;
+  const TensorDataType &Type;
   const Decl *DeclNode;
 };
 

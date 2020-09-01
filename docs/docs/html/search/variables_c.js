@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['parent',['Parent',['../classphaeton_1_1ExprTreeLifter.html#ab3e496886df5aaf25244c9dbb7ab14be',1,'phaeton::ExprTreeLifter::Parent()'],['../classphaeton_1_1IdentifierCopier.html#aeee9fb336a0b8ecafa932cf15df0e01a',1,'phaeton::IdentifierCopier::Parent()'],['../classphaeton_1_1ParentFinder.html#a7e0d5fe7474372917ed06f1a33ef0e15',1,'phaeton::ParentFinder::Parent()'],['../classphaeton_1_1StackRemover.html#a965df103f38b0fe71d7eec925a78333c',1,'phaeton::StackRemover::Parent()']]],
+  ['parent',['Parent',['../classphaeton_1_1ExprTreeLifter.html#a1e7e694f8a69f57ecb9826dba3640726',1,'phaeton::ExprTreeLifter::Parent()'],['../classphaeton_1_1IdentifierCopier.html#acaca93c41e579c01363e4fa5dbffc00e',1,'phaeton::IdentifierCopier::Parent()'],['../classphaeton_1_1ParentFinder.html#ad5b025e3120f839e97742c7f3d7011ad',1,'phaeton::ParentFinder::Parent()'],['../classphaeton_1_1StackRemover.html#ab047472d876d3dc3602c0df80d7ec433',1,'phaeton::StackRemover::Parent()']]],
   ['patch',['patch',['../namespacecxxopts.html#a6d7d82764847cde60d24c9077234adef',1,'cxxopts']]],
   ['permute',['Permute',['../classphaeton_1_1IdentifierExpr.html#a4315c9d2f1ccc8bbe3628c01c937bbe3',1,'phaeton::IdentifierExpr']]],
   ['phaetonlexer',['PhaetonLexer',['../classphaeton_1_1Parser.html#a5b5a82515ab661f7546d3c855d8010d7',1,'phaeton::Parser']]],

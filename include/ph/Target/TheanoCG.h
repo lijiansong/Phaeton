@@ -53,8 +53,8 @@ protected:
 
 #undef GEN_VISIT_EXPR_NODE_DECL
 
-  void visitBinOpExpr(const ExprNode *Node, const std::string &Operation);
-  void visitTensorDotExpr(const ExprNode *Node, const std::string &Axes);
+  void visitBinOpExpr(const ExpressionNode *Node, const std::string &Operation);
+  void visitTensorDotExpr(const ExpressionNode *Node, const std::string &Axes);
 
 private:
   CodeGen *CG;
@@ -66,7 +66,7 @@ private:
   // some information from these help methods.
   const Sema *getSema() const { return CG->getSema(); }
   const std::string &getCGFuncName() const { return CG->getCGFuncName(); }
-  std::string getTemp() { return CG->getTemp(); }
+  std::string getTmp() { return CG->getTmp(); }
   void addFuncArg(const std::string &Name) { CG->addFuncArg(Name); }
   void appendCode(const std::string &Code) { CG->appendCode(Code); }
 };

@@ -25,7 +25,7 @@ using namespace phaeton;
 
 void JuliaCG::genCode(const Program *Prog) {}
 
-void JuliaCG::visitBinOpExpr(const ExprNode *Node,
+void JuliaCG::visitBinOpExpr(const ExpressionNode *Node,
                              const std::string &Operation) {
   const std::string Result = getResultTmp();
   std::string Tmps[2];
@@ -62,7 +62,7 @@ void JuliaCG::visitScalarDivExpr(const ScalarDivExpr *E) {
   visitBinOpExpr(E, "/");
 }
 
-void JuliaCG::visitTensorDotExpr(const ExprNode *Node,
+void JuliaCG::visitTensorDotExpr(const ExpressionNode *Node,
                                  const std::string &Axes) {
   const std::string Result = getResultTmp();
   std::string Tmps[2];
@@ -99,7 +99,7 @@ void JuliaCG::visitStackExpr(const StackExpr *Expr) {
 
   std::string Stack;
   for (int I = 0; I < Expr->getNumChildren(); ++I) {
-    const ExprNode *Child = Expr->getChild(I);
+    const ExpressionNode *Child = Expr->getChild(I);
 
     if (Child->isIdentifier()) {
       Stack += Child->getName();

@@ -15,7 +15,7 @@
 
 namespace phaeton {
 
-class TensorType {
+class TensorDataType {
 public:
   /// AddrSpaceType - Memory hierarchy specifier.
   enum AddrSpaceType {
@@ -30,8 +30,8 @@ public:
   };
 
 public:
-  TensorType() {}
-  TensorType(const std::vector<int> &Dims) : Dims(Dims) {}
+  TensorDataType() {}
+  TensorDataType(const std::vector<int> &Dims) : Dims(Dims) {}
 
   void addDim(int Dim) { Dims.push_back(Dim); }
 
@@ -39,11 +39,11 @@ public:
 
   int getDim(unsigned I) const { return Dims.at(I); }
 
-  bool operator==(const TensorType &RHS) const;
-  bool operator!=(const TensorType &RHS) const { return !(*this == RHS); }
+  bool operator==(const TensorDataType &RHS) const;
+  bool operator!=(const TensorDataType &RHS) const { return !(*this == RHS); }
 
   bool equals(const std::vector<int> &Dims) const {
-    return (*this == TensorType(Dims));
+    return (*this == TensorDataType(Dims));
   }
 
   const std::string getDimString() const;

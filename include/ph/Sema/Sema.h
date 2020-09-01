@@ -39,24 +39,29 @@ public:
   Sema();
   ~Sema();
 
-  const TensorType *createType(const std::vector<int> &Dim);
-  const TensorType *getType(const std::vector<int> &Dim);
-  const TensorType *getType(const std::vector<int> &Dim) const;
-  const TensorType *getType(const Expr *E) const { return ExprTypes.at(E); }
-  const TensorType &getScalar() const { return *Scalar; }
-  bool isScalar(const TensorType &Type) const { return (Type == getScalar()); }
+  const TensorDataType *createType(const std::vector<int> &Dim);
+  const TensorDataType *getType(const std::vector<int> &Dim);
+  const TensorDataType *getType(const std::vector<int> &Dim) const;
+  const TensorDataType *getType(const Expression *E) const {
+    return ExprTypes.at(E);
+  }
+  const TensorDataType &getScalar() const { return *Scalar; }
+  bool isScalar(const TensorDataType &Type) const {
+    return (Type == getScalar());
+  }
 
   const Symbol *createSymbol(Symbol::SymbolKind SK, const std::string &Name,
-                             const TensorType &Type, const Decl *D = nullptr);
+                             const TensorDataType &Type,
+                             const Decl *D = nullptr);
 
   const Symbol *getSymbol(const std::string &Name) const;
 
-  bool isTypeName(const Expr *E, const TensorType *&Type) const;
-  static bool isIntegerList(const Expr *E, std::vector<int> &Ints);
-  static bool isListOfLists(const Expr *E,
+  bool isTypeName(const Expression *E, const TensorDataType *&Type) const;
+  static bool isIntegerList(const Expression *E, std::vector<int> &Ints);
+  static bool isListOfLists(const Expression *E,
                             std::vector<std::vector<int>> &Lists);
 
-  const TensorType *visitTypeExpr(const Expr *E);
+  const TensorDataType *visitTypeExpr(const Expression *E);
 
 #define GEN_VISIT_EXPRNODE_DECL(ExprName)                                      \
   virtual void visit##ExprName(const ExprName *E) override;
@@ -72,10 +77,10 @@ public:
 
 #undef GEN_VISIT_EXPRNODE_DECL
 
-  std::list<const TensorType *>::const_iterator types_begin() const {
+  std::list<const TensorDataType *>::const_iterator types_begin() const {
     return Types.begin();
   }
-  std::list<const TensorType *>::const_iterator types_end() const {
+  std::list<const TensorDataType *>::const_iterator types_end() const {
     return Types.end();
   }
 
@@ -117,15 +122,15 @@ public:
 
   int outputs_size() const { return Outputs.size(); }
 
-  bool isNamedType(const TensorType *Type) const;
+  bool isNamedType(const TensorDataType *Type) const;
 
-  const Symbol *getTypeSymbol(const TensorType *Type) const;
+  const Symbol *getTypeSymbol(const TensorDataType *Type) const;
 
   const ElemInfo &getElemInfo() const { return ElementInfo; }
 
 private:
-  const TensorType *Scalar;
-  std::list<const TensorType *> Types;
+  const TensorDataType *Scalar;
+  std::list<const TensorDataType *> Types;
 
   SymbolTable Symbols;
 
@@ -135,10 +140,10 @@ private:
   std::vector<const Symbol *> Outputs;
 
   // map for 'Expr' AST nodes to types
-  std::map<const Expr *, const TensorType *> ExprTypes;
+  std::map<const Expression *, const TensorDataType *> ExprTypes;
 
   // map user-defined types to the corresponding symbols holding the type names
-  std::map<const TensorType *, const Symbol *> NamedTypes;
+  std::map<const TensorDataType *, const Symbol *> NamedTypes;
 
   // for element directive
   ElemInfo ElementInfo;

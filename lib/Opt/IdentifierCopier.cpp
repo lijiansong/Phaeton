@@ -12,8 +12,8 @@
 
 using namespace phaeton;
 
-void IdentifierCopier::transformChildren(ExprNode *Node) {
-  ExprNode *SavedParent = Parent;
+void IdentifierCopier::transformChildren(ExpressionNode *Node) {
+  ExpressionNode *SavedParent = Parent;
   unsigned SavedChildIndex = ChildIndex;
 
   Parent = Node;
@@ -95,20 +95,20 @@ void IdentifierCopier::transformIdentifierExpr(IdentifierExpr *Node) {
   // If we get here, that means current identifier must be replaced.
   // If there isn't a replacement for the identifier yet, we need to create a
   // name for it.
-  const std::string Tmp = (ReplaceName != "") ? ReplaceName : getTemp();
+  const std::string Tmp = (ReplaceName != "") ? ReplaceName : getTmp();
 
-  ExprNode *NewIdNode =
-      getENBuilder()->createIdentifierExpr(Tmp, Node->getDims());
+  ExpressionNode *NewIdNode =
+      getExprNodeBuilder()->createIdentifierExpr(Tmp, Node->getDims());
   Parent->setChild(ChildIndex, NewIdNode);
 
   // Note that if there wasn't a replacement identifier, we can simply assign
   // 'LHS' to it.
   if (ReplaceName == "") {
     ReplaceName = Tmp;
-    ExprNode *CopyLHSId = getENBuilder()->createIdentifierExpr(
+    ExpressionNode *CopyLHSId = getExprNodeBuilder()->createIdentifierExpr(
         CurrentLHS->getName(), CurrentLHS->getDims());
-    ExprNode *NewRHSId =
-        getENBuilder()->createIdentifierExpr(ReplaceName, Node->getDims());
+    ExpressionNode *NewRHSId = getExprNodeBuilder()->createIdentifierExpr(
+        ReplaceName, Node->getDims());
     // Note: Replacement identifier for 'RHS' must be assigned the
     // value of 'LHS' before current assignment.
     // TODO: To make the insertion clear, we need to add a wrapper for

@@ -18,21 +18,21 @@
 namespace phaeton {
 
 class Identifier;
-class Expr;
+class Expression;
 
 class Stmt : public ASTNode {
 public:
-  Stmt(const Identifier *Id, const Expr *E)
+  Stmt(const Identifier *Id, const Expression *E)
       : ASTNode(AST_NODE_KIND_Stmt), Id(Id), RightExpr(E) {}
 
   const Identifier *getIdentifier() const { return Id; }
-  const Expr *getExpr() const { return RightExpr; }
+  const Expression *getExpr() const { return RightExpr; }
 
   virtual void _delete() const final;
 
   virtual void dump(unsigned int Indent = 0) const final;
 
-  static Stmt *create(const Identifier *Id, const Expr *E) {
+  static Stmt *create(const Identifier *Id, const Expression *E) {
     return new Stmt(Id, E);
   }
 
@@ -40,7 +40,7 @@ public:
 
 private:
   const Identifier *Id;
-  const Expr *RightExpr;
+  const Expression *RightExpr;
 };
 
 } // end namespace phaeton

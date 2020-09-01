@@ -41,7 +41,7 @@
 
   const phaeton::Stmt *Stmt;
 
-  const phaeton::Expr *Expr;
+  const phaeton::Expression *Expr;
 
   const phaeton::ElementDirective *ElemDirective;
 
@@ -70,22 +70,22 @@
 %token KW_INPUT
 %token KW_OUTPUT
 %token KW_TYPE
-%token COLON
-%token LPAREN
-%token RPAREN
-%token LBRACK
-%token RBRACK
-%token DOT
-%token ADD
-%token SUB
-%token MUL
-%token DIV
-%token PRODUCT
+%token SYMBOL_COLON
+%token SYMBOL_LEFT_PAREN
+%token SYMBOL_RIGHT_PAREN
+%token SYMBOL_LEFT_BRACKET
+%token SYMBOL_RIGHT_BRACKET
+%token ARITHM_DOT
+%token ARITHM_ADD
+%token ARITHM_SUB
+%token ARITHM_MUL
+%token ARITHM_DIV
+%token ARITHM_PRODUCT
 %token EQUAL
 %token KW_ELEM
 %token KW_FIRST
 %token KW_LAST
-%token CARET
+%token ARITHM_CARET
 %token <integer_literal> INT
 %token <string_literal> ID
 
@@ -118,7 +118,7 @@ decl_list : decl_list decl { $$ = phaeton::DeclList::append($1, $2); }
 decl : var_decl
      | type_decl
 
-var_decl : KW_VAR in_out_spec identifier COLON type_expr {
+var_decl : KW_VAR in_out_spec identifier SYMBOL_COLON type_expr {
              $$ = phaeton::Decl::create(phaeton::ASTNode::AST_NODE_KIND_VarDecl,
                                $3, $5,
                                (phaeton::Decl::InOutSpecifier)$2);
@@ -128,7 +128,7 @@ in_out_spec : /* empty */ { $$ = phaeton::Decl::IO_SPEC_Empty; }
        | KW_INPUT in_out_spec { $$ = phaeton::Decl::IO_SPEC_Input | $2; }
        | KW_OUTPUT in_out_spec { $$ = phaeton::Decl::IO_SPEC_Output | $2; }
 
-type_decl : KW_TYPE identifier COLON type_expr {
+type_decl : KW_TYPE identifier SYMBOL_COLON type_expr {
               $$ = phaeton::Decl::create(phaeton::ASTNode::AST_NODE_KIND_TypeDecl, $2, $4);
             }
 
@@ -137,44 +137,44 @@ stmt_list : stmt_list stmt { $$ = phaeton::StmtList::append($1, $2); }
 
 stmt : identifier EQUAL expr { $$ = phaeton::Stmt::create($1, $3); }
 
-type_expr : identifier { $$ = (const phaeton::Expr *)$1; }
-          | brack_expr { $$ = (const phaeton::Expr *)$1; }
+type_expr : identifier { $$ = (const phaeton::Expression *)$1; }
+          | brack_expr { $$ = (const phaeton::Expression *)$1; }
 
 expr : term
-     | term ADD expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_AddExpr, $1, $3); }
-     | term SUB expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_SubExpr, $1, $3); }
+     | term ARITHM_ADD expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_AddExpr, $1, $3); }
+     | term ARITHM_SUB expr { $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_SubExpr, $1, $3); }
 
 term : factor
-     | factor MUL term {
+     | factor ARITHM_MUL term {
          $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_MulExpr, $1, $3);
        }
-     | factor DIV term {
+     | factor ARITHM_DIV term {
          $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_DivExpr, $1, $3);
        }
-     | factor DOT term {
+     | factor ARITHM_DOT term {
          $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_ContractionExpr, $1, $3);
        }
 
 factor : atom
-       | atom PRODUCT factor {
+       | atom ARITHM_PRODUCT factor {
            $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_ProductExpr, $1, $3);
          }
-       | atom CARET factor {
+       | atom ARITHM_CARET factor {
            $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_TranspositionExpr, $1, $3);
          }
 
-atom : identifier { $$ = (const phaeton::Expr *)$1; }
-     | integer { $$ = (const phaeton::Expr *)$1; }
-     | brack_expr { $$ = (const phaeton::Expr *)$1; }
-     | paren_expr { $$ = (const phaeton::Expr *)$1; }
+atom : identifier { $$ = (const phaeton::Expression *)$1; }
+     | integer { $$ = (const phaeton::Expression *)$1; }
+     | brack_expr { $$ = (const phaeton::Expression *)$1; }
+     | paren_expr { $$ = (const phaeton::Expression *)$1; }
 
 identifier : ID { $$ = phaeton::Identifier::create($1); }
 
 integer : INT { $$ = phaeton::Integer::create($1); }
      
-brack_expr : LBRACK expr_list RBRACK { $$ = phaeton::BrackExpr::create($2); }
+brack_expr : SYMBOL_LEFT_BRACKET expr_list SYMBOL_RIGHT_BRACKET { $$ = phaeton::BrackExpr::create($2); }
        
-paren_expr : LPAREN expr RPAREN { $$ = phaeton::ParenExpr::create($2); }
+paren_expr : SYMBOL_LEFT_PAREN expr SYMBOL_RIGHT_PAREN { $$ = phaeton::ParenExpr::create($2); }
 
 expr_list : /* empty */ { $$ = phaeton::ExprList::create(); }
           | expr_list expr {
@@ -192,7 +192,7 @@ elem_direct : /* empty */ { $$ = nullptr; }
 
 /* TODO: refine contraction op */
 /*contract_expr : expr
-              | expr DOT contract_expr {
+              | expr ARITHM_DOT contract_expr {
                   $$ = phaeton::BinaryExpr::create(phaeton::ASTNode::AST_NODE_KIND_ContractionExpr, $1, $3);
                 }*/
 /* TODO: add dnn ops */

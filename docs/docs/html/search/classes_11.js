@@ -1,7 +1,7 @@
 var searchData=
 [
+  ['tensordatatype',['TensorDataType',['../classphaeton_1_1TensorDataType.html',1,'phaeton']]],
   ['tensorgraph',['TensorGraph',['../classphaeton_1_1TensorGraph.html',1,'phaeton']]],
-  ['tensortype',['TensorType',['../classphaeton_1_1TensorType.html',1,'phaeton']]],
   ['theanocg',['TheanoCG',['../classphaeton_1_1TheanoCG.html',1,'phaeton']]],
   ['toolaction',['ToolAction',['../classphaeton_1_1ToolAction.html',1,'phaeton']]],
   ['tools',['Tools',['../classphaeton_1_1Tools.html',1,'phaeton']]],

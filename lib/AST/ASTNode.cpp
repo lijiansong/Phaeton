@@ -85,8 +85,8 @@ void StmtList::visit(ASTVisitor *Visitor) const {
   Visitor->visitStmtList(this);
 }
 
-template class phaeton::ASTNodeList<const Expr, ASTNode::AST_NODE_KIND_ExprList,
-                                    ExprList>;
+template class phaeton::ASTNodeList<const Expression,
+                                    ASTNode::AST_NODE_KIND_ExprList, ExprList>;
 
 void ExprList::visit(ASTVisitor *Visitor) const {
   Visitor->visitExprList(this);

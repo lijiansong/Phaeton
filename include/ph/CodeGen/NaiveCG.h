@@ -36,7 +36,7 @@ public:
 
 #undef GEN_DCG_VISIT_EXPR_DECL
 
-  void visitContraction(const Expr *E, const TupleList &Index);
+  void visitContraction(const Expression *E, const TupleList &Index);
   virtual void visitElementDirective(const ElementDirective *ED) override {}
 };
 

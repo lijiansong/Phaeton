@@ -51,9 +51,9 @@ public:
 
 #undef GEN_TRANSFORM_EXPR_NODE_DECL
 
-  void transformNode(ExprNode *Node);
-  void transformChildren(ExprNode *Node);
-  void liftNode(ExprNode *Node);
+  void transformNode(ExpressionNode *Node);
+  void transformChildren(ExpressionNode *Node);
+  void liftNode(ExpressionNode *Node);
 
   void transformAssignments();
 
@@ -62,7 +62,7 @@ private:
   CodeGen::AssignmentsListTy &Assignments;
 
   const IdentifierExpr *CurrentLHS;
-  ExprNode *Parent;
+  ExpressionNode *Parent;
   int ChildIndex;
   bool Incompatible;
   std::string ReplaceName;
@@ -71,8 +71,10 @@ private:
 
   // Helper methods that helps to implement functionality from the code
   // generator 'CG', and provide some information.
-  std::string getTemp() { return CG->getTemp(); }
-  ExprNodeBuilder *getENBuilder() { return CG->getENBuilder(); }
+  std::string getTmp() { return CG->getTmp(); }
+  ExpressionNodeBuilder *getExprNodeBuilder() {
+    return CG->getExprNodeBuilder();
+  }
 };
 
 } // end namespace phaeton

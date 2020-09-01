@@ -41,7 +41,7 @@ void ASTVisitor::visitProgram(const Program *Prog) {
   Prog->getStmts()->visit(this);
 }
 
-void ASTVisitor::visitExpr(const Expr *E) { E->visit(this); }
+void ASTVisitor::visitExpression(const Expression *E) { E->visit(this); }
 
 void ASTVisitor::visitFactor(const Factor *F) { F->visit(this); }
 

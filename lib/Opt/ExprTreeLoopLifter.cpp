@@ -15,7 +15,7 @@ using namespace phaeton;
 void ExprTreeLifter::transformAssignments() {
   for (CurrentPos = Assignments.begin(); CurrentPos != Assignments.end();
        ++CurrentPos) {
-    ExprNode *RHS = CurrentPos->RHS;
+    ExpressionNode *RHS = CurrentPos->RHS;
 
     setRoot(RHS);
     setParent(nullptr);
@@ -24,25 +24,26 @@ void ExprTreeLifter::transformAssignments() {
   }
 }
 
-void ExprTreeLifter::liftNode(ExprNode *Node) {
-  ExprNode *Root = getRoot();
-  ExprNode *Parent = getParent();
+void ExprTreeLifter::liftNode(ExpressionNode *Node) {
+  ExpressionNode *Root = getRoot();
+  ExpressionNode *Parent = getParent();
   unsigned ChildIndex = getChildIndex();
 
   if (Parent == nullptr) {
-    // Note that since ExprNode 'Node' is at the top of the tree,
+    // Note that since ExpressionNode 'Node' is at the top of the tree,
     // nothing to do here but visit children
     setParent(Node);
     transformChildren(Node);
     setParent(nullptr);
   } else {
-    const std::string Tmp = getTempWithDims(Node->getDims());
-    ExprNode *NewNode =
-        getENBuilder()->createIdentifierExpr(Tmp, Node->getDims());
-    // Replace sub-expression ExprNode 'Node' which is to be lifted with the
-    // identifier 'Tmp'
+    const std::string Tmp = getTmpWithDims(Node->getDims());
+    ExpressionNode *NewNode =
+        getExprNodeBuilder()->createIdentifierExpr(Tmp, Node->getDims());
+    // Replace sub-expression ExpressionNode 'Node' which is to be lifted with
+    // the identifier 'Tmp'
     Parent->setChild(ChildIndex, NewNode);
-    // Recursively lift expressions out of the sub-expression ExprNode 'Node'.
+    // Recursively lift expressions out of the sub-expression ExpressionNode
+    // 'Node'.
     setRoot(Node);
     setParent(nullptr);
     setChildIndex(-1);
@@ -50,19 +51,19 @@ void ExprTreeLifter::liftNode(ExprNode *Node) {
 
     // Add a new assignment that assigns the lifted sub-expression node 'Node'
     // to the new identifier 'Tmp'.
-    ExprNode *NewLHS =
-        getENBuilder()->createIdentifierExpr(Tmp, Node->getDims());
+    ExpressionNode *NewLHS =
+        getExprNodeBuilder()->createIdentifierExpr(Tmp, Node->getDims());
     // The new assignment is inserted before 'CurrentPos' on purpose.
     Assignments.insert(CurrentPos, {NewLHS, Node});
 
-    // Since the ExprNode 'Node' has been lifted, the expression tree
+    // Since the ExpressionNode 'Node' has been lifted, the expression tree
     // rooted at 'Root' must be re-visited.
     setRoot(Root);
     setParent(nullptr);
     setChildIndex(-1);
     transformChildren(Root);
 
-    freeTempWithDims(Tmp, Node->getDims());
+    freeTmpWithDims(Tmp, Node->getDims());
   }
 
   setChildIndex(ChildIndex);
@@ -70,7 +71,7 @@ void ExprTreeLifter::liftNode(ExprNode *Node) {
   setRoot(Root);
 }
 
-void ExprTreeLifter::transformNode(ExprNode *Node) {
+void ExprTreeLifter::transformNode(ExpressionNode *Node) {
   if (IsNodeToBeLifted(Node, getRoot())) {
     liftNode(Node);
   } else {
@@ -78,8 +79,8 @@ void ExprTreeLifter::transformNode(ExprNode *Node) {
   }
 }
 
-void ExprTreeLifter::transformChildren(ExprNode *Node) {
-  ExprNode *Parent = getParent();
+void ExprTreeLifter::transformChildren(ExpressionNode *Node) {
+  ExpressionNode *Parent = getParent();
   unsigned ChildIndex = getChildIndex();
 
   setParent(Node);

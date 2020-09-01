@@ -52,7 +52,7 @@ public:
 #define GEN_VISIT_ASTNODE_DECL(NodeName)                                       \
   virtual void visit##NodeName(const NodeName *);
 
-  GEN_VISIT_ASTNODE_DECL(Expr)
+  GEN_VISIT_ASTNODE_DECL(Expression)
   GEN_VISIT_ASTNODE_DECL(Factor)
   GEN_VISIT_ASTNODE_DECL(ParenExpr)
 

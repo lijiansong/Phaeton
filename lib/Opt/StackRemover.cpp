@@ -16,7 +16,7 @@
 
 using namespace phaeton;
 
-bool StackRemover::isDeclaredId(const ExprNode *Node) const {
+bool StackRemover::isDeclaredId(const ExpressionNode *Node) const {
   if (!Node->isIdentifier()) {
     return false;
   }
@@ -28,15 +28,15 @@ bool StackRemover::isDeclaredId(const ExprNode *Node) const {
   return false;
 }
 
-ExprNode *StackRemover::buildReplacement(ExprNode *OriginalNode,
-                                         bool IsForLHS) {
+ExpressionNode *StackRemover::buildReplacement(ExpressionNode *OriginalNode,
+                                               bool IsForLHS) {
   assert(OriginalNode->isIdentifier());
   const std::string &Name = OriginalNode->getName();
   assert(Replacements.count(Name));
   const IdentifierExpr *Id = Replacements[Name];
 
   IdentifierExpr *ReplaceExpr =
-      ENBuilder->createIdentifierExpr(Id->getName(), Id->getDims());
+      ExprNodeBuilder->createIdentifierExpr(Id->getName(), Id->getDims());
 
   for (unsigned I = 0; I < Id->getNumIndices(); ++I) {
     ReplaceExpr->addIndex(Id->getIndex(I));
@@ -55,17 +55,17 @@ ExprNode *StackRemover::buildReplacement(ExprNode *OriginalNode,
     // Notice: On 'RHS' transpositions are not represented within an
     // 'IdentifierExpr' directly, instead, a 'TranspositionExpr'
     // must be used.
-    return ENBuilder->createTranspositionExpr(ReplaceExpr,
-                                              ReplaceExpr->getIndexPairs());
+    return ExprNodeBuilder->createTranspositionExpr(
+        ReplaceExpr, ReplaceExpr->getIndexPairs());
   }
   // Note that all branches of the above if else statement have a return,
   // we should NOT get here.
   ph_unreachable(INTERNAL_ERROR "should not be here");
 }
 
-void StackRemover::transformChildren(ExprNode *Node) {
+void StackRemover::transformChildren(ExpressionNode *Node) {
   unsigned ChildIndex = getChildIndex();
-  ExprNode *Parent = getParent();
+  ExpressionNode *Parent = getParent();
 
   setParent(Node);
   for (int I = 0; I < Node->getNumChildren(); ++I) {
@@ -81,8 +81,8 @@ void StackRemover::transformIdentifierExpr(IdentifierExpr *Id) {
   if (Replacements.count(Id->getName()) == 0) {
     return;
   }
-  ExprNode *Replacement = buildReplacement(Id, /* IsForLHS =*/false);
-  ExprNode *Parent = getParent();
+  ExpressionNode *Replacement = buildReplacement(Id, /* IsForLHS =*/false);
+  ExpressionNode *Parent = getParent();
   if (Parent == nullptr) {
     CurrentPos->RHS = Replacement;
   } else {
@@ -92,8 +92,8 @@ void StackRemover::transformIdentifierExpr(IdentifierExpr *Id) {
 
 void StackRemover::transformAssignments() {
   // 1. We need to lift all tensor stack expressions up to the top level.
-  const auto &nodeLiftPredicate = [](const ExprNode *Node,
-                                     const ExprNode *Root) {
+  const auto &nodeLiftPredicate = [](const ExpressionNode *Node,
+                                     const ExpressionNode *Root) {
     return Node->isStackExpr();
   };
   ExprTreeLifter Lifter(CG, nodeLiftPredicate);
@@ -103,7 +103,7 @@ void StackRemover::transformAssignments() {
   CurrentPos = Assignments.begin();
   while (CurrentPos != Assignments.end()) {
     IdentifierExpr *LHS = static_cast<IdentifierExpr *>(CurrentPos->LHS);
-    ExprNode *RHS = CurrentPos->RHS;
+    ExpressionNode *RHS = CurrentPos->RHS;
 
     if (!RHS->isStackExpr()) {
       ++CurrentPos;
@@ -114,11 +114,11 @@ void StackRemover::transformAssignments() {
     const std::string &LHSName = LHS->getName();
 
     for (unsigned I = 0; I < RHS->getNumChildren(); ++I) {
-      ExprNode *Child = RHS->getChild(I);
+      ExpressionNode *Child = RHS->getChild(I);
 
       // Note here we build 'LHS' for assigning the i-th child.
       IdentifierExpr *Id =
-          ENBuilder->createIdentifierExpr(LHSName, LHS->getDims());
+          ExprNodeBuilder->createIdentifierExpr(LHSName, LHS->getDims());
       for (unsigned J = 0; J < LHS->getNumIndices(); ++J) {
         Id->addIndex(LHS->getIndex(J));
       }
@@ -156,7 +156,7 @@ void StackRemover::transformAssignments() {
        ++CurrentPos) {
     // Here we handle replacements of defs, i.e. replacements on 'LHS'.
     {
-      ExprNode *LHS = CurrentPos->LHS;
+      ExpressionNode *LHS = CurrentPos->LHS;
       assert(LHS->isIdentifier());
       if (Replacements.count(LHS->getName()))
         CurrentPos->LHS = buildReplacement(LHS, /* IsForLHS = */ true);
@@ -164,7 +164,7 @@ void StackRemover::transformAssignments() {
 
     // Here we handle replacements of uses, i.e. replacements on 'RHS'.
     {
-      ExprNode *RHS = CurrentPos->RHS;
+      ExpressionNode *RHS = CurrentPos->RHS;
       setParent(nullptr);
       setChildIndex(-1);
       RHS->transform(this);

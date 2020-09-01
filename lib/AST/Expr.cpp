@@ -15,8 +15,9 @@
 
 using namespace phaeton;
 
-void Expr::visit(ASTVisitor *Visitor) const {
-  ph_unreachable(INTERNAL_ERROR "base class 'Expr' should not be visited");
+void Expression::visit(ASTVisitor *Visitor) const {
+  ph_unreachable(INTERNAL_ERROR
+                 "base class 'Expression' should not be visited");
 }
 
 void Factor::visit(ASTVisitor *Visitor) const {

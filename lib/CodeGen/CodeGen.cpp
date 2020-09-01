@@ -22,14 +22,14 @@
 using namespace phaeton;
 
 CodeGen::CodeGen(const Sema *S, const std::string &FuncName)
-    : TheSema(S), TempCounter(0), TgtLangCode(""), CGFuncName(FuncName) {
-  ENBuilder = new ExprNodeBuilder;
+    : ThisSema(S), TmpCounter(0), TgtLangCode(""), CGFuncName(FuncName) {
+  ExprNodeBuilder = new ExpressionNodeBuilder;
 }
 
-CodeGen::~CodeGen() { delete ENBuilder; }
+CodeGen::~CodeGen() { delete ExprNodeBuilder; }
 
-std::string CodeGen::getTemp() {
-  return "t" + std::to_string((long long)TempCounter++);
+std::string CodeGen::getTmp() {
+  return "t" + std::to_string((long long)TmpCounter++);
 }
 
 void CodeGen::addFuncArg(const std::string &Name) {
@@ -37,9 +37,9 @@ void CodeGen::addFuncArg(const std::string &Name) {
   FuncArgs.push_back({Position, Name});
 }
 
-void CodeGen::assertExprTreeMap(const Expr *E) const {
+void CodeGen::assertExprTreeMap(const Expression *E) const {
   if (ExprTrees.find((E)) == ExprTrees.end())
-    ph_unreachable(INTERNAL_ERROR "no expression tree for 'Expr' node");
+    ph_unreachable(INTERNAL_ERROR "no expression tree for 'Expression' node");
 }
 
 void CodeGen::visitDecl(const Decl *Decl) {
@@ -55,8 +55,9 @@ void CodeGen::visitStmt(const Stmt *Stmt) { addAssignment(Stmt); }
 void CodeGen::addDeclaredId(const Decl *Decl) {
   const Sema *S = getSema();
   const std::string &Name = Decl->getIdentifier()->getName();
-  const TensorType &Type = S->getSymbol(Name)->getType();
-  ExprNode *Id = ENBuilder->createIdentifierExpr(Name, Type.getDims());
+  const TensorDataType &Type = S->getSymbol(Name)->getType();
+  ExpressionNode *Id =
+      ExprNodeBuilder->createIdentifierExpr(Name, Type.getDims());
 
   DeclaredIds.push_back(Id);
 }
@@ -64,12 +65,13 @@ void CodeGen::addDeclaredId(const Decl *Decl) {
 void CodeGen::addAssignment(const Stmt *Stmt) {
   const Sema *Sema = getSema();
   const std::string &Name = Stmt->getIdentifier()->getName();
-  const TensorType &T = Sema->getSymbol(Name)->getType();
-  ExprNode *LHS = ENBuilder->createIdentifierExpr(Name, T.getDims());
+  const TensorDataType &T = Sema->getSymbol(Name)->getType();
+  ExpressionNode *LHS =
+      ExprNodeBuilder->createIdentifierExpr(Name, T.getDims());
 
-  const Expr *E = Stmt->getExpr();
+  const Expression *E = Stmt->getExpr();
   assertExprTreeMap(E);
-  ExprNode *RHS = ExprTrees[E];
+  ExpressionNode *RHS = ExprTrees[E];
 
   Assignments.push_back({LHS, RHS});
 }
@@ -217,7 +219,7 @@ const std::string CodeGen::getTupleListString(const TupleList &TList) {
   return Res;
 }
 
-const BinaryExpr *CodeGen::extractTensorExprOrNull(const Expr *E) {
+const BinaryExpr *CodeGen::extractTensorExprOrNull(const Expression *E) {
   const BinaryExpr *TensorExpr = dynamic_cast<const BinaryExpr *>(E);
   if (!TensorExpr) {
     const ParenExpr *PE = dynamic_cast<const ParenExpr *>(E);

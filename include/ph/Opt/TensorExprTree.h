@@ -25,8 +25,8 @@ namespace phaeton {
 class ExprTreeVisitor;
 class ExprTreeTransformer;
 
-/// ExprNode - This class keeps track of state of each expression node.
-class ExprNode {
+/// ExpressionNode - This class keeps track of state of each expression node.
+class ExpressionNode {
 public:
   /// ExprDims - Helper alias type traits to record dimensions of each
   /// expression.
@@ -49,25 +49,26 @@ public:
   };
 
 public:
-  ExprNode(ExprKind Kind, int NumChildren, const ExprDims &ED = ExprDims());
+  ExpressionNode(ExprKind Kind, int NumChildren,
+                 const ExprDims &ED = ExprDims());
 
-  virtual ~ExprNode() {}
+  virtual ~ExpressionNode() {}
 
   int getNumChildren() const { return NumChildren; }
 
-  const ExprNode *getChild(int I) const {
+  const ExpressionNode *getChild(int I) const {
     assert(I < getNumChildren());
     return Children[I];
   }
 
-  ExprNode *getChild(int I) {
+  ExpressionNode *getChild(int I) {
     assert(I < getNumChildren());
     return Children[I];
   }
 
   enum ExprKind getExprKind() const { return ExKind; }
 
-  void setChild(int I, ExprNode *Node) {
+  void setChild(int I, ExpressionNode *Node) {
     assert(I < getNumChildren());
     Children[I] = Node;
   }
@@ -92,15 +93,15 @@ protected:
 private:
   const ExprKind ExKind;
   const int NumChildren;
-  std::vector<ExprNode *> Children;
+  std::vector<ExpressionNode *> Children;
   ExprDims Dims;
 };
 
 #define GEN_EXPR_NODE_CLASS_DECL(ExprName)                                     \
-  class ExprName##Expr : public ExprNode {                                     \
+  class ExprName##Expr : public ExpressionNode {                               \
   public:                                                                      \
-    ExprName##Expr(ExprNode *LHS, ExprNode *RHS)                               \
-        : ExprNode(EXPR_KIND_##ExprName, 2) {                                  \
+    ExprName##Expr(ExpressionNode *LHS, ExpressionNode *RHS)                   \
+        : ExpressionNode(EXPR_KIND_##ExprName, 2) {                            \
       setChild(0, LHS);                                                        \
       setChild(1, RHS);                                                        \
       /* Type checking for element-wise expr, the following must hold:         \
@@ -112,7 +113,7 @@ private:
     virtual void visit(ExprTreeVisitor *Visitor) const;                        \
     virtual void transform(ExprTreeTransformer *Transformer);                  \
                                                                                \
-    static ExprName##Expr *create(ExprNode *LHS, ExprNode *RHS) {              \
+    static ExprName##Expr *create(ExpressionNode *LHS, ExpressionNode *RHS) {  \
       return new ExprName##Expr(LHS, RHS);                                     \
     }                                                                          \
   };
@@ -125,36 +126,36 @@ GEN_EXPR_NODE_CLASS_DECL(Div)
 #undef GEN_EXPR_NODE_CLASS_DECL
 
 /// ScalarMulExpr - This class represents scalar multiplication expression node.
-class ScalarMulExpr : public ExprNode {
+class ScalarMulExpr : public ExpressionNode {
 public:
-  ScalarMulExpr(ExprNode *LHS, ExprNode *RHS);
+  ScalarMulExpr(ExpressionNode *LHS, ExpressionNode *RHS);
 
   virtual void visit(ExprTreeVisitor *Visitor) const;
   virtual void transform(ExprTreeTransformer *Transformer);
 
-  static ScalarMulExpr *create(ExprNode *LHS, ExprNode *RHS) {
+  static ScalarMulExpr *create(ExpressionNode *LHS, ExpressionNode *RHS) {
     return new ScalarMulExpr(LHS, RHS);
   }
 };
 
 /// ScalarDivExpr - This class represents for scalar division expression.
-class ScalarDivExpr : public ExprNode {
+class ScalarDivExpr : public ExpressionNode {
 public:
-  ScalarDivExpr(ExprNode *LHS, ExprNode *RHS);
+  ScalarDivExpr(ExpressionNode *LHS, ExpressionNode *RHS);
 
   virtual void visit(ExprTreeVisitor *Visitor) const;
   virtual void transform(ExprTreeTransformer *Transformer);
 
-  static ScalarDivExpr *create(ExprNode *LHS, ExprNode *RHS) {
+  static ScalarDivExpr *create(ExpressionNode *LHS, ExpressionNode *RHS) {
     return new ScalarDivExpr(LHS, RHS);
   }
 };
 
 /// IdentifierExpr - This class represents for identifier expression.
-class IdentifierExpr : public ExprNode {
+class IdentifierExpr : public ExpressionNode {
 public:
   IdentifierExpr(const std::string &Name, const ExprDims &ED)
-      : ExprNode(EXPR_KIND_Identifier, /*NumChildren=*/0, ED), Name(Name),
+      : ExpressionNode(EXPR_KIND_Identifier, /*NumChildren=*/0, ED), Name(Name),
         Permute(false), ElementIndexPosition(-1) {}
 
   void addIndex(const std::string &Index) { Indices.push_back(Index); }
@@ -190,23 +191,23 @@ private:
 };
 
 /// ProductExpr - This class represents for tensor product expression.
-class ProductExpr : public ExprNode {
+class ProductExpr : public ExpressionNode {
 public:
-  ProductExpr(ExprNode *LHS, ExprNode *RHS);
+  ProductExpr(ExpressionNode *LHS, ExpressionNode *RHS);
 
   virtual void visit(ExprTreeVisitor *Visitor) const;
   virtual void transform(ExprTreeTransformer *Transformer);
 
-  static ProductExpr *create(ExprNode *LHS, ExprNode *RHS) {
+  static ProductExpr *create(ExpressionNode *LHS, ExpressionNode *RHS) {
     return new ProductExpr(LHS, RHS);
   }
 };
 
 /// ContractionExpr - This class represents for tensor contraction expression.
-class ContractionExpr : public ExprNode {
+class ContractionExpr : public ExpressionNode {
 public:
-  ContractionExpr(ExprNode *LHS, const CodeGen::List &LeftIndex, ExprNode *RHS,
-                  const CodeGen::List &RightIndex);
+  ContractionExpr(ExpressionNode *LHS, const CodeGen::List &LeftIndex,
+                  ExpressionNode *RHS, const CodeGen::List &RightIndex);
 
   virtual bool isContractionExpr() const override { return true; }
 
@@ -218,8 +219,9 @@ public:
   virtual void visit(ExprTreeVisitor *Visitor) const override;
   virtual void transform(ExprTreeTransformer *Transformer) override;
 
-  static ContractionExpr *create(ExprNode *LHS, const CodeGen::List &LeftIndex,
-                                 ExprNode *RHS,
+  static ContractionExpr *create(ExpressionNode *LHS,
+                                 const CodeGen::List &LeftIndex,
+                                 ExpressionNode *RHS,
                                  const CodeGen::List &RightIndex) {
     return new ContractionExpr(LHS, LeftIndex, RHS, RightIndex);
   }
@@ -230,25 +232,25 @@ private:
 };
 
 /// StackExpr - This class represents for tensor stack expression.
-class StackExpr : public ExprNode {
+class StackExpr : public ExpressionNode {
 public:
-  StackExpr(const std::vector<ExprNode *> &Members);
+  StackExpr(const std::vector<ExpressionNode *> &Members);
 
   virtual bool isStackExpr() const override { return true; }
 
   virtual void visit(ExprTreeVisitor *Visitor) const override;
   virtual void transform(ExprTreeTransformer *Transformer) override;
 
-  static StackExpr *create(const std::vector<ExprNode *> &Members) {
+  static StackExpr *create(const std::vector<ExpressionNode *> &Members) {
     return new StackExpr(Members);
   }
 };
 
 /// TranspositionExpr - This class represents for tensor transposition
 /// expression.
-class TranspositionExpr : public ExprNode {
+class TranspositionExpr : public ExpressionNode {
 public:
-  TranspositionExpr(ExprNode *Node, const CodeGen::TupleList &IndexPairs);
+  TranspositionExpr(ExpressionNode *Node, const CodeGen::TupleList &IndexPairs);
 
   virtual bool isTranspositionExpr() const override { return true; }
 
@@ -259,7 +261,7 @@ public:
   virtual void visit(ExprTreeVisitor *Visitor) const override;
   virtual void transform(ExprTreeTransformer *Transformer) override;
 
-  static TranspositionExpr *create(ExprNode *Node,
+  static TranspositionExpr *create(ExpressionNode *Node,
                                    const CodeGen::TupleList &IndexPairs) {
     return new TranspositionExpr(Node, IndexPairs);
   }

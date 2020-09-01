@@ -4,7 +4,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-//  This file defines the Expr interface and subclasses.
+//  This file defines the Expression interface and subclasses.
 //
 //===----------------------------------------------------------------------===//
 
@@ -17,21 +17,21 @@
 
 namespace phaeton {
 
-class Expr : public ASTNode {
+class Expression : public ASTNode {
 protected:
-  Expr(ASTNodeKind NK) : ASTNode(NK) {}
+  Expression(ASTNodeKind NK) : ASTNode(NK) {}
 
 public:
-  virtual ~Expr() {}
+  virtual ~Expression() {}
 
   virtual void visit(ASTVisitor *Visitor) const override;
 
   virtual bool isIdentifier() const { return false; }
 };
 
-class Factor : public Expr {
+class Factor : public Expression {
 protected:
-  Factor(ASTNodeKind NK) : Expr(NK) {}
+  Factor(ASTNodeKind NK) : Expression(NK) {}
 
 public:
   virtual ~Factor() {}
@@ -39,33 +39,33 @@ public:
   virtual void visit(ASTVisitor *Visitor) const override = 0;
 };
 
-class BinaryExpr : public Expr {
+class BinaryExpr : public Expression {
 public:
-  BinaryExpr(ASTNodeKind NK, const Expr *Left, const Expr *Right)
-      : Expr(NK), LeftExpr(Left), RightExpr(Right) {
+  BinaryExpr(ASTNodeKind NK, const Expression *Left, const Expression *Right)
+      : Expression(NK), LeftExpr(Left), RightExpr(Right) {
     assert(NK == AST_NODE_KIND_TranspositionExpr ||
            NK == AST_NODE_KIND_ContractionExpr || NK == AST_NODE_KIND_AddExpr ||
            NK == AST_NODE_KIND_SubExpr || NK == AST_NODE_KIND_MulExpr ||
            NK == AST_NODE_KIND_DivExpr || NK == AST_NODE_KIND_ProductExpr);
   }
 
-  const Expr *getLeft() const { return LeftExpr; }
-  const Expr *getRight() const { return RightExpr; }
+  const Expression *getLeft() const { return LeftExpr; }
+  const Expression *getRight() const { return RightExpr; }
 
   virtual void _delete() const final;
 
   virtual void dump(unsigned Indent = 0) const final;
 
-  static BinaryExpr *create(ASTNodeKind NK, const Expr *Left,
-                            const Expr *Right) {
+  static BinaryExpr *create(ASTNodeKind NK, const Expression *Left,
+                            const Expression *Right) {
     return new BinaryExpr(NK, Left, Right);
   }
 
   virtual void visit(ASTVisitor *Visitor) const override;
 
 private:
-  const Expr *LeftExpr;
-  const Expr *RightExpr;
+  const Expression *LeftExpr;
+  const Expression *RightExpr;
 };
 
 class Identifier : public Factor {
@@ -132,23 +132,23 @@ private:
 
 class ParenExpr : public Factor {
 public:
-  ParenExpr(const Expr *expr)
+  ParenExpr(const Expression *expr)
       : Factor(AST_NODE_KIND_ParenExpr), NestedExpr(expr) {}
 
-  const Expr *getExpr() const { return NestedExpr; }
+  const Expression *getExpr() const { return NestedExpr; }
 
   virtual void _delete() const final;
 
   virtual void dump(unsigned indent = 0) const final;
 
-  static const ParenExpr *create(const Expr *expr) {
+  static const ParenExpr *create(const Expression *expr) {
     return new ParenExpr(expr);
   }
 
-  virtual void visit(ASTVisitor *v) const override;
+  virtual void visit(ASTVisitor *visitor) const override;
 
 private:
-  const Expr *NestedExpr;
+  const Expression *NestedExpr;
 };
 
 } // end namespace phaeton

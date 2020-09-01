@@ -4,7 +4,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements interfaces of ExprNode.
+// This file implements interfaces of ExpressionNode.
 //
 //===----------------------------------------------------------------------===//
 
@@ -22,7 +22,7 @@
 
 using namespace phaeton;
 
-std::map<ExprNode::ExprKind, std::string> ExprNode::ExprLabel = {
+std::map<ExpressionNode::ExprKind, std::string> ExpressionNode::ExprLabel = {
     {EXPR_KIND_Add, "Add"},
     {EXPR_KIND_Sub, "Sub"},
     {EXPR_KIND_Mul, "Mul"},
@@ -35,14 +35,15 @@ std::map<ExprNode::ExprKind, std::string> ExprNode::ExprLabel = {
     {EXPR_KIND_Transposition, "Transposition"},
     {EXPR_KIND_Identifier, "Identifier"}};
 
-ExprNode::ExprNode(ExprKind Kind, int NumChildren, const ExprDims &ED)
+ExpressionNode::ExpressionNode(ExprKind Kind, int NumChildren,
+                               const ExprDims &ED)
     : ExKind(Kind), NumChildren(NumChildren), Dims(ED) {
   for (int I = 0; I < getNumChildren(); ++I) {
     Children.push_back(nullptr);
   }
 }
 
-void ExprNode::dump(unsigned Indent) const {
+void ExpressionNode::dump(unsigned Indent) const {
   std::string Str = ExprLabel[getExprKind()];
 
   std::stringstream StrStream;
@@ -58,7 +59,7 @@ void ExprNode::dump(unsigned Indent) const {
   std::cout << ")\n";
 }
 
-void ExprNode::_delete() const {
+void ExpressionNode::_delete() const {
   for (int I = 0; I < getNumChildren(); ++I) {
     getChild(I)->_delete();
     delete getChild(I);
@@ -103,20 +104,20 @@ GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL(Identifier)
 
 #undef GEN_EXPR_NODE_CLASS_TRANSFORM_IMPL
 
-ScalarMulExpr::ScalarMulExpr(ExprNode *LHS, ExprNode *RHS)
-    : ExprNode(EXPR_KIND_ScalarMul, /*NumChildren=*/2, RHS->getDims()) {
+ScalarMulExpr::ScalarMulExpr(ExpressionNode *LHS, ExpressionNode *RHS)
+    : ExpressionNode(EXPR_KIND_ScalarMul, /*NumChildren=*/2, RHS->getDims()) {
   setChild(0, LHS);
   setChild(1, RHS);
 }
 
-ScalarDivExpr::ScalarDivExpr(ExprNode *LHS, ExprNode *RHS)
-    : ExprNode(EXPR_KIND_ScalarDiv, /*NumChildren=*/2, LHS->getDims()) {
+ScalarDivExpr::ScalarDivExpr(ExpressionNode *LHS, ExpressionNode *RHS)
+    : ExpressionNode(EXPR_KIND_ScalarDiv, /*NumChildren=*/2, LHS->getDims()) {
   setChild(0, LHS);
   setChild(1, RHS);
 }
 
-ProductExpr::ProductExpr(ExprNode *LHS, ExprNode *RHS)
-    : ExprNode(EXPR_KIND_Product, /*NumChildren=*/2) {
+ProductExpr::ProductExpr(ExpressionNode *LHS, ExpressionNode *RHS)
+    : ExpressionNode(EXPR_KIND_Product, /*NumChildren=*/2) {
   setChild(0, LHS);
   setChild(1, RHS);
 
@@ -128,11 +129,11 @@ ProductExpr::ProductExpr(ExprNode *LHS, ExprNode *RHS)
   setDims(LHSDims);
 }
 
-ContractionExpr::ContractionExpr(ExprNode *LHS,
+ContractionExpr::ContractionExpr(ExpressionNode *LHS,
                                  const CodeGen::List &LeftIndices,
-                                 ExprNode *RHS,
+                                 ExpressionNode *RHS,
                                  const CodeGen::List &RightIndices)
-    : ExprNode(EXPR_KIND_Contraction, /*NumChildren=*/2),
+    : ExpressionNode(EXPR_KIND_Contraction, /*NumChildren=*/2),
       LeftIndices(LeftIndices), RightIndices(RightIndices) {
   setChild(0, LHS);
   setChild(1, RHS);
@@ -183,8 +184,8 @@ void ContractionExpr::dump(unsigned Indent) const {
   std::cout << ")\n";
 }
 
-StackExpr::StackExpr(const std::vector<ExprNode *> &Mems)
-    : ExprNode(EXPR_KIND_Stack, Mems.size()) {
+StackExpr::StackExpr(const std::vector<ExpressionNode *> &Mems)
+    : ExpressionNode(EXPR_KIND_Stack, Mems.size()) {
   for (int I = 0; I < Mems.size(); ++I) {
     setChild(I, Mems[I]);
   }
@@ -203,9 +204,9 @@ StackExpr::StackExpr(const std::vector<ExprNode *> &Mems)
   setDims(Dims);
 }
 
-TranspositionExpr::TranspositionExpr(ExprNode *Node,
+TranspositionExpr::TranspositionExpr(ExpressionNode *Node,
                                      const CodeGen::TupleList &IndexPairs)
-    : ExprNode(EXPR_KIND_Transposition, /*NumChildren=*/1),
+    : ExpressionNode(EXPR_KIND_Transposition, /*NumChildren=*/1),
       IndexPairs(IndexPairs) {
   setChild(0, Node);
 

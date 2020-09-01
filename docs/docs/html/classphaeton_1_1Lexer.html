@@ -94,13 +94,13 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a57a1f0af38636ffd791e7f384fa9d740"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1Lexer.html#a57a1f0af38636ffd791e7f384fa9d740">getTokenString</a> (int Token)</td></tr>
-<tr class="separator:a57a1f0af38636ffd791e7f384fa9d740"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c69a7dedd6893166d2c492169f03e49"><td class="memItemLeft" align="right" valign="top">static const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1Lexer.html#a5c69a7dedd6893166d2c492169f03e49">getTokenStr</a> (int Token)</td></tr>
+<tr class="separator:a5c69a7dedd6893166d2c492169f03e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:addbfe6e00f9b6bff24e4735c07c66d32"><td class="memItemLeft" align="right" valign="top">static std::map&lt; int, const std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1Lexer.html#addbfe6e00f9b6bff24e4735c07c66d32">TokenStrings</a></td></tr>
-<tr class="separator:addbfe6e00f9b6bff24e4735c07c66d32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e0be85e02801632e9b2db2d2ff6ae60"><td class="memItemLeft" align="right" valign="top">static std::map&lt; int, const std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classphaeton_1_1Lexer.html#a8e0be85e02801632e9b2db2d2ff6ae60">TokenStrs</a></td></tr>
+<tr class="separator:a8e0be85e02801632e9b2db2d2ff6ae60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
@@ -173,8 +173,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a57a1f0af38636ffd791e7f384fa9d740"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57a1f0af38636ffd791e7f384fa9d740">&#9670;&nbsp;</a></span>getTokenString()</h2>
+<a id="a5c69a7dedd6893166d2c492169f03e49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c69a7dedd6893166d2c492169f03e49">&#9670;&nbsp;</a></span>getTokenStr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +183,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const std::string&amp; phaeton::Lexer::getTokenString </td>
+          <td class="memname">static const std::string&amp; phaeton::Lexer::getTokenStr </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>Token</em></td><td>)</td>
@@ -286,8 +286,8 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="addbfe6e00f9b6bff24e4735c07c66d32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#addbfe6e00f9b6bff24e4735c07c66d32">&#9670;&nbsp;</a></span>TokenStrings</h2>
+<a id="a8e0be85e02801632e9b2db2d2ff6ae60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e0be85e02801632e9b2db2d2ff6ae60">&#9670;&nbsp;</a></span>TokenStrs</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -296,7 +296,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::map&lt; int, const std::string &gt; Lexer::TokenStrings</td>
+          <td class="memname">std::map&lt; int, const std::string &gt; Lexer::TokenStrs</td>
         </tr>
       </table>
   </td>
@@ -305,7 +305,7 @@ Private Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div><div class="line">    {KW_VAR, <span class="stringliteral">&quot;KW_VAR&quot;</span>},</div><div class="line">    {KW_INPUT, <span class="stringliteral">&quot;KW_INPUT&quot;</span>},</div><div class="line">    {KW_OUTPUT, <span class="stringliteral">&quot;KW_OUTPUT&quot;</span>},</div><div class="line">    {KW_TYPE, <span class="stringliteral">&quot;KW_TYPE&quot;</span>},</div><div class="line">    {COLON, <span class="stringliteral">&quot;COLON&quot;</span>},</div><div class="line">    {LPAREN, <span class="stringliteral">&quot;LPAREN&quot;</span>},</div><div class="line">    {RPAREN, <span class="stringliteral">&quot;RPAREN&quot;</span>},</div><div class="line">    {LBRACK, <span class="stringliteral">&quot;LBRACK&quot;</span>},</div><div class="line">    {RBRACK, <span class="stringliteral">&quot;RBRACK&quot;</span>},</div><div class="line">    {ADD, <span class="stringliteral">&quot;ADD&quot;</span>},</div><div class="line">    {SUB, <span class="stringliteral">&quot;SUB&quot;</span>},</div><div class="line">    {MUL, <span class="stringliteral">&quot;MUL&quot;</span>},</div><div class="line">    {DIV, <span class="stringliteral">&quot;DIV&quot;</span>},</div><div class="line">    {DOT, <span class="stringliteral">&quot;DOT&quot;</span>},</div><div class="line">    {EQUAL, <span class="stringliteral">&quot;EQUAL&quot;</span>},</div><div class="line">    {INT, <span class="stringliteral">&quot;INT&quot;</span>},</div><div class="line">    {ID, <span class="stringliteral">&quot;ID&quot;</span>}}</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div><div class="line">    {KW_VAR, <span class="stringliteral">&quot;KW_VAR&quot;</span>},</div><div class="line">    {KW_INPUT, <span class="stringliteral">&quot;KW_INPUT&quot;</span>},</div><div class="line">    {KW_OUTPUT, <span class="stringliteral">&quot;KW_OUTPUT&quot;</span>},</div><div class="line">    {KW_TYPE, <span class="stringliteral">&quot;KW_TYPE&quot;</span>},</div><div class="line">    {SYMBOL_COLON, <span class="stringliteral">&quot;SYMBOL_COLON&quot;</span>},</div><div class="line">    {SYMBOL_LEFT_PAREN, <span class="stringliteral">&quot;SYMBOL_LEFT_PAREN&quot;</span>},</div><div class="line">    {SYMBOL_RIGHT_PAREN, <span class="stringliteral">&quot;SYMBOL_RIGHT_PAREN&quot;</span>},</div><div class="line">    {SYMBOL_LEFT_BRACKET, <span class="stringliteral">&quot;SYMBOL_LEFT_BRACKET&quot;</span>},</div><div class="line">    {SYMBOL_RIGHT_BRACKET, <span class="stringliteral">&quot;SYMBOL_RIGHT_BRACKET&quot;</span>},</div><div class="line">    {ARITHM_ADD, <span class="stringliteral">&quot;ARITHM_ADD&quot;</span>},</div><div class="line">    {ARITHM_SUB, <span class="stringliteral">&quot;ARITHM_SUB&quot;</span>},</div><div class="line">    {ARITHM_MUL, <span class="stringliteral">&quot;ARITHM_MUL&quot;</span>},</div><div class="line">    {ARITHM_DIV, <span class="stringliteral">&quot;ARITHM_DIV&quot;</span>},</div><div class="line">    {ARITHM_DOT, <span class="stringliteral">&quot;ARITHM_DOT&quot;</span>},</div><div class="line">    {EQUAL, <span class="stringliteral">&quot;EQUAL&quot;</span>},</div><div class="line">    {INT, <span class="stringliteral">&quot;INT&quot;</span>},</div><div class="line">    {ID, <span class="stringliteral">&quot;ID&quot;</span>}}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a8add99904851ac8b828b25438732d859"></a>

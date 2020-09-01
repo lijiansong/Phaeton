@@ -81,7 +81,7 @@ void OMPCG::genCode(const Program *Prog) {
     StackRemover Rm(CG);
     Rm.transformAssignments();
 
-    std::map<const ExprNode *, const IdentifierExpr *> RHSToLHSMap;
+    std::map<const ExpressionNode *, const IdentifierExpr *> RHSToLHSMap;
     for (auto &Assign : CG->getAssignments()) {
       RHSToLHSMap[Assign.RHS] = static_cast<const IdentifierExpr *>(Assign.LHS);
     }
@@ -89,7 +89,8 @@ void OMPCG::genCode(const Program *Prog) {
     // 3. Multiple steps for contractions.
     // 3.1 Lift contractions to the top level.
     const auto &nodeLiftPredicate =
-        [&RHSToLHSMap](const ExprNode *Node, const ExprNode *Root) -> bool {
+        [&RHSToLHSMap](const ExpressionNode *Node,
+                       const ExpressionNode *Root) -> bool {
       if (Node->isStackExpr()) {
         // Note that tensor stack expressions should not occur here.
         ph_unreachable(INTERNAL_ERROR
@@ -131,8 +132,8 @@ void OMPCG::genCode(const Program *Prog) {
     // 3.2 We lift out any expressions below contractions;
     // Note that in general, multiplication or division by a scalar
     // can probably remain under a contraction.
-    const auto &subContrLiftPredicate = [](const ExprNode *Node,
-                                           const ExprNode *Root) -> bool {
+    const auto &subContrLiftPredicate = [](const ExpressionNode *Node,
+                                           const ExpressionNode *Root) -> bool {
 
       // Note that 'ParentFinder' can help to lift out expressions below
       // contractions.
@@ -238,7 +239,7 @@ void OMPCG::genCode(const Program *Prog) {
       EmittedNames.insert(NextResultName);
     }
 
-    const ExprNode *EN = AssignIt->RHS;
+    const ExpressionNode *EN = AssignIt->RHS;
     const std::vector<int> &Dims = getDims(EN);
 
     if (!Fuse) {
@@ -463,7 +464,7 @@ void OMPCG::emitForLoopFooter(unsigned Indent) {
   appendCode("}\n");
 }
 
-void OMPCG::emitTempDefinition(unsigned Indent, const std::string &Tmp) {
+void OMPCG::emitTmpDefinition(unsigned Indent, const std::string &Tmp) {
   OMP_CG_INDENT(Indent)
   appendCode(getFloatPointTypeName() + " " + Tmp + ";\n");
 }
@@ -555,7 +556,7 @@ void OMPCG::updateWithElemInfo(std::vector<std::string> &Indices,
 }
 
 std::string
-OMPCG::subscriptedIdentifier(const ExprNode *Node,
+OMPCG::subscriptedIdentifier(const ExpressionNode *Node,
                              const std::vector<std::string> &Indices) const {
   assert(Node->isIdentifier());
 
@@ -668,13 +669,14 @@ void OMPCG::emitLoopFooterNest() {
   }
 }
 
-std::string OMPCG::visitChildExpr(const ExprNode *Node) {
+std::string OMPCG::visitChildExpr(const ExpressionNode *Node) {
   if (Node->isIdentifier()) {
     return subscriptedIdentifier(Node, ExprIndices);
   } else {
-    const std::string Tmp = getTemp();
-    emitTempDefinition(NestLevel * OMP_INDENT_PER_LEVEL, Tmp);
-    ExprNode *TmpNode = CG->getENBuilder()->createIdentifierExpr(Tmp, {});
+    const std::string Tmp = getTmp();
+    emitTmpDefinition(NestLevel * OMP_INDENT_PER_LEVEL, Tmp);
+    ExpressionNode *TmpNode =
+        CG->getExprNodeBuilder()->createIdentifierExpr(Tmp, {});
 
     std::vector<std::string> SavedResultIndices = ResultIndices;
     setResultTmp(TmpNode);
@@ -685,19 +687,20 @@ std::string OMPCG::visitChildExpr(const ExprNode *Node) {
   }
 }
 
-void OMPCG::visitBinOpExpr(const ExprNode *Node, const std::string &Operation) {
+void OMPCG::visitBinOpExpr(const ExpressionNode *Node,
+                           const std::string &Operation) {
   // Here 'BinOp' refers to element-wise and scalar tensor operations.
   // Hence these operations children's number must be 2.
   assert(Node->getNumChildren() == 2);
-  const ExprNode *Result = getResultTmp();
+  const ExpressionNode *Result = getResultTmp();
 
   std::string LHSTmp, RHSTmp;
 
   const std::vector<std::string> SavedExprIndices = ExprIndices;
   const int SavedNestingLevel = NestLevel;
 
-  const ExprNode *LHSExpr = Node->getChild(0);
-  const ExprNode *RHSExpr = Node->getChild(1);
+  const ExpressionNode *LHSExpr = Node->getChild(0);
+  const ExpressionNode *RHSExpr = Node->getChild(1);
 
   const std::vector<int> &ExprDims = getDims(Node);
   const std::vector<int> &LHSDims = getDims(Node->getChild(0));
@@ -757,11 +760,11 @@ void OMPCG::visitScalarDivExpr(const ScalarDivExpr *E) {
 void OMPCG::visitProductExpr(const ProductExpr *PE) {
   assert(PE->getNumChildren() == 2);
 
-  const ExprNode *Result = getResultTmp();
+  const ExpressionNode *Result = getResultTmp();
   std::string LHSTmp, RHSTmp;
 
-  const ExprNode *LHSExpr = PE->getChild(0);
-  const ExprNode *RHSExpr = PE->getChild(1);
+  const ExpressionNode *LHSExpr = PE->getChild(0);
+  const ExpressionNode *RHSExpr = PE->getChild(1);
 
   const std::vector<int> &ExprDims = getDims(PE);
   const std::vector<int> &LHSDims = getDims(PE->getChild(0));
@@ -800,13 +803,13 @@ void OMPCG::visitProductExpr(const ProductExpr *PE) {
 void OMPCG::visitContractionExpr(const ContractionExpr *ContrExpr) {
   assert(ContrExpr->getNumChildren() == 2);
 
-  const ExprNode *Result = getResultTmp();
+  const ExpressionNode *Result = getResultTmp();
   std::string LHSTmp, RHSTmp;
-  const std::string Tmp = getTemp();
+  const std::string Tmp = getTmp();
 
   // Here 'LHS' and 'RHS' for contraction expression means its two operand.
-  const ExprNode *LHSExpr = ContrExpr->getChild(0);
-  const ExprNode *RHSExpr = ContrExpr->getChild(1);
+  const ExpressionNode *LHSExpr = ContrExpr->getChild(0);
+  const ExpressionNode *RHSExpr = ContrExpr->getChild(1);
 
   const std::vector<int> &ExprDims = getDims(ContrExpr);
   const std::vector<int> &LHSDims = getDims(ContrExpr->getChild(0));
@@ -904,7 +907,7 @@ void OMPCG::visitStackExpr(const StackExpr *Expr) {
   // 'ExprIndices' and 'ResultIndices' must agree assert(ExprIndices ==
   // ResultIndices);
 
-  const ExprNode *Result = getResultTmp();
+  const ExpressionNode *Result = getResultTmp();
   const std::vector<std::string> SavedExprIndices = ExprIndices;
   const int SavedNestingLevel = NestLevel;
 
@@ -920,14 +923,14 @@ void OMPCG::visitStackExpr(const StackExpr *Expr) {
   for (int C = 0; C < Expr->getNumChildren(); ++C) {
     // Here we need to replace the first index in 'Result' with the constant
     // 'C'.
-    IdentifierExpr *Id = CG->getENBuilder()->createIdentifierExpr(
+    IdentifierExpr *Id = CG->getExprNodeBuilder()->createIdentifierExpr(
         Result->getName(), Result->getDims());
     for (unsigned I = 0; I < Result->getNumIndices(); ++I) {
       Id->addIndex(Result->getIndex(I));
     }
     Id->addIndex(std::to_string((long long)C));
 
-    const ExprNode *Child = Expr->getChild(C);
+    const ExpressionNode *Child = Expr->getChild(C);
     const std::vector<int> ChildDims = getDims(Child);
 
     ExprIndices = ChildExprIndices;
@@ -974,8 +977,8 @@ void OMPCG::visitTranspositionExpr(const TranspositionExpr *TransExpr) {
   }
 
   ExprIndices = TransposedExprIndices;
-  const ExprNode *Child = TransExpr->getChild(0);
-  const ExprNode *Result = getResultTmp();
+  const ExpressionNode *Child = TransExpr->getChild(0);
+  const ExpressionNode *Result = getResultTmp();
 
   if (Child->isIdentifier()) {
     const IdentifierExpr *Id = static_cast<const IdentifierExpr *>(Child);
@@ -990,10 +993,10 @@ void OMPCG::visitTranspositionExpr(const TranspositionExpr *TransExpr) {
   ExprIndices = SavedExprIndices;
 }
 
-void OMPCG::visitTopLevelIdentifier(const ExprNode *Id) {
+void OMPCG::visitTopLevelIdentifier(const ExpressionNode *Id) {
   // Note that this function is only allowed to be called from the top level
   assert(NestLevel == InitialNestLevel);
-  const ExprNode *Result = getResultTmp();
+  const ExpressionNode *Result = getResultTmp();
   const int SavedNestingLevel = NestLevel;
   const std::vector<int> &Dims = getDims(Id);
   emitLoopHeaderNest(Dims, /*Unroll=*/true, /*Simd=*/true);

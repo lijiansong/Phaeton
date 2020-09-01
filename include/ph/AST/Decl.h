@@ -16,7 +16,7 @@
 namespace phaeton {
 
 class Identifier;
-class Expr;
+class Expression;
 
 class Decl : public ASTNode {
 public:
@@ -27,7 +27,7 @@ public:
   };
 
 public:
-  Decl(ASTNodeKind NodeKind, const Identifier *Id, const Expr *Expr,
+  Decl(ASTNodeKind NodeKind, const Identifier *Id, const Expression *Expr,
        InOutSpecifier IOSpec = IO_SPEC_Empty)
       : ASTNode(NodeKind), Id(Id), TypeExpr(Expr), InOutSpec(IOSpec) {
     assert(NodeKind == AST_NODE_KIND_VarDecl ||
@@ -35,7 +35,7 @@ public:
   }
 
   const Identifier *getIdentifier() const { return Id; }
-  const Expr *getTypeExpr() const { return TypeExpr; }
+  const Expression *getTypeExpr() const { return TypeExpr; }
   InOutSpecifier getInOutSpecifier() const { return InOutSpec; }
 
   virtual void _delete() const final;
@@ -43,7 +43,7 @@ public:
   virtual void dump(unsigned int Indent = 0) const final;
 
   static const Decl *create(ASTNodeKind NodeKind, const Identifier *Id,
-                            const Expr *Expr,
+                            const Expression *Expr,
                             InOutSpecifier IOSpec = IO_SPEC_Empty) {
     return new Decl(NodeKind, Id, Expr, IOSpec);
   }
@@ -52,7 +52,7 @@ public:
 
 private:
   const Identifier *Id;
-  const Expr *TypeExpr;
+  const Expression *TypeExpr;
 
   const InOutSpecifier InOutSpec;
 };

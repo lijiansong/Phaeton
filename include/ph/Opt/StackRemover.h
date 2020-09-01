@@ -31,7 +31,7 @@ namespace phaeton {
 class StackRemover : public ExprTreeTransformer {
 public:
   StackRemover(CodeGen *Gen)
-      : CG(Gen), ENBuilder(CG->getENBuilder()),
+      : CG(Gen), ExprNodeBuilder(CG->getExprNodeBuilder()),
         Assignments(CG->getAssignments()) {}
 
 #define GEN_TRANSFORM_EXPR_NODE_DECL(ExprName)                                 \
@@ -51,24 +51,24 @@ public:
 
 #undef GEN_TRANSFORM_EXPR_NODE_DECL
 
-  void transformChildren(ExprNode *Node);
+  void transformChildren(ExpressionNode *Node);
 
   void transformAssignments();
 
 protected:
-  ExprNode *buildReplacement(ExprNode *OriginalNode, bool IsForLHS);
+  ExpressionNode *buildReplacement(ExpressionNode *OriginalNode, bool IsForLHS);
 
-  void setParent(ExprNode *Node) { Parent = Node; }
-  ExprNode *getParent() const { return Parent; }
+  void setParent(ExpressionNode *Node) { Parent = Node; }
+  ExpressionNode *getParent() const { return Parent; }
 
   void setChildIndex(int Index) { ChildIndex = Index; }
   int getChildIndex() const { return ChildIndex; }
 
 private:
   CodeGen *CG;
-  ExprNodeBuilder *ENBuilder;
+  ExpressionNodeBuilder *ExprNodeBuilder;
   CodeGen::AssignmentsListTy &Assignments;
-  ExprNode *Parent;
+  ExpressionNode *Parent;
   int ChildIndex;
   CodeGen::AssignmentsListTy::iterator CurrentPos;
   std::map<std::string, const IdentifierExpr *> Replacements;
@@ -76,9 +76,11 @@ private:
   // The following three methods are helper methods that help to implement
   // functionality from the code generator 'CG', and get the state of
   // code generator.
-  std::string getTemp() { return CG->getTemp(); }
-  bool isDeclaredId(const ExprNode *Node) const;
-  ExprNodeBuilder *getENBuilder() { return CG->getENBuilder(); }
+  std::string getTmp() { return CG->getTmp(); }
+  bool isDeclaredId(const ExpressionNode *Node) const;
+  ExpressionNodeBuilder *getExprNodeBuilder() {
+    return CG->getExprNodeBuilder();
+  }
 };
 
 } // end namespace phaeton

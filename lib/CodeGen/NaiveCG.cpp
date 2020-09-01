@@ -41,25 +41,25 @@ void NaiveCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
 
       visitContraction(TensorExpr, ContractionsList);
       assertExprTreeMap(TensorExpr);
-      addExprNode(BE, getExprNode(TensorExpr));
+      addExpressionNode(BE, getExpressionNode(TensorExpr));
     } else {
-      const Expr *Left = BE->getLeft();
+      const Expression *Left = BE->getLeft();
       Left->visit(this);
       assertExprTreeMap(Left);
 
-      const Expr *Right = BE->getRight();
+      const Expression *Right = BE->getRight();
       Right->visit(this);
       assertExprTreeMap(Right);
 
       const int LeftRank = S.getType(Left)->getRank();
-      addExprNode(
-          BE, ENBuilder->createContractionExpr(
-                  getExprNode(Left), {LeftRank - 1}, getExprNode(Right), {0}));
+      addExpressionNode(BE, ExprNodeBuilder->createContractionExpr(
+                                getExpressionNode(Left), {LeftRank - 1},
+                                getExpressionNode(Right), {0}));
     }
     return;
   } else if (NK == ASTNode::AST_NODE_KIND_TranspositionExpr) {
     // Handle transposition expression.
-    const Expr *Left = BE->getLeft();
+    const Expression *Left = BE->getLeft();
     Left->visit(this);
     assertExprTreeMap(Left);
 
@@ -70,8 +70,8 @@ void NaiveCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
     if (IndexPairs.empty())
       ph_unreachable(INTERNAL_ERROR "cannot have an empty list here");
 
-    addExprNode(
-        BE, ENBuilder->createTranspositionExpr(getExprNode(Left), IndexPairs));
+    addExpressionNode(BE, ExprNodeBuilder->createTranspositionExpr(
+                              getExpressionNode(Left), IndexPairs));
     return;
   }
 
@@ -79,49 +79,49 @@ void NaiveCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
          NK != ASTNode::AST_NODE_KIND_TranspositionExpr &&
          INTERNAL_ERROR "should not be here");
 
-  const Expr *Left = BE->getLeft();
+  const Expression *Left = BE->getLeft();
   Left->visit(this);
   assertExprTreeMap(Left);
 
-  const Expr *Right = BE->getRight();
+  const Expression *Right = BE->getRight();
   Right->visit(this);
   assertExprTreeMap(Right);
 
   // Handle element-wise and product expression.
-  ExprNode *Result;
-  ExprNode *LHS = getExprNode(Left);
-  ExprNode *RHS = getExprNode(Right);
+  ExpressionNode *Result;
+  ExpressionNode *LHS = getExpressionNode(Left);
+  ExpressionNode *RHS = getExpressionNode(Right);
   switch (NK) {
   case ASTNode::AST_NODE_KIND_AddExpr:
-    Result = ENBuilder->createAddExpr(LHS, RHS);
+    Result = ExprNodeBuilder->createAddExpr(LHS, RHS);
     break;
   case ASTNode::AST_NODE_KIND_SubExpr:
-    Result = ENBuilder->createSubExpr(LHS, RHS);
+    Result = ExprNodeBuilder->createSubExpr(LHS, RHS);
     break;
   case ASTNode::AST_NODE_KIND_MulExpr:
     if (S.isScalar(*S.getType(Left)))
-      Result = ENBuilder->createScalarMulExpr(LHS, RHS);
+      Result = ExprNodeBuilder->createScalarMulExpr(LHS, RHS);
     else
-      Result = ENBuilder->createMulExpr(LHS, RHS);
+      Result = ExprNodeBuilder->createMulExpr(LHS, RHS);
     break;
   case ASTNode::AST_NODE_KIND_DivExpr:
     if (S.isScalar(*S.getType(Right)))
-      Result = ENBuilder->createScalarDivExpr(LHS, RHS);
+      Result = ExprNodeBuilder->createScalarDivExpr(LHS, RHS);
     else
-      Result = ENBuilder->createDivExpr(LHS, RHS);
+      Result = ExprNodeBuilder->createDivExpr(LHS, RHS);
     break;
   case ASTNode::AST_NODE_KIND_ProductExpr:
-    Result = ENBuilder->createProductExpr(LHS, RHS);
+    Result = ExprNodeBuilder->createProductExpr(LHS, RHS);
     break;
   default:
     ph_unreachable(INTERNAL_ERROR "invalid binary expression");
   }
 
-  addExprNode(BE, Result);
+  addExpressionNode(BE, Result);
 }
 
 void NaiveCodeGen::visitStmt(const Stmt *S) {
-  const Expr *E = S->getExpr();
+  const Expression *E = S->getExpr();
   E->visit(this);
   assertExprTreeMap(E);
   CodeGen::visitStmt(S);
@@ -132,35 +132,37 @@ void NaiveCodeGen::visitBrackExpr(const BrackExpr *BracketExpr) {
   assert(Exprs.size() &&
          "internal error: tensor stack should not be empty here");
 
-  std::vector<ExprNode *> Members;
+  std::vector<ExpressionNode *> Members;
   for (unsigned i = 0; i < Exprs.size(); i++) {
-    const Expr *E = Exprs[i];
+    const Expression *E = Exprs[i];
     E->visit(this);
     assertExprTreeMap(E);
 
-    Members.push_back(getExprNode(E));
+    Members.push_back(getExpressionNode(E));
   }
 
-  addExprNode(BracketExpr, ENBuilder->createStackExpr(Members));
+  addExpressionNode(BracketExpr, ExprNodeBuilder->createStackExpr(Members));
 }
 
 void NaiveCodeGen::visitParenExpr(const ParenExpr *PE) {
-  const Expr *Node = PE->getExpr();
+  const Expression *Node = PE->getExpr();
   Node->visit(this);
   assertExprTreeMap(Node);
 
-  addExprNode(PE, getExprNode(Node));
+  addExpressionNode(PE, getExpressionNode(Node));
 }
 
 void NaiveCodeGen::visitIdentifier(const Identifier *Id) {
   const Sema &S = *getSema();
   const std::string &Name = Id->getName();
-  const TensorType &Type = S.getSymbol(Name)->getType();
+  const TensorDataType &Type = S.getSymbol(Name)->getType();
 
-  addExprNode(Id, ENBuilder->createIdentifierExpr(Name, Type.getDims()));
+  addExpressionNode(
+      Id, ExprNodeBuilder->createIdentifierExpr(Name, Type.getDims()));
 }
 
-void NaiveCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
+void NaiveCodeGen::visitContraction(const Expression *E,
+                                    const TupleList &Index) {
   if (Index.empty()) {
     E->visit(this);
     assertExprTreeMap(E);
@@ -174,9 +176,9 @@ void NaiveCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
   if (!isPairList(Index))
     ph_unreachable(INTERNAL_ERROR "only pairs of indices can be contracted");
 
-  const Expr *TensorLeft = TensorExpr->getLeft();
-  const Expr *TensorRight = TensorExpr->getRight();
-  const TensorType *TypeLeft = getSema()->getType(TensorLeft);
+  const Expression *TensorLeft = TensorExpr->getLeft();
+  const Expression *TensorRight = TensorExpr->getRight();
+  const TensorDataType *TypeLeft = getSema()->getType(TensorLeft);
   int RankLeft = TypeLeft->getRank();
 
   TupleList ContrLeft, ContrRight, ContrMixed;
@@ -201,8 +203,9 @@ void NaiveCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
   assertExprTreeMap(TensorRight);
 
   if (ContrMixed.empty()) {
-    addExprNode(E, ENBuilder->createProductExpr(getExprNode(TensorLeft),
-                                                getExprNode(TensorRight)));
+    addExpressionNode(
+        E, ExprNodeBuilder->createProductExpr(getExpressionNode(TensorLeft),
+                                              getExpressionNode(TensorRight)));
     return;
   }
 
@@ -219,7 +222,7 @@ void NaiveCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
   // must be relative to the first index of the right sub-expresion.
   shiftList(-RankContractedLeft, IndexRight);
 
-  addExprNode(E, ENBuilder->createContractionExpr(
-                     getExprNode(TensorLeft), IndexLeft,
-                     getExprNode(TensorRight), IndexRight));
+  addExpressionNode(E, ExprNodeBuilder->createContractionExpr(
+                           getExpressionNode(TensorLeft), IndexLeft,
+                           getExpressionNode(TensorRight), IndexRight));
 }

@@ -29,7 +29,8 @@ namespace phaeton {
 /// replace them with temporary variables. This can help generate better C code.
 class ExprTreeLifter : public ExprTreeTransformer {
 public:
-  using LiftPredicate = std::function<bool(const ExprNode *, const ExprNode *)>;
+  using LiftPredicate =
+      std::function<bool(const ExpressionNode *, const ExpressionNode *)>;
   ExprTreeLifter(CodeGen *Gen, const LiftPredicate &Predicate)
       : CG(Gen), Assignments(CG->getAssignments()),
         IsNodeToBeLifted(Predicate) {}
@@ -51,35 +52,37 @@ public:
 
 #undef GEN_TRANSFORM_EXPR_NODE_DECL
 
-  void transformNode(ExprNode *);
-  void transformChildren(ExprNode *);
-  void liftNode(ExprNode *);
+  void transformNode(ExpressionNode *);
+  void transformChildren(ExpressionNode *);
+  void liftNode(ExpressionNode *);
 
   void transformAssignments();
 
 protected:
-  void setRoot(ExprNode *Node) { Root = Node; }
-  ExprNode *getRoot() const { return Root; }
+  void setRoot(ExpressionNode *Node) { Root = Node; }
+  ExpressionNode *getRoot() const { return Root; }
 
-  void setParent(ExprNode *Node) { Parent = Node; }
-  ExprNode *getParent() const { return Parent; }
+  void setParent(ExpressionNode *Node) { Parent = Node; }
+  ExpressionNode *getParent() const { return Parent; }
 
   void setChildIndex(int Index) { ChildIndex = Index; }
   int getChildIndex() const { return ChildIndex; }
 
   /// helper methods that implement functionality from the code generator 'CG'
 private:
-  std::string getTempWithDims(const std::vector<int> &Dims) {
-    return CG->getTempWithDims(Dims);
+  std::string getTmpWithDims(const std::vector<int> &Dims) {
+    return CG->getTmpWithDims(Dims);
   }
-  void freeTempWithDims(const std::string &Name, const std::vector<int> &Dims) {
-    CG->freeTempWithDims(Name, Dims);
+  void freeTmpWithDims(const std::string &Name, const std::vector<int> &Dims) {
+    CG->freeTmpWithDims(Name, Dims);
   }
-  ExprNodeBuilder *getENBuilder() { return CG->getENBuilder(); }
+  ExpressionNodeBuilder *getExprNodeBuilder() {
+    return CG->getExprNodeBuilder();
+  }
   CodeGen *CG;
   CodeGen::AssignmentsListTy &Assignments;
-  ExprNode *Root;
-  ExprNode *Parent;
+  ExpressionNode *Root;
+  ExpressionNode *Parent;
   int ChildIndex;
   CodeGen::AssignmentsListTy::iterator CurrentPos;
   const LiftPredicate IsNodeToBeLifted;

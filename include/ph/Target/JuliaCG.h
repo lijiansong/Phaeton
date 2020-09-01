@@ -53,8 +53,8 @@ protected:
 
 #undef GEN_VISIT_EXPR_NODE_DECL
 
-  void visitBinOpExpr(const ExprNode *Node, const std::string &Operation);
-  void visitTensorDotExpr(const ExprNode *Node, const std::string &Axes);
+  void visitBinOpExpr(const ExpressionNode *Node, const std::string &Operation);
+  void visitTensorDotExpr(const ExpressionNode *Node, const std::string &Axes);
 
 private:
   CodeGen *CG;

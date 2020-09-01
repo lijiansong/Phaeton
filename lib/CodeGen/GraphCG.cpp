@@ -14,11 +14,11 @@
 #include "ph/Support/ErrorHandling.h"
 
 #include <cassert>
+#include <cstring>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <sstream>
-#include <cstring>
 #include <unistd.h> // mkdtemp
 
 #define TMP_STRING_TEMPLATE "/tmp/phaeton-XXXXXXXXX"
@@ -44,18 +44,18 @@ void GraphCodeGen::visitStmt(const Stmt *S) {
   CodeGen::visitStmt(S);
 }
 
-void GraphCodeGen::buildExprTreeForExpr(const Expr *E) {
+void GraphCodeGen::buildExprTreeForExpr(const Expression *E) {
   GraphCGGraph *SavedGraph = CurrentGraph;
   GraphCGLegs SavedLegs = CurrentLegs;
   GraphCGNode *SavedEnd = CurrentEnd;
   {
-    GraphCGGraph TempGraph;
-    CurrentGraph = &TempGraph;
+    GraphCGGraph TmpGraph;
+    CurrentGraph = &TmpGraph;
     CurrentLegs.clear();
     CurrentEnd = nullptr;
-    // Here we builds the graph for Expr 'E' into 'CurrentGraph'.
+    // Here we builds the graph for Expression 'E' into 'CurrentGraph'.
     E->visit(this);
-    addExprNode(E, buildExprTreeForGraph(CurrentGraph));
+    addExpressionNode(E, buildExprTreeForGraph(CurrentGraph));
   }
   CurrentGraph = SavedGraph;
   CurrentLegs = SavedLegs;
@@ -66,10 +66,11 @@ void GraphCodeGen::visitIdentifier(const Identifier *Id) {
   const Sema &S = *getSema();
 
   const std::string &Name = Id->getName();
-  const TensorType *Type = S.getType(Id);
+  const TensorDataType *Type = S.getType(Id);
   const int Rank = Type->getRank();
 
-  ExprNode *ResNode = ENBuilder->createIdentifierExpr(Name, Type->getDims());
+  ExpressionNode *ResNode =
+      ExprNodeBuilder->createIdentifierExpr(Name, Type->getDims());
   GraphCGNode *Node = CurrentGraph->getNode(NodeID(ResNode, Name, Id), Rank);
 
   for (int I = 0; I < Rank; ++I) {
@@ -84,26 +85,26 @@ void GraphCodeGen::visitInteger(const Integer *I) {
 }
 
 void GraphCodeGen::visitParenExpr(const ParenExpr *PE) {
-  const Expr *E = PE->getExpr();
+  const Expression *E = PE->getExpr();
   PE->visit(this);
 }
 
 void GraphCodeGen::visitBrackExpr(const BrackExpr *BE) {
-  std::vector<ExprNode *> Members;
+  std::vector<ExpressionNode *> Members;
 
   const ExprList &Exprs = *BE->getExprs();
   for (unsigned I = 0; I < Exprs.size(); ++I) {
     buildExprTreeForExpr(Exprs[I]);
     assertExprTreeMap(Exprs[I]);
 
-    ExprNode *Node = getExprNode(Exprs[I]);
+    ExpressionNode *Node = getExpressionNode(Exprs[I]);
     Members.push_back(Node);
   }
 
-  ExprNode *ResNode = ENBuilder->createStackExpr(Members);
-  addExprNode(BE, ResNode);
+  ExpressionNode *ResNode = ExprNodeBuilder->createStackExpr(Members);
+  addExpressionNode(BE, ResNode);
 
-  const TensorType *Type = getSema()->getType(BE);
+  const TensorDataType *Type = getSema()->getType(BE);
   const int Rank = Type->getRank();
   GraphCGNode *Node =
       CurrentGraph->getNode(NodeID(ResNode, /*Label =*/"stack", BE), Rank);
@@ -131,24 +132,24 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
 
       visitContraction(TensorExpr, ContrList);
     } else {
-      const Expr *Left = BE->getLeft();
+      const Expression *Left = BE->getLeft();
       buildExprTreeForExpr(Left);
       assertExprTreeMap(Left);
 
-      const Expr *Right = BE->getRight();
+      const Expression *Right = BE->getRight();
       buildExprTreeForExpr(Right);
       assertExprTreeMap(Right);
 
-      ExprNode *LHS = getExprNode(Left);
-      ExprNode *RHS = getExprNode(Right);
+      ExpressionNode *LHS = getExpressionNode(Left);
+      ExpressionNode *RHS = getExpressionNode(Right);
 
-      const TensorType *LeftType = S.getType(BE->getLeft());
+      const TensorDataType *LeftType = S.getType(BE->getLeft());
       const int LeftRank = LeftType->getRank();
-      ExprNode *ResNode =
-          ENBuilder->createContractionExpr(LHS, {LeftRank - 1}, RHS, {0});
-      addExprNode(BE, ResNode);
+      ExpressionNode *ResNode =
+          ExprNodeBuilder->createContractionExpr(LHS, {LeftRank - 1}, RHS, {0});
+      addExpressionNode(BE, ResNode);
 
-      const TensorType *Type = S.getType(BE);
+      const TensorDataType *Type = S.getType(BE);
       const int Rank = Type->getRank();
       GraphCGNode *Node =
           CurrentGraph->getNode(NodeID(ResNode, /*Lable=*/".", BE), Rank);
@@ -167,7 +168,7 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
     return;
   } else if (NK == ASTNode::AST_NODE_KIND_TranspositionExpr) {
     // Hanle transposition expression.
-    const Expr *Left = BE->getLeft();
+    const Expression *Left = BE->getLeft();
     // Note that here we need a single expression node at which the
     // expression tree for Expr 'Left' is rooted
     buildExprTreeForExpr(Left);
@@ -179,11 +180,11 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
     if (IndexPairs.empty())
       ph_unreachable(INTERNAL_ERROR "cannot have an empty list here");
 
-    ExprNode *ResNode =
-        ENBuilder->createTranspositionExpr(getExprNode(Left), IndexPairs);
-    addExprNode(BE, ResNode);
+    ExpressionNode *ResNode = ExprNodeBuilder->createTranspositionExpr(
+        getExpressionNode(Left), IndexPairs);
+    addExpressionNode(BE, ResNode);
 
-    const TensorType *Type = S.getType(BE);
+    const TensorDataType *Type = S.getType(BE);
     const int Rank = Type->getRank();
     GraphCGNode *Node =
         CurrentGraph->getNode(NodeID(ResNode, /*Label=*/"transpose", BE), Rank);
@@ -203,48 +204,48 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
          INTERNAL_ERROR "should not be here");
 
   // Handle element-wise expression.
-  const Expr *Left = BE->getLeft();
+  const Expression *Left = BE->getLeft();
   buildExprTreeForExpr(Left);
   assertExprTreeMap(Left);
 
-  const Expr *Right = BE->getRight();
+  const Expression *Right = BE->getRight();
   buildExprTreeForExpr(Right);
   assertExprTreeMap(Right);
 
-  ExprNode *ResNode;
-  ExprNode *LHS = getExprNode(Left);
-  ExprNode *RHS = getExprNode(Right);
+  ExpressionNode *ResNode;
+  ExpressionNode *LHS = getExpressionNode(Left);
+  ExpressionNode *RHS = getExpressionNode(Right);
   std::string OperatorLabel;
   switch (NK) {
   case ASTNode::AST_NODE_KIND_AddExpr:
-    ResNode = ENBuilder->createAddExpr(LHS, RHS);
+    ResNode = ExprNodeBuilder->createAddExpr(LHS, RHS);
     OperatorLabel = "+";
     break;
   case ASTNode::AST_NODE_KIND_SubExpr:
-    ResNode = ENBuilder->createSubExpr(LHS, RHS);
+    ResNode = ExprNodeBuilder->createSubExpr(LHS, RHS);
     OperatorLabel = "-";
     break;
   case ASTNode::AST_NODE_KIND_MulExpr:
     if (S.isScalar(*S.getType(Left)))
-      ResNode = ENBuilder->createScalarMulExpr(LHS, RHS);
+      ResNode = ExprNodeBuilder->createScalarMulExpr(LHS, RHS);
     else
-      ResNode = ENBuilder->createMulExpr(LHS, RHS);
+      ResNode = ExprNodeBuilder->createMulExpr(LHS, RHS);
     OperatorLabel = "*";
     break;
   case ASTNode::AST_NODE_KIND_DivExpr:
     if (S.isScalar(*S.getType(Right)))
-      ResNode = ENBuilder->createScalarDivExpr(LHS, RHS);
+      ResNode = ExprNodeBuilder->createScalarDivExpr(LHS, RHS);
     else
-      ResNode = ENBuilder->createDivExpr(LHS, RHS);
+      ResNode = ExprNodeBuilder->createDivExpr(LHS, RHS);
     OperatorLabel = "/";
     break;
   default:
     ph_unreachable(INTERNAL_ERROR "invalid binary expression");
   }
 
-  addExprNode(BE, ResNode);
+  addExpressionNode(BE, ResNode);
 
-  const TensorType *Type = S.getType(BE);
+  const TensorDataType *Type = S.getType(BE);
   const int Rank = Type->getRank();
   GraphCGNode *Node =
       CurrentGraph->getNode(NodeID(ResNode, OperatorLabel, BE), Rank);
@@ -255,7 +256,8 @@ void GraphCodeGen::visitBinaryExpr(const BinaryExpr *BE) {
   updateCurrentEnd(Node);
 }
 
-void GraphCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
+void GraphCodeGen::visitContraction(const Expression *E,
+                                    const TupleList &Index) {
   if (Index.empty()) {
     E->visit(this);
     return;
@@ -268,9 +270,9 @@ void GraphCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
   if (!isPairList(Index))
     ph_unreachable(INTERNAL_ERROR "only pairs of indices can be contracted");
 
-  const Expr *TensorLeft = TensorExpr->getLeft();
-  const Expr *TensorRight = TensorExpr->getRight();
-  const TensorType *TypeLeft = getSema()->getType(TensorLeft);
+  const Expression *TensorLeft = TensorExpr->getLeft();
+  const Expression *TensorRight = TensorExpr->getRight();
+  const TensorDataType *TypeLeft = getSema()->getType(TensorLeft);
   int RankLeft = TypeLeft->getRank();
 
   TupleList ContrLeft, ContrRight, ContrMixed;
@@ -328,7 +330,7 @@ void GraphCodeGen::visitContraction(const Expr *E, const TupleList &Index) {
                    << TargetIndex << ")";
 
     bool Success =
-        CurrentGraph->addEdge(EdgeID(getTemp(), StrStreamLabel.str(), E),
+        CurrentGraph->addEdge(EdgeID(getTmp(), StrStreamLabel.str(), E),
                               SrcNode, SrcIndex, TargetNode, TargetIndex);
     assert(Success && INTERNAL_ERROR "should not fail to add edge");
   }
@@ -349,15 +351,16 @@ void GraphCodeGen::dump(const GraphCGGraph &Graph) {
   /// std::tmpnam is dangerous, here we use 'mkstemp' in <unistd.h>.
   char TmpDirName[L_tmpnam];
   mkdtemp(strcpy(TmpDirName, TMP_STRING_TEMPLATE));
-  const std::string TempFileName = std::string(TmpDirName) + std::string("phaeton.dot");
+  const std::string TmpFileName =
+      std::string(TmpDirName) + std::string("phaeton.dot");
   // TODO: add a wrapper for IO stream.
-  std::ofstream OS(TempFileName);
-  std::cout << "Writing graph to file \'" << TempFileName << "\' ... \n";
+  std::ofstream OS(TmpFileName);
+  std::cout << "Writing graph to file \'" << TmpFileName << "\' ... \n";
   Graph.plot(OS);
   OS.close();
 }
 
-ExprNode *GraphCodeGen::buildExprTreeForGraph(GraphCGGraph *Graph) {
+ExpressionNode *GraphCodeGen::buildExprTreeForGraph(GraphCGGraph *Graph) {
   bool Success;
   while (Graph->getNumEdges()) {
     EdgeSet EdgesToContract;
@@ -380,7 +383,7 @@ ExprNode *GraphCodeGen::buildExprTreeForGraph(GraphCGGraph *Graph) {
       TargetIndices.push_back(E->getTargetIndex());
     }
 
-    ExprNode *ResNode = ENBuilder->createContractionExpr(
+    ExpressionNode *ResNode = ExprNodeBuilder->createContractionExpr(
         Src.getID().get(), SrcIndices, Target.getID().get(), TargetIndices);
 
     // Here we find edges that remain at 'Src' node or 'Target' node after the
@@ -412,10 +415,10 @@ ExprNode *GraphCodeGen::buildExprTreeForGraph(GraphCGGraph *Graph) {
   // Here graph has no edges left, hence, form the tensor product
   // of the remaining nodes from left to right.
   const GraphCGNode *Node = Graph->getStartNode();
-  ExprNode *ResNode = Node->getID().get();
+  ExpressionNode *ResNode = Node->getID().get();
   while (Node->hasSucc()) {
     const GraphCGNode *Succ = Node->getSucc();
-    ResNode = ENBuilder->createProductExpr(ResNode, Succ->getID().get());
+    ResNode = ExprNodeBuilder->createProductExpr(ResNode, Succ->getID().get());
     Node = Succ;
   }
 
@@ -476,7 +479,7 @@ void GraphCodeGen::replaceEdgesAtNode(GraphCGGraph &Graph,
                    << NewSrcIndex << " -- " << NewTargetNode->getID().getLabel()
                    << ":" << NewTargetIndex << ")";
 
-    GraphCGEdge NewEdge(EdgeID(getTemp(), StrStreamLabel.str()), NewSrcNode,
+    GraphCGEdge NewEdge(EdgeID(getTmp(), StrStreamLabel.str()), NewSrcNode,
                         NewSrcIndex, NewTargetNode, NewTargetIndex);
 
     bool Success = Graph.eraseEdge(Edge->getID());

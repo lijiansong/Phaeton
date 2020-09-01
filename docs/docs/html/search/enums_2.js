@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['exprkind',['ExprKind',['../classphaeton_1_1ExprNode.html#a491a259887e91d4c783fc7a196ca90d0',1,'phaeton::ExprNode']]]
+  ['exprkind',['ExprKind',['../classphaeton_1_1ExpressionNode.html#a3cee3f2d456182e2b90177222cc2f19a',1,'phaeton::ExpressionNode']]]
 ];

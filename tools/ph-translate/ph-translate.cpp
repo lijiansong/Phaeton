@@ -20,10 +20,10 @@
 #include <iostream>
 
 #include "ph/CodeGen/GraphCG.h"
-#include "ph/Target/OMPCG.h"
 #include "ph/Lex/Lexer.h"
 #include "ph/Parse/Parser.h"
 #include "ph/Sema/Sema.h"
+#include "ph/Target/OMPCG.h"
 #include "ph/Tooling/CommonOptionsParser.h"
 
 #define PH_COMPILER_EXE "ph-translate"
@@ -74,8 +74,9 @@ void createOptions(Options &Opts) {
       "token-dump", "Build Phaeton source code and dump the tokens")(
       "o, output", "Output file",
       cxxopts::value<std::string>()->default_value("a.cpp"))(
-      "positional", "These are the arguments that are entered "
-                    "without an option",
+      "positional",
+      "These are the arguments that are entered "
+      "without an option",
       cxxopts::value<std::vector<std::string>>());
   Opts.parse_positional({"input", "positional"});
 }
@@ -171,7 +172,7 @@ void dumpPhaetonTokens(char *InPhTokens) {
       break;
     }
 
-    std::cout << Lexer::getTokenString(Token) << ' ';
+    std::cout << Lexer::getTokenStr(Token) << ' ';
   }
   std::cout << '\n';
 
@@ -296,7 +297,7 @@ void buildJobs(const Options &Opts, const ParseResult &Result) {
 
 int main(int argc, char *argv[]) {
   Options Opts(/*argv[0]*/ PH_COMPILER_EXE,
-                  "Phaeton compiler command line options");
+               "Phaeton compiler command line options");
   createOptions(Opts);
   // Parse input command line arguments.
   auto Result = parseArgs(Opts, argc, argv);

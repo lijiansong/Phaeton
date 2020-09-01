@@ -31,12 +31,12 @@ void TheanoCG::genCode(const Program *Prog) {
 
   const Sema &Sema = *getSema();
 
-  std::map<const TensorType *, std::string> EmittedTypes;
+  std::map<const TensorDataType *, std::string> EmittedTypes;
   for (const auto *Id : CG->getDeclaredIds()) {
     assert(Id->isIdentifier() && INTERNAL_ERROR "expected 'IdentifierExpr'");
 
     const std::string &Name = Id->getName();
-    const TensorType *Type = Sema.getType(Id->getDims());
+    const TensorDataType *Type = Sema.getType(Id->getDims());
     assert(Type && INTERNAL_ERROR "expected valid type");
 
     std::string TypeName;
@@ -44,7 +44,7 @@ void TheanoCG::genCode(const Program *Prog) {
       TypeName = EmittedTypes[Type];
     } else {
       TypeName = Sema.isNamedType(Type) ? Sema.getTypeSymbol(Type)->getName()
-                                        : getTemp();
+                                        : getTmp();
       appendCode(TypeName + " = " + getModulePrefix() +
                  ".TensorType('float64', (False,)*" +
                  std::to_string((long long)Type->getRank()) + ")\n");
@@ -58,7 +58,7 @@ void TheanoCG::genCode(const Program *Prog) {
     assert(Assign.LHS->isIdentifier() && INTERNAL_ERROR
            "LHS must be indentifier");
     const std::string Result = Assign.LHS->getName();
-    const ExprNode *Node = Assign.RHS;
+    const ExpressionNode *Node = Assign.RHS;
 
     // Note that we need this if stmt because code generation
     // for identifiers has been optimized out, we need to visit it.
@@ -108,7 +108,7 @@ void TheanoCG::genCode(const Program *Prog) {
   std::string Output;
   if (Sema.outputs_size() == 1) {
     const Symbol *Sym = *Sema.outputs_begin();
-    appendCode(getTemp() + " = " + FunctionName + "(" + InsList + ", " +
+    appendCode(getTmp() + " = " + FunctionName + "(" + InsList + ", " +
                Sym->getName() + ")\n");
   } else {
     // Handle variables with 'out' specifier.
@@ -124,7 +124,7 @@ void TheanoCG::genCode(const Program *Prog) {
       First = false;
     }
     OutsList += "]";
-    appendCode(getTemp() + " = " + FunctionName + "(" + InsList + ", " +
+    appendCode(getTmp() + " = " + FunctionName + "(" + InsList + ", " +
                OutsList + ")\n");
   }
 
@@ -134,7 +134,7 @@ void TheanoCG::genCode(const Program *Prog) {
   }
 }
 
-void TheanoCG::visitBinOpExpr(const ExprNode *Node,
+void TheanoCG::visitBinOpExpr(const ExpressionNode *Node,
                               const std::string &Operation) {
   const std::string Result = getResultTmp();
   std::string Tmps[2];
@@ -145,7 +145,7 @@ void TheanoCG::visitBinOpExpr(const ExprNode *Node,
     if (Node->getChild(I)->isIdentifier()) {
       Tmps[I] = Node->getChild(I)->getName();
     } else {
-      Tmps[I] = getTemp();
+      Tmps[I] = getTmp();
       setResultTmp(Tmps[I]);
       Node->getChild(I)->visit(this);
     }
@@ -171,7 +171,7 @@ void TheanoCG::visitScalarDivExpr(const ScalarDivExpr *E) {
   visitBinOpExpr(E, "/");
 }
 
-void TheanoCG::visitTensorDotExpr(const ExprNode *Node,
+void TheanoCG::visitTensorDotExpr(const ExpressionNode *Node,
                                   const std::string &Axes) {
   const std::string Result = getResultTmp();
   std::string Tmps[2];
@@ -181,7 +181,7 @@ void TheanoCG::visitTensorDotExpr(const ExprNode *Node,
     if (Node->getChild(I)->isIdentifier()) {
       Tmps[I] = Node->getChild(I)->getName();
     } else {
-      Tmps[I] = getTemp();
+      Tmps[I] = getTmp();
       setResultTmp(Tmps[I]);
       Node->getChild(I)->visit(this);
     }
@@ -208,12 +208,12 @@ void TheanoCG::visitStackExpr(const StackExpr *Expr) {
 
   std::string Stack;
   for (int I = 0; I < Expr->getNumChildren(); ++I) {
-    const ExprNode *Child = Expr->getChild(I);
+    const ExpressionNode *Child = Expr->getChild(I);
 
     if (Child->isIdentifier()) {
       Stack += Child->getName();
     } else {
-      const std::string Tmp = getTemp();
+      const std::string Tmp = getTmp();
       setResultTmp(Tmp);
       Child->visit(this);
       Stack += Tmp;

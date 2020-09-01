@@ -8,7 +8,7 @@ var searchData=
   ['astnode',['ASTNode',['../classphaeton_1_1ASTNode.html',1,'phaeton']]],
   ['astnodelist',['ASTNodeList',['../classphaeton_1_1ASTNodeList.html',1,'phaeton']]],
   ['astnodelist_3c_20const_20decl_2c_20astnode_3a_3aast_5fnode_5fkind_5fdecllist_2c_20decllist_20_3e',['ASTNodeList&lt; const Decl, ASTNode::AST_NODE_KIND_DeclList, DeclList &gt;',['../classphaeton_1_1ASTNodeList.html',1,'phaeton']]],
-  ['astnodelist_3c_20const_20expr_2c_20astnode_3a_3aast_5fnode_5fkind_5fexprlist_2c_20exprlist_20_3e',['ASTNodeList&lt; const Expr, ASTNode::AST_NODE_KIND_ExprList, ExprList &gt;',['../classphaeton_1_1ASTNodeList.html',1,'phaeton']]],
+  ['astnodelist_3c_20const_20expression_2c_20astnode_3a_3aast_5fnode_5fkind_5fexprlist_2c_20exprlist_20_3e',['ASTNodeList&lt; const Expression, ASTNode::AST_NODE_KIND_ExprList, ExprList &gt;',['../classphaeton_1_1ASTNodeList.html',1,'phaeton']]],
   ['astnodelist_3c_20const_20stmt_2c_20astnode_3a_3aast_5fnode_5fkind_5fstmtlist_2c_20stmtlist_20_3e',['ASTNodeList&lt; const Stmt, ASTNode::AST_NODE_KIND_StmtList, StmtList &gt;',['../classphaeton_1_1ASTNodeList.html',1,'phaeton']]],
   ['astvisitor',['ASTVisitor',['../classphaeton_1_1ASTVisitor.html',1,'phaeton']]]
 ];

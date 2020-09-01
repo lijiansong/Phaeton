@@ -27,9 +27,9 @@ namespace phaeton {
 /// may not work in general, i.e. if more than two assignments are fused.
 class ParentFinder : public ExprTreeVisitor {
 public:
-  ParentFinder(const ExprNode *Node) : Root(Node) {}
+  ParentFinder(const ExpressionNode *Node) : Root(Node) {}
 
-  void visitChildren(const ExprNode *Node) {
+  void visitChildren(const ExpressionNode *Node) {
     for (int I = 0; I < Node->getNumChildren(); ++I) {
       Parent = Node;
       Node->getChild(I)->visit(this);
@@ -67,7 +67,7 @@ public:
 
 #undef GEN_VISIT_EXPR_NODE_IMPL
 
-  virtual const ExprNode *find(const ExprNode *Node) {
+  virtual const ExpressionNode *find(const ExpressionNode *Node) {
     NodeToFind = Node;
     Parent = nullptr;
     Found = false;
@@ -76,9 +76,9 @@ public:
   }
 
 private:
-  const ExprNode *Root;
-  const ExprNode *NodeToFind;
-  const ExprNode *Parent;
+  const ExpressionNode *Root;
+  const ExpressionNode *NodeToFind;
+  const ExpressionNode *Parent;
   bool Found;
 };
 

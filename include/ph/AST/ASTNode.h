@@ -106,13 +106,14 @@ private:
   Container Elements;
 };
 
-class Expr;
-class ExprList : public ASTNodeList<const Expr, ASTNode::AST_NODE_KIND_ExprList,
-                                    ExprList> {
+class Expression;
+class ExprList : public ASTNodeList<const Expression,
+                                    ASTNode::AST_NODE_KIND_ExprList, ExprList> {
 public:
   ExprList()
-      : ASTNodeList<const Expr, ASTNode::AST_NODE_KIND_ExprList, ExprList>() {}
-  ExprList(const Expr *E) : ASTNodeList(E) {}
+      : ASTNodeList<const Expression, ASTNode::AST_NODE_KIND_ExprList,
+                    ExprList>() {}
+  ExprList(const Expression *E) : ASTNodeList(E) {}
 
   virtual void visit(ASTVisitor *Visitor) const override;
 };

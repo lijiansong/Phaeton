@@ -26,7 +26,7 @@ namespace phaeton {
 class GraphCodeGen : public CodeGen {
 public:
   // Helper alias for type traits.
-  using NodeID = AddressID<ExprNode>;
+  using NodeID = AddressID<ExpressionNode>;
   using EdgeID = StringID;
   using GraphCGNode = GraphNode<NodeID, EdgeID>;
   using GraphCGEdge = GraphEdge<NodeID, EdgeID>;
@@ -53,10 +53,10 @@ public:
   static void dump(const GraphCGGraph &Graph);
 
 private:
-  void visitContraction(const Expr *E, const TupleList &Index);
+  void visitContraction(const Expression *E, const TupleList &Index);
 
-  void buildExprTreeForExpr(const Expr *);
-  ExprNode *buildExprTreeForGraph(GraphCGGraph *);
+  void buildExprTreeForExpr(const Expression *);
+  ExpressionNode *buildExprTreeForGraph(GraphCGGraph *);
 
   void selectEdgesToContract(EdgeSet &Res, const GraphCGGraph &Graph) const;
   void getRemainingEdgesAtNode(EdgeSet &Res, const GraphCGNode &Node,
@@ -73,8 +73,8 @@ private:
 
   // set for keeping track of allocated graphs.
   std::set<const GraphCGGraph *> Graphs;
-  // map for 'Exprs' in the AST to graphs representing the 'Expr'.
-  std::map<const Expr *, const GraphCGGraph *> ExprGraphs;
+  // map for 'Exprs' in the AST to graphs representing the 'Expression'.
+  std::map<const Expression *, const GraphCGGraph *> ExprGraphs;
 };
 
 } // end namespace phaeton

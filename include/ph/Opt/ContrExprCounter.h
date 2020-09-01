@@ -28,7 +28,7 @@ namespace phaeton {
 /// Note that this pass should be associate with Transposition operation.
 class ContrExprCounter : public ExprTreeVisitor {
 public:
-  ContrExprCounter(const ExprNode *EN) : Root(EN) {}
+  ContrExprCounter(const ExpressionNode *EN) : Root(EN) {}
 
   virtual void visitContractionExpr(const ContractionExpr *Expr) override {
     ++Counter;
@@ -36,7 +36,7 @@ public:
     visitChildren(Expr);
   }
 
-  void visitChildren(const ExprNode *EN) {
+  void visitChildren(const ExpressionNode *EN) {
     for (int I = 0; I < EN->getNumChildren(); ++I) {
       EN->getChild(I)->visit(this);
     }
@@ -68,13 +68,13 @@ public:
 
   unsigned getCount() const { return Counter; }
 
-  const ExprNode *getDeepest() const { return Deepest; }
+  const ExpressionNode *getDeepest() const { return Deepest; }
 
 private:
-  const ExprNode *Root;
-  /// Helper variable to keep track of ExprNode states.
+  const ExpressionNode *Root;
+  /// Helper variable to keep track of ExpressionNode states.
   unsigned Counter;
-  const ExprNode *Deepest;
+  const ExpressionNode *Deepest;
 };
 
 } // end namespace phaeton

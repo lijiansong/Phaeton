@@ -24,9 +24,9 @@ namespace phaeton {
 /// and used on the RHS.
 class IdentifierFinder : public ExprTreeVisitor {
 public:
-  IdentifierFinder(const ExprNode *root) : Root(root) {}
+  IdentifierFinder(const ExpressionNode *root) : Root(root) {}
 
-  void visitChildren(const ExprNode *en) {
+  void visitChildren(const ExpressionNode *en) {
     for (int i = 0; i < en->getNumChildren(); i++)
       en->getChild(i)->visit(this);
   }
@@ -83,7 +83,7 @@ public:
   }
 
 private:
-  const ExprNode *Root;
+  const ExpressionNode *Root;
   bool Incompatible;
 
   std::string NameToFind;

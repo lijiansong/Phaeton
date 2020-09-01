@@ -17,7 +17,7 @@
 namespace phaeton {
 
 class Integer;
-class Expr;
+class Expression;
 
 class ElementDirective : public ASTNode {
 public:
@@ -28,21 +28,22 @@ public:
 
 public:
   ElementDirective(ASTNodeKind NK, POSSpecifier POSSpec, const Integer *Int,
-                   const Expr *Id)
+                   const Expression *Id)
       : ASTNode(NK), POSSpec(POSSpec), Int(Int), Identifiers(Id) {
     assert(NK == AST_NODE_KIND_ElementDirective);
   }
 
   POSSpecifier getPOSSpecifier() const { return POSSpec; }
   const Integer *getInteger() const { return Int; }
-  const Expr *getIdentifiers() const { return Identifiers; }
+  const Expression *getIdentifiers() const { return Identifiers; }
 
   virtual void _delete() const final;
 
   virtual void dump(unsigned int Indent = 0) const final;
 
   static const ElementDirective *create(ASTNodeKind NK, POSSpecifier POSSpec,
-                                        const Integer *Int, const Expr *Id) {
+                                        const Integer *Int,
+                                        const Expression *Id) {
     return new ElementDirective(NK, POSSpec, Int, Id);
   }
 
@@ -51,7 +52,7 @@ public:
 private:
   const POSSpecifier POSSpec;
   const Integer *Int;
-  const Expr *Identifiers;
+  const Expression *Identifiers;
 };
 
 } // end namespace phaeton

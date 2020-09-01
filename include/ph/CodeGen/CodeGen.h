@@ -21,8 +21,8 @@
 
 namespace phaeton {
 
-class ExprNode;
-class ExprNodeBuilder;
+class ExpressionNode;
+class ExpressionNodeBuilder;
 
 class CodeGen : public ASTVisitor {
 public:
@@ -30,14 +30,14 @@ public:
   // A program has input and output specifier, both of which
   // are generated as function arguments.
   struct Assignment {
-    ExprNode *LHS;
-    ExprNode *RHS;
+    ExpressionNode *LHS;
+    ExpressionNode *RHS;
   };
   struct FuncArg {
     int Position;
     std::string Name;
   };
-  using DeclaredIdListTy = std::list<ExprNode *>;
+  using DeclaredIdListTy = std::list<ExpressionNode *>;
   using AssignmentsListTy = std::list<Assignment>;
   using FuncArgsListTy = std::vector<FuncArg>;
 
@@ -47,15 +47,15 @@ public:
   virtual ~CodeGen();
 
   // Helper methods for accessing and manipulating this object's state.
-  const Sema *getSema() const { return TheSema; }
-  std::string getTemp();
+  const Sema *getSema() const { return ThisSema; }
+  std::string getTmp();
   const std::string &getTgtLangCode() const { return TgtLangCode; }
   void appendCode(const std::string &Code) { TgtLangCode += Code; }
   const std::string &getCGFuncName() const { return CGFuncName; }
 
   // Helper methods for accessing and manipulating state
   // that is built up during CodeGen.
-  ExprNodeBuilder *getENBuilder() { return ENBuilder; }
+  ExpressionNodeBuilder *getExprNodeBuilder() { return ExprNodeBuilder; }
 
   virtual void addDeclaredId(const Decl *D);
   virtual void addAssignment(const Stmt *S);
@@ -102,33 +102,33 @@ public:
                                     const TupleList &Contractions);
   static const std::string getListString(const List &L);
   static const std::string getTupleListString(const TupleList &TList);
-  static const BinaryExpr *extractTensorExprOrNull(const Expr *E);
+  static const BinaryExpr *extractTensorExprOrNull(const Expression *E);
   using DimsTy = std::vector<int>;
-  using TempVecTy = std::vector<std::string>;
+  using TmpVecTy = std::vector<std::string>;
 
-  std::string getTempWithDims(const DimsTy &Dims) {
-    TempVecTy &Temps = FreeTemps[Dims];
+  std::string getTmpWithDims(const DimsTy &Dims) {
+    TmpVecTy &Tmps = FreeTmps[Dims];
 
-    if (Temps.size() == 0) {
-      return getTemp();
+    if (Tmps.size() == 0) {
+      return getTmp();
     } else {
-      auto Result = Temps.back();
-      Temps.pop_back();
+      auto Result = Tmps.back();
+      Tmps.pop_back();
       return Result;
     }
   }
 
-  void freeTempWithDims(const std::string &Name, const DimsTy &Dims) {
-    TempVecTy &Temps = FreeTemps[Dims];
-    Temps.push_back(Name);
+  void freeTmpWithDims(const std::string &Name, const DimsTy &Dims) {
+    TmpVecTy &Tmps = FreeTmps[Dims];
+    Tmps.push_back(Name);
   }
 
 protected:
   // States that are built up during code generation.
 
-  // ENBuilder is used for creating new 'ExprNode' objects, hence we
+  // ExprNodeBuilder is used for creating new 'ExpressionNode' objects, hence we
   // need to keep track of these information.
-  ExprNodeBuilder *ENBuilder;
+  ExpressionNodeBuilder *ExprNodeBuilder;
 
   // Some components of the result target language program.
   DeclaredIdListTy DeclaredIds;
@@ -136,18 +136,22 @@ protected:
   FuncArgsListTy FuncArgs;
 
   // Note: map for Expr in AST, each 'Expr' in the AST is mapped to an
-  // 'ExprNode'.
-  std::map<const Expr *, ExprNode *> ExprTrees;
-  void assertExprTreeMap(const Expr *E) const;
+  // 'ExpressionNode'.
+  std::map<const Expression *, ExpressionNode *> ExprTrees;
+  void assertExprTreeMap(const Expression *E) const;
 
-  void addExprNode(const Expr *E, ExprNode *ENode) { ExprTrees[E] = ENode; }
-  ExprNode *getExprNode(const Expr *E) const { return ExprTrees.at(E); }
+  void addExpressionNode(const Expression *E, ExpressionNode *ENode) {
+    ExprTrees[E] = ENode;
+  }
+  ExpressionNode *getExpressionNode(const Expression *E) const {
+    return ExprTrees.at(E);
+  }
 
 private:
-  std::map<DimsTy, TempVecTy> FreeTemps;
+  std::map<DimsTy, TmpVecTy> FreeTmps;
   // Member variables that tracks the state of this object.
-  const Sema *TheSema;
-  int TempCounter;
+  const Sema *ThisSema;
+  int TmpCounter;
   std::string TgtLangCode;
   const std::string CGFuncName;
 };

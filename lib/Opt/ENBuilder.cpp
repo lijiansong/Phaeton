@@ -4,7 +4,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements interfaces of base class ExprNodeBuilder.
+// This file implements interfaces of base class ExpressionNodeBuilder.
 //
 //===----------------------------------------------------------------------===//
 
@@ -13,8 +13,8 @@
 using namespace phaeton;
 
 #define GEN_BUILDER_CREATE_EXPR_NODE_IMPL(ExprName)                            \
-  ExprName##Expr *ExprNodeBuilder::create##ExprName##Expr(ExprNode *lhs,       \
-                                                          ExprNode *rhs) {     \
+  ExprName##Expr *ExpressionNodeBuilder::create##ExprName##Expr(               \
+      ExpressionNode *lhs, ExpressionNode *rhs) {                              \
     ExprName##Expr *result = ExprName##Expr::create(lhs, rhs);                 \
     AllocatedNodes.insert(result);                                             \
     return result;                                                             \
@@ -30,8 +30,8 @@ GEN_BUILDER_CREATE_EXPR_NODE_IMPL(Product)
 
 #undef GEN_BUILDER_CREATE_EXPR_NODE_IMPL
 
-ContractionExpr *ExprNodeBuilder::createContractionExpr(
-    ExprNode *LHS, const CodeGen::List &LeftIndex, ExprNode *RHS,
+ContractionExpr *ExpressionNodeBuilder::createContractionExpr(
+    ExpressionNode *LHS, const CodeGen::List &LeftIndex, ExpressionNode *RHS,
     const CodeGen::List &RightIndex) {
   ContractionExpr *Res =
       ContractionExpr::create(LHS, LeftIndex, RHS, RightIndex);
@@ -39,24 +39,22 @@ ContractionExpr *ExprNodeBuilder::createContractionExpr(
   return Res;
 }
 
-StackExpr *
-ExprNodeBuilder::createStackExpr(const std::vector<ExprNode *> &Mems) {
+StackExpr *ExpressionNodeBuilder::createStackExpr(
+    const std::vector<ExpressionNode *> &Mems) {
   StackExpr *Res = StackExpr::create(Mems);
   AllocatedNodes.insert(Res);
   return Res;
 }
 
-TranspositionExpr *
-ExprNodeBuilder::createTranspositionExpr(ExprNode *Node,
-                                         const CodeGen::TupleList &IndexPairs) {
+TranspositionExpr *ExpressionNodeBuilder::createTranspositionExpr(
+    ExpressionNode *Node, const CodeGen::TupleList &IndexPairs) {
   TranspositionExpr *Res = TranspositionExpr::create(Node, IndexPairs);
   AllocatedNodes.insert(Res);
   return Res;
 }
 
-IdentifierExpr *
-ExprNodeBuilder::createIdentifierExpr(const std::string &Name,
-                                      const ExprNode::ExprDims &ED) {
+IdentifierExpr *ExpressionNodeBuilder::createIdentifierExpr(
+    const std::string &Name, const ExpressionNode::ExprDims &ED) {
   IdentifierExpr *Res = IdentifierExpr::create(Name, ED);
   AllocatedNodes.insert(Res);
   return Res;
