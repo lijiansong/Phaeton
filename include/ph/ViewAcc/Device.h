@@ -5,7 +5,7 @@
 //===----------------------------------------------------------------------===//
 //
 //  This file defines the Device interface.
-//  Refer to the design of Apache Singa.
+//  Design concept of Device partially comes from Apache Singa.
 //
 //===----------------------------------------------------------------------===//
 
@@ -22,6 +22,8 @@
 #include <type_traits>
 #include <unordered_set>
 #include <vector>
+
+#include "ph/ViewAcc/Context.h"
 
 namespace phaeton {
 
@@ -83,14 +85,10 @@ public:
   /// wait for all operations submitted to this device.
   virtual void Sync();
 
-  int id() const { return id_; }
-
   /// Return the programming language for this device.
-  LangType lang() const { return lang_; }
+  LangType lang() const { return Lang_; }
 
-  Context *context(int k) { return &ctx_; }
-
-  bool graph_enabled() const { return graph_enabled_; }
+  Context *context(int k) { return &Ctx_; }
 
   virtual std::shared_ptr<Device> host() const { return host_; }
 
@@ -117,16 +115,16 @@ protected:
   int DeviceId = 0;
   /// The computational graph
   CodeGen *CG = nullptr;
-  /// Programming language type, could be kCpp, kCuda, kOpencl
-  LangType lang_;
+  /// Programming language type, could be Cpp, Cuda, OpenCL, Bang and etc.
+  LangType Lang_;
   /// The host device
-  std::shared_ptr<Device> host_;
+  std::shared_ptr<Device> Host_;
 
-  Context ctx_;
+  Context Ctx_;
 
   /// Device type, could be DT_CppCPU, DT_CudaGPU, DT_SwapCudaGPU,
   /// DT_OpenclDevice.
-  DeviceType device_type_;
+  DeviceType DeviceType_;
 };
 
 } // end namespace phaeton
